@@ -1,4 +1,4 @@
-﻿@charset "utf-8";
+@charset "utf-8";
 
 header {
     min-height: 10vh;
@@ -7,9 +7,18 @@ header {
 
 main {
     min-height: 90vh;
+}
+
+nav {
     border: solid chocolate;
 }
 
 footer {
     text-align: center;
+}
+
+img {
+    width: 100%;
+    height: auto;
+    max-width: 600px;
 }
