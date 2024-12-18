@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <title>깃허브로 블로그 만들기 Part 3</title>
+    <title>Jekyll없이 깃허브 블로그 만들기 Part 3</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../css/Style1.css" />
     <link rel="icon" href="../image/favicon.ico" type="image/x-icon">
@@ -9,12 +9,25 @@
 <body>
     <div id="header"></div>
     <main>
-        <h1>깃허브로 블로그 만들기 Part 3</h1>
+        <h1>Jekyll없이 깃허브 블로그 만들기 Part 3</h1>
         <h2>1. HTML 파일을 템플릿 형식으로 분리하기</h2>
         여러 페이지에서 공용으로 사용할 수 있는 부분을 재사용하기 위해서 분리한다
-        <h4>1-1. </h4>dhk한글
+        <h4>1-1. header.html과 footer.html을 작성 후, 불러올 JavaScript 코드를 작성</h4>
+        예시 js코드<br />
+        <img src="../image/JsCode01.png" alt="JsCode01.png" /><br />
+        예시 html코드<br />
+        &lt;body&gt;<br />
+        &lt;div id="header"&gt;&lt;/div&gt;<br />
+        &lt;main&gt;<br />
+        본문<br />
+        &lt;/main&gt;<br />
+        &lt;div id="footer"&gt;&lt;/div&gt;<br />
+        &lt;script src="js/includehtml.js"&gt;&lt;/script&gt;<br />
+        &lt;/body&gt;<br />
+        <h4>이렇게 하면 웹 페이지의 유지 보수가 쉬워지고, 코드도 더 깔끔해진다</h4>
 
-        <h4><a href="./CreateBlog4.html">깃허브로 블로그 만들기 Part 4</a></h4>
+
+        <h4><a href="./CreateBlog4.html">Jekyll없이 깃허브 블로그 만들기 Part 4</a></h4>
 
     </main>
     <div id="footer"></div>
