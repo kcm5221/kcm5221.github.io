@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <title>깃허브로 블로그 만들기 Part 2</title>
+    <title>Jekyll없이 깃허브 블로그 만들기 Part 2</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../css/Style1.css" />
     <link rel="icon" href="../image/favicon.ico" type="image/x-icon">
@@ -9,12 +9,12 @@
 <body>
     <div id="header"></div>
     <main>
-        <h1>깃허브로 블로그 만들기 Part 2</h1>
+        <h1>Jekyll없이 깃허브 블로그 만들기 Part 2</h1>
         <h2>1. 라이브서버 설치</h2>
         실시간으로 편하게 확인하기 위해선 라이브서버를 설치할 필요가 있다
         <h4>1-1. Node.js를 다운받고 설치한다</h4>
         <h4>1-2. cmd를 실행하고 npm i -D live-server 를 입력해서 설치한다</h4>
-        <h4>1-3. 폴더위치에서 cmd로 입력하고 live-server를 입력하면 실행 된다 </h4>
+        <h4>1-3. 폴더위치에서 cmd로 입력하고 npx live-server를 입력하면 실행 된다 </h4>
 
         <h2>2. 비주얼 스튜디오 인코딩 설정</h2>
         인코딩 설정이 잘못되면 문자가 깨질수있다 생성되는 파일들을 utf-8로 설정한다
@@ -41,8 +41,8 @@
         <pre id="code-block"></pre>
         <script>
             const code = `
-                    <h1>안녕하세요!</h1>
-                    <p>이 문장은 코드로 표시됩니다.</p>
+                            <h1>안녕하세요!</h1>
+                            <p>이 문장은 코드로 표시됩니다.</p>
 `;
             document.getElementById('code-block').textContent = code;
         </script>
@@ -53,7 +53,7 @@
         <h4>구현된걸 확인할땐 캐시를 지우기 위해서 Ctrl + Shift + R, Shift + F5를 사용하자</h4>
         <h4>깃허브는 커밋후에도 사이트에 적용이 바로 안될수있다 라이브서버에서 성공했다면 기다리면 된다</h4>
         <br />
-        <h4><a href="./CreateBlog3.html">깃허브로 블로그 만들기 Part 3</a></h4>
+        <h4><a href="./CreateBlog3.html">Jekyll없이 깃허브 블로그 만들기 Part 3</a></h4>
     </main>
     <div id="footer"></div>
     <script src="../js/includehtml.js"></script>
