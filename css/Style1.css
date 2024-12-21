@@ -1,8 +1,8 @@
 @charset "utf-8";
 
 header {
+    font-size: 20px;
     min-height: 10vh;
-    border: solid red;
 }
 
 main {
@@ -10,7 +10,6 @@ main {
 }
 
 nav {
-    border: solid chocolate;
 }
 
 footer {
@@ -21,4 +20,31 @@ img {
     width: 100%;
     height: auto;
     max-width: 600px;
+}
+
+.content-wrapper {
+    display: flex; /* 플렉스 레이아웃 활성화 */
+    justify-content: space-between; /* 항목 사이에 공간을 균등 배분 */
+    align-items: flex-start; /* 세로 정렬 */
+}
+
+/* 각 영역에 스타일 추가 */
+nav, main, aside {
+    padding: 20px;
+    margin: 10px;
+}
+
+/* nav, aside 영역의 크기 조정 */
+nav, aside {
+    width: 20%; /* 네비게이션과 사이드는 20% 폭 */
+}
+
+/* main 영역 크기 조정 */
+main {
+    width: 55%; /* main 영역은 55% 폭 */
+}
+
+a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: inherit; /* 부모 요소의 색상 그대로 사용 */
 }
