@@ -10,6 +10,28 @@ main {
 }
 
 nav {
+    padding: 20px;
+    margin: 10px;
+    position: fixed; /* 화면에 고정 */
+    top: 20px; /* 상단에서 떨어진 거리 */
+    left: 0;
+    width: 20%; /* 고정된 너비 */
+    height: 100vh; /* 화면의 높이만큼 고정 */
+    overflow: auto; /* 내용이 넘치면 스크롤이 생기게 */
+    z-index: 1000; /* 다른 요소들 위로 배치 */
+}
+
+aside {
+    padding: 20px;
+    margin: 10px;
+    position: fixed; /* 화면에 고정 */
+    top: 20px; /* 상단에서 떨어진 거리 */
+    right: 0; /* 오른쪽 고정 */
+    width: 20%; /* 고정된 너비 */
+    height: 100vh; /* 화면의 높이만큼 고정 */
+    overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
+    z-index: 1000; /* 다른 요소들 위로 배치 */
+    font-size: 14px; /* 글자 크기를 14px로 설정 */
 }
 
 footer {
@@ -26,25 +48,28 @@ img {
     display: flex; /* 플렉스 레이아웃 활성화 */
     justify-content: space-between; /* 항목 사이에 공간을 균등 배분 */
     align-items: flex-start; /* 세로 정렬 */
-}
-
-/* 각 영역에 스타일 추가 */
-nav, main, aside {
-    padding: 20px;
-    margin: 10px;
-}
-
-/* nav, aside 영역의 크기 조정 */
-nav, aside {
-    width: 20%; /* 네비게이션과 사이드는 20% 폭 */
+    margin-left: 20%; /* nav 고정 영역을 제외한 공간 */
+    margin-right: 20%; /* aside 고정 영역을 제외한 공간 */
 }
 
 /* main 영역 크기 조정 */
 main {
-    width: 55%; /* main 영역은 55% 폭 */
+    width: 100%; /* main 영역은 남은 공간을 차지 */
+    margin-left: 0; /* 왼쪽 마진 제거 */
+    margin-right: 0; /* 오른쪽 마진 제거 */
 }
 
 a {
     text-decoration: none; /* 밑줄 제거 */
     color: inherit; /* 부모 요소의 색상 그대로 사용 */
+    font-weight: bolder; /* 부모보다 글씨 굵게*/
+}
+
+    a:hover {
+        text-decoration: underline;
+        color: #BDBDBD;
+    }
+
+pre {
+    font-family: sans-serif;
 }
