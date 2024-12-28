@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 asideContainer.innerHTML = html;
 
                 // Now proceed to generate the table of contents
-                const headings = mainContent.querySelectorAll("h2, h3, h4");
+                const headings = mainContent.querySelectorAll("h2, h3, h4, .profile th");
                 const tocList = document.createElement("ul");
 
                 headings.forEach((heading, index) => {

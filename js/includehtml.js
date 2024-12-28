@@ -28,3 +28,16 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => console.error('aside.html load fail', error));
 });
+
+// 오른쪽 클릭 방지
+document.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+});
+
+// 이미지 드래그 방지
+document.addEventListener("dragstart", (event) => {
+    if (event.target.tagName === "IMG") {
+        event.preventDefault();
+        alert("이미지를 드래그할 수 없습니다.");
+    }
+});
