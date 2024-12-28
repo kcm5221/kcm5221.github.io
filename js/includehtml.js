@@ -38,6 +38,5 @@ document.addEventListener("contextmenu", (event) => {
 document.addEventListener("dragstart", (event) => {
     if (event.target.tagName === "IMG") {
         event.preventDefault();
-        alert("이미지를 드래그할 수 없습니다.");
     }
 });
