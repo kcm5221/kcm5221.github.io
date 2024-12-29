@@ -1,5 +1,9 @@
 @charset "utf-8";
 
+body {
+    background-color: white;
+}
+
 header {
     font-size: 20px;
     min-height: 10vh;
@@ -99,3 +103,28 @@ pre {
         font-size: 16px;
         margin-left: 10px;
     }
+
+/* 라이트 모드 */
+html[theme="light-mode"] {
+    transition: 0.4s;
+}
+
+html[theme="dark-mode"] {
+    filter: invert(100%) hue-rotate(180deg);
+    transition: 0.4s;
+}
+
+    /* 다크 모드에서 특정 요소 제외 */
+    html[theme="dark-mode"] img {
+        filter: invert(100%) hue-rotate(180deg); /* 이미지 반전 방지 */
+    }
+
+#toggleTheme {
+    float: right;
+    margin-right: 5%;
+}
+
+#HeaderSearch {
+    float: right;
+    margin-right: 1%;
+}
