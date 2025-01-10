@@ -1,0 +1,53 @@
+[
+
+    {
+        "id": "B1",
+        "title": "처음읽는 양자컴퓨터 이야기",
+        "url": "html/BookReview/Book001.html",
+        "content": "책 독서 양자 컴퓨터"
+    },
+    {
+        "id": "E1",
+        "title": "Jekyll없이 깃허브 블로그 만들기 Part 1",
+        "url": "html/Etc/CreateBlog.html",
+        "content": "깃허브 페이지 생성 깃허브 로그인 리포지토리 생성 리포지토리Settings 깃허브Desktop 비주얼 스튜디오 설치"
+    },
+    {
+        "id": "E2",
+        "title": "Jekyll없이 깃허브 블로그 만들기 Part 2",
+        "url": "html/Etc/CreateBlog.html2",
+        "content": "라이브서버 설치 실시간 Node.js 노드.js npm i -D live-server 비주얼 스튜디오 인코딩 설정  utf-8 editorconfig 코드 텍스트 보기 Ctrl Shift R, Shift F5"
+    },
+    {
+        "id": "E3",
+        "title": "Jekyll없이 깃허브 블로그 만들기 Part 3",
+        "url": "html/Etc/CreateBlog3.html",
+        "content": "템플릿 형식 분리 공용 재사용"
+    },
+    {
+        "id": "E4",
+        "title": "Jekyll없이 깃허브 블로그 만들기 Part 4",
+        "url": "html/Etc/CreateBlog4.html",
+        "content": "비밀번호 설정 인증 암호 패스워드password 비번"
+    },
+    {
+        "id": "E5",
+        "title": "Jekyll없이 깃허브 블로그 만들기 Part 5",
+        "url": "html/Etc/CreateBlog5.html",
+        "content": "다크모드 전환 테마전환 토글버튼 dark"
+    },
+    {
+        "id": "E6",
+        "title": "Jekyll없이 깃허브 블로그 만들기 Part 6",
+        "url": "html/Etc/CreateBlog6.html",
+        "content": "검색기능 search 찾기 입력"
+    },
+    {
+        "id": "EA1",
+        "title": "WebUI 설치하기",
+        "url": "html/Etc/DownloadWebUI.html",
+        "content": "WebUI 설치 AI그림 웹유아이"
+    }
+
+
+]

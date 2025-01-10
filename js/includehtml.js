@@ -81,6 +81,23 @@ function postHeaderLoad() {
     } else {
         console.error("다크 모드 토글 버튼을 찾을 수 없습니다! HTML 구조를 확인하세요.");
     }
+
+    // 검색 기능 초기화
+    const searchInput = document.getElementById('HeaderSearch');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    // 검색 결과 페이지로 이동하며 쿼리 전달
+                    window.location.href = `/search.html?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+        console.log("검색 기능 초기화 완료");
+    } else {
+        console.error("검색 입력란을 찾을 수 없습니다!");
+    }
 }
 
 // 초기화 함수

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>Jekyll없이 깃허브 블로그 만들기 Part 6</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../css/Style1.css" />
+    <link rel="icon" href="../../image/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>Jekyll없이 깃허브 블로그 만들기 Part 6</h1>
+            <div style="text-align: right; margin-right: 100px;">2025.01.10</div>
+            <h2>1. 검색기능 구현</h2>
+            <h4>1-1. searchData.json 파일을 생성 </h4>
+            <pre><code>
+    [
+     {
+        "id": "1",
+        "title": "홈 페이지",
+        "url": "/index.html",
+        "content": "이 페이지는 홈 페이지입니다. 주요 내용을 설명합니다."
+     },
+     {
+       "id": "2",
+       "title": "아무거나",
+       "url": "/aa.html",
+       "content": "키워드 추가."
+     }
+    ]
+</code></pre>
+            <h4>1-2. 검색 입력창을 추가 </h4>
+            &lt;input id="HeaderSearch" type="text" placeholder="검색"&gt;
+            <h4>1-3. 검색어 입력 후 검색 결과 페이지로 이동 </h4>
+            search.js 작성, 검색창이 있는 html에 스크립트를 연결
+            <pre><code>
+    document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('HeaderSearch');
+
+    if (searchInput) {
+    searchInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+    const query = searchInput.value.trim();
+    if (query) {
+    // 검색 결과 페이지로 이동하며 쿼리 전달
+    window.location.href = `/search.html?q=${encodeURIComponent(query)}`;
+    }
+    }
+    });
+    } else {
+    console.error("검색 입력란을 찾을 수 없습니다!");
+    }
+    });
+</code></pre>
+            <h4>1-4. 검색 결과 페이지 생성 </h4>
+            검색 결과를 표시할 search.html 페이지 작성
+            <h4>1-5. 검색 결과 로직 작성 </h4>
+            searchResult.js 파일을 작성한다. 검색어를 기반으로 JSON 데이터를 검색하여 결과를 화면에 표시한다.
+            <pre><code>
+    document.addEventListener(&#39;DOMContentLoaded&#39;, () =&gt; {
+    const query = new URLSearchParams(window.location.search).get(&#39;q&#39;);
+    if (!query) {
+    return displayMessage(&#39;검색어를 입력해주세요.&#39;);
+    }
+    fetch(&#39;/json/searchData.json&#39;)
+    .then(response =&gt; response.json())
+    .then(data =&gt; displayResults(data.filter(item =&gt; matchQuery(item, query)), query))
+    .catch(() =&gt; displayMessage(&#39;검색 데이터를 불러오지 못했습니다.&#39;));
+    });
+    function matchQuery(item, query) {
+    const lowerQuery = query.toLowerCase();
+    return item.title.toLowerCase().includes(lowerQuery) || item.content.toLowerCase().includes(lowerQuery);
+    }
+    function displayResults(results, query) {
+    const container = document.getElementById(&#39;searchResults&#39;);
+    container.innerHTML = results.length
+    ? results.map(result =&gt; `
+    &lt;div&gt;
+    &lt;h2&gt;&lt;a href=&quot;${result.url}&quot;&gt;${highlight(result.title, query)}&lt;/a&gt;&lt;/h2&gt;
+    &lt;p&gt;${highlight(snippet(result.content, query), query)}&lt;/p&gt;
+    &lt;/div&gt;
+    `).join(&#39;&#39;)
+    : &#39;&lt;p&gt;검색 결과가 없습니다.&lt;/p&gt;&#39;;
+    }
+    function highlight(text, query) {
+    return text.replace(new RegExp(`(${query})`, &#39;gi&#39;), &#39;&lt;span class=&quot;highlight&quot;&gt;$1&lt;/span&gt;&#39;);
+    }
+    function snippet(content, query) {
+    const index = content.toLowerCase().indexOf(query.toLowerCase());
+    return index === -1
+    ? &#39;&#39;
+    : content.substring(Math.max(0, index - 25), Math.min(content.length, index + 25)) + &#39;...&#39;;
+    }
+    function displayMessage(message) {
+    document.getElementById(&#39;searchResults&#39;).innerHTML = `&lt;p&gt;${message}&lt;/p&gt;`;
+    }
+</code></pre>
+        </main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+    <script src="../../js/includehtml.js"></script>
+    <script src="../../js/MoveAside.js"></script>
+</body>
+</html>
