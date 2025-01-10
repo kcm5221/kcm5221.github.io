@@ -128,3 +128,12 @@ html[theme="dark-mode"] {
     float: right;
     margin-right: 1%;
 }
+
+#searchResults {
+    margin-top: 20px;
+}
+
+.highlight {
+    background-color: lightgreen;
+    font-weight: bold;
+}
