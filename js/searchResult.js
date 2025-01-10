@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    fetch(`json/searchData.json?${Date.now()}`)
+    fetch(`json/SearchData.json?${Date.now()}`)
         .then(response => response.json())
         .then(data => {
             const lowerCaseQuery = query.toLowerCase().trim(); // 검색어 소문자로 변환 및 공백 제거
