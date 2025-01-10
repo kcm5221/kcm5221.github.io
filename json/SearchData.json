@@ -15,7 +15,7 @@
     {
         "id": "E2",
         "title": "Jekyll없이 깃허브 블로그 만들기 Part 2",
-        "url": "html/Etc/CreateBlog.html2",
+        "url": "html/Etc/CreateBlog2.html",
         "content": "라이브서버 설치 실시간 Node.js 노드.js npm i -D live-server 비주얼 스튜디오 인코딩 설정  utf-8 editorconfig 코드 텍스트 보기 Ctrl Shift R, Shift F5"
     },
     {
