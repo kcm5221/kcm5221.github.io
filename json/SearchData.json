@@ -7,6 +7,12 @@
         "content": "책 독서 양자 컴퓨터"
     },
     {
+        "id": "B2",
+        "title": "혼자 공부하는 얄팍한 코딩지식",
+        "url": "html/BookReview/Book002.html",
+        "content": "책 독서 코딩 입문 기초지식 개발자 it"
+    },
+    {
         "id": "E1",
         "title": "Jekyll없이 깃허브 블로그 만들기 Part 1",
         "url": "html/Etc/CreateBlog.html",
