@@ -137,3 +137,7 @@ html[theme="dark-mode"] {
     background-color: lightgreen;
     font-weight: bold;
 }
+
+li {
+    margin-bottom: 10px;
+}
