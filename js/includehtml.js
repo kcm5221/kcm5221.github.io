@@ -34,27 +34,35 @@ function loadComponent(url, elementId, callback) {
 
 // 헤더 로드 후 초기화 작업
 function postHeaderLoad() {
-    // 비밀번호 확인 로직
-    const isAuthenticated = sessionStorage.getItem("authenticated");
-    const passwordPrompt = document.getElementById("passwordPrompt");
-    if (!isAuthenticated) {
-        passwordPrompt.style.display = "flex"; // 비밀번호 입력 창 표시
-    } else {
-        passwordPrompt.style.display = "none"; // 숨기기
-    }
 
-    // 비밀번호 입력 처리
-    const checkPasswordButton = document.querySelector("#passwordPrompt button");
-    if (checkPasswordButton) {
-        checkPasswordButton.addEventListener("click", () => {
-            const enteredPassword = document.getElementById("passwordInput").value;
-            if (enteredPassword === "Open") {
-                sessionStorage.setItem("authenticated", "true");
-                passwordPrompt.style.display = "none";
-            } else {
-                alert("비밀번호가 틀렸습니다!");
-            }
-        });
+    const currentPath = window.location.pathname; // 현재 경로 확인
+    if (currentPath === "/OtherProject/KimchiRun/index.html") {
+        // 특정 HTML 페이지에서 비밀번호 확인 없이 진행
+        console.log("비밀번호 확인이 비활성화되었습니다.");
+    } else {
+
+        // 비밀번호 확인 로직
+        const isAuthenticated = sessionStorage.getItem("authenticated");
+        const passwordPrompt = document.getElementById("passwordPrompt");
+        if (!isAuthenticated) {
+            passwordPrompt.style.display = "flex"; // 비밀번호 입력 창 표시
+        } else {
+            passwordPrompt.style.display = "none"; // 숨기기
+        }
+
+        // 비밀번호 입력 처리
+        const checkPasswordButton = document.querySelector("#passwordPrompt button");
+        if (checkPasswordButton) {
+            checkPasswordButton.addEventListener("click", () => {
+                const enteredPassword = document.getElementById("passwordInput").value;
+                if (enteredPassword === "Open") {
+                    sessionStorage.setItem("authenticated", "true");
+                    passwordPrompt.style.display = "none";
+                } else {
+                    alert("비밀번호가 틀렸습니다!");
+                }
+            });
+        }
     }
 
     // 다크 모드 토글 로직
