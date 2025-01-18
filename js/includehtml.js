@@ -36,7 +36,7 @@ function loadComponent(url, elementId, callback) {
 function postHeaderLoad() {
 
     const currentPath = window.location.pathname; // 현재 경로 확인
-    if (currentPath === "/OtherProject/KimchiRun/index.html") {
+    if (currentPath === "/html/Etc/KimchiRun.html") {
         // 특정 HTML 페이지에서 비밀번호 확인 없이 진행
         console.log("비밀번호 확인이 비활성화되었습니다.");
     } else {
