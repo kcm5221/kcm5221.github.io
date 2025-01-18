@@ -66,6 +66,12 @@
         "url": "html/Etc/RandomNumber.html",
         "content": "랜덤 숫자 생성 RandomNumber"
     }
+    {
+        "id": "EA3",
+        "title": "유니티 - 김치런",
+        "url": "html/Etc/KimchiRun.html",
+        "content": "유니티게임 김치런 unitygame kimchirun"
+    }
 
 
 ]
