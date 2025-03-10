@@ -29,10 +29,10 @@ aside {
     padding: 20px;
     margin: 10px;
     position: fixed; /* 화면에 고정 */
-    top: 20px; /* 상단에서 떨어진 거리 */
+    top: 30px; /* 상단에서 떨어진 거리 */
+    bottom: 30px;
     right: 0; /* 오른쪽 고정 */
     width: 20%; /* 고정된 너비 */
-    height: 100vh; /* 화면의 높이만큼 고정 */
     overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
     z-index: 1000; /* 다른 요소들 위로 배치 */
     font-size: 14px; /* 글자 크기를 14px로 설정 */
