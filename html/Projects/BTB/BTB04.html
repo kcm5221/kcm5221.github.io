@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>PlayerManager 및 거점 점수 UI 구현</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../css/Style1.css" />
+    <link rel="icon" href="../../../image/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>PlayerManager 및 거점 점수 UI 구현</h1>
+            <div style="text-align: right;margin-right: 100px;">2025.03.17 ~ 2025.03.19</div>
+            <br />
+            <h2>1. 개념 정리</h2>
+            <p><strong>싱글톤 패턴</strong></p>
+            <ul>
+                <li>클래스가 인스턴스를 단 하나만 갖도록 보장</li>
+                <li>어디에서든 접근할 수 있도록 전역 액세스 제공 </li>
+            </ul>
+            <p><strong>MVP (Model-View-Presenter) 패턴</strong></p>
+            <ul>
+                <li>UI를 담당하는 코드(View)와 로직을 담당하는 코드(Model)를 분리하여 유지보수성을 높이는 디자인 패턴</li>
+                <li><strong>Model (모델):</strong> 데이터를 관리하는 역할</li>
+                <li><strong>View (뷰):</strong> UI 요소를 담당하고 데이터를 표시하는 역할</li>
+                <li><strong>Presenter (프레젠터):</strong> Model과 View를 연결하는 역할</li>
+            </ul>
+
+            <h2>2. PlayerManager 구현</h2>
+            <p>세션 내 전체 플레이어를 저장하고 관리하는 싱글톤 클래스</p>
+            <p>DontDestroyOnLoad로 씬이 변경되더라도 유지될 수 있도록 설정</p>
+            <pre><code>
+    public static GameManager Instance { get; private set; }
+
+    private void Awake()
+    {
+    if (Instance == null)
+    {
+    Instance = this;
+    DontDestroyOnLoad(gameObject);
+    }
+    else
+    {
+    Destroy(gameObject);
+    }
+    }
+</code></pre>
+
+            <h2>3. 거점 점수 UI 시스템 구현</h2>
+
+            <h2>4. 문제 해결 및 개선</h2>
+            <p><strong>OnPlayerDied 실행 안됨</strong></p>
+            <ul>
+                <li><strong>원인: </strong>OnPlayerDied 이벤트에 구독한 코드가 없어서 null 상태이며 실행되지 않음</li>
+                <li>
+                    <strong>해결 방법: </strong>이벤트는 null 상태일 때 실행되지 않으므로 PlayerManager 외부에서 구독하는 코드 추가.
+                    <pre><code>PlayerManager.Instance.OnPlayerDied += HandlePlayerDeath;</code></pre>
+                </li>
+            </ul>
+            <br />
+            <br />
+            <div style="text-align: right;margin-right: 100px;"><a href="./BTB01.html">프로젝트 BTB</a></div>
+            <br />
+        </main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+
+    <script src="../../../js/includehtml.js"></script>
+    <script src="../../../js/MoveAside.js"></script>
+</body>
+</html>
