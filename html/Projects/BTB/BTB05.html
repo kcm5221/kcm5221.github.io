@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>캐릭터 선택 UI 구현 (MVP 패턴)</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../css/Style1.css" />
+    <link rel="icon" href="../../../image/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>캐릭터 선택 UI 구현 (MVP 패턴)</h1>
+            <div style="text-align: right;margin-right: 100px;">2025.03.25</div>
+            <br />
+
+            <h2>1. 개념 정리</h2>
+            <p><strong>MVP (Model-View-Presenter) 패턴</strong></p>
+            <ul>
+                <li>UI를 구성하는 View와 처리 로직인 Presenter를 분리하여 유지보수성을 높이는 디자인 패턴</li>
+                <li><strong>View:</strong> 버튼 등 UI 구성과 사용자 입력 처리</li>
+                <li><strong>Presenter:</strong> View와 로직을 연결, 클릭 이벤트 처리</li>
+                <li><strong>Model:</strong> 현재는 존재하지 않지만, 추후 캐릭터 데이터 관리에 사용 가능</li>
+            </ul>
+
+            <h2>2. 캐릭터 선택 시스템 구조</h2>
+            <p>캐릭터 선택 UI를 버튼 프리팹으로 구성하고, MVP 구조에 따라 Viewer, Presenter를 분리함.</p>
+
+            <h3>CharacterSelectButton.cs</h3>
+            <pre><code>
+[SerializeField] string m_CharacterName;
+[SerializeField] Button m_Button;
+
+public string CharacterName => m_CharacterName;
+public event Action&lt;CharacterSelectButton&gt; OnButtonClick;
+
+private void Awake()
+{
+    m_Button.onClick.AddListener(OnButtonClicked);
+}
+
+private void OnButtonClicked()
+{
+    OnButtonClick?.Invoke(this);
+}
+            </code></pre>
+
+            <h3>CharacterSelectViewer.cs</h3>
+            <pre><code>
+[SerializeField] private List&lt;CharacterSelectButton&gt; m_CharacterSelectButtons;
+public List&lt;CharacterSelectButton&gt; CharacterSelectButtons =&gt; m_CharacterSelectButtons;
+            </code></pre>
+
+            <h3>CharacterSelectPresenter.cs</h3>
+            <pre><code>
+[SerializeField] CharacterSelectViewer m_Viewer;
+
+private void Start()
+{
+    for (int i = 0; i &lt; m_Viewer.CharacterSelectButtons.Count; i++)
+    {
+        m_Viewer.CharacterSelectButtons[i].OnButtonClick += OnSelectButtonClick;
+    }
+}
+
+private void OnSelectButtonClick(CharacterSelectButton button)
+{
+    Debug.Log(button.CharacterName);
+}
+            </code></pre>
+
+            <br />
+            <div style="text-align: right;margin-right: 100px;"><a href="./BTB01.html">프로젝트 BTB</a></div>
+            <br />
+        </main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+
+    <script src="../../../js/includehtml.js"></script>
+    <script src="../../../js/MoveAside.js"></script>
+</body>
+</html>
