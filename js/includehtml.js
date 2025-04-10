@@ -32,15 +32,20 @@ function loadComponent(url, elementId, callback) {
     });
 }
 
-// 헤더 로드 후 초기화 작업
+ //헤더 로드 후 초기화 작업
 function postHeaderLoad() {
-
     const currentPath = window.location.pathname; // 현재 경로 확인
-    if (currentPath === "/html/Etc/KimchiRun.html") {
-        // 특정 HTML 페이지에서 비밀번호 확인 없이 진행
+    // 비밀번호 확인이 필요 없는 경우의 조건을 확인
+    const isPasswordRequired = !(
+        currentPath === "/" || // 메인 페이지(루트 경로)
+        currentPath === "/index.html" || // 메인 페이지(명시적 경로)
+        currentPath.startsWith("/html/Projects/") || // 프로젝트 폴더 내 모든 페이지
+        currentPath === "/html/Etc/KimchiRun.html" // 특정 예외 페이지
+    );
+
+    if (!isPasswordRequired) {
         console.log("비밀번호 확인이 비활성화되었습니다.");
     } else {
-
         // 비밀번호 확인 로직
         const isAuthenticated = sessionStorage.getItem("authenticated");
         const passwordPrompt = document.getElementById("passwordPrompt");
