@@ -19,6 +19,12 @@
         "content": "유니티 게임개발 unity game"
     },
     {
+        "id": "B4",
+        "title": "그림과 작동 원리로 쉽게 이해하는 서버의 기초",
+        "url": "html/BookReview/Book004.html",
+        "content": "IP/포트/DNS 프로토콜"
+    },
+    {
         "id": "P1",
         "title": "프로젝트 BTB",
         "url": "html/Projects/BTB/BTB01.html",
