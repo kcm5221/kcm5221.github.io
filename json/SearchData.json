@@ -25,6 +25,12 @@
         "content": "IP/포트/DNS 프로토콜"
     },
     {
+        "id": "B5",
+        "title": "개발자를 위한 챗GPT 활용법",
+        "url": "html/BookReview/Book005.html",
+        "content": "인공지능/AI/언어모델"
+    },
+    {
         "id": "P1",
         "title": "프로젝트 BTB",
         "url": "html/Projects/BTB/BTB01.html",
@@ -84,6 +90,5 @@
         "url": "html/Etc/KimchiRun.html",
         "content": "유니티게임 김치런 unitygame kimchirun"
     }
-
 
 ]
