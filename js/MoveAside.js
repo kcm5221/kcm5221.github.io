@@ -6,6 +6,7 @@ document.addEventListener("componentsLoaded", () => {
 
     if (!main || !aside) return;
 
+    aside.innerHTML = "";
     const toc = document.createElement("ul");
 
     main.querySelectorAll("h2, h3, h4, .profile th").forEach((heading, index) => {
