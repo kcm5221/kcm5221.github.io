@@ -1,3 +1,5 @@
+"use strict";
+
 document.addEventListener('DOMContentLoaded', () => {
     const searchParams = new URLSearchParams(window.location.search);
     const query = searchParams.get('q');
