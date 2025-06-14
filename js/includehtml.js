@@ -1,3 +1,4 @@
+
 (() => {
     "use strict";
 
@@ -65,6 +66,7 @@
         );
 
         if (!requirePassword) return;
+
 
         const passwordPrompt = document.getElementById("passwordPrompt");
         const button = document.querySelector("#passwordPrompt button");
@@ -160,6 +162,7 @@
                 document.dispatchEvent(new Event("componentsLoaded"));
             })
             .catch((error) => console.error("컴포넌트 로드 중 오류 발생:", error));
+
     });
 })();
 

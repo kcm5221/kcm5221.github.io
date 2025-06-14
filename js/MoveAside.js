@@ -25,6 +25,12 @@
                     block: "start",
                 });
             });
+        });
+
+        const li = document.createElement("li");
+        li.appendChild(link);
+        toc.appendChild(li);
+    });
 
             const li = document.createElement("li");
             li.appendChild(link);
