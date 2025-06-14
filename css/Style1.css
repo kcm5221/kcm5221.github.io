@@ -11,6 +11,14 @@ body {
 header {
     font-size: 20px;
     min-height: 10vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
 }
 
 main {
@@ -124,13 +132,11 @@ html[theme="dark-mode"] {
     }
 
 #toggleTheme {
-    float: right;
-    margin-right: 5%;
+    margin-left: 10px;
 }
 
 #HeaderSearch {
-    float: right;
-    margin-right: 1%;
+    margin-right: 0;
 }
 
 #searchResults {
@@ -147,6 +153,16 @@ li {
 }
 
 @media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-controls {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
     nav,
     aside {
         position: static;
