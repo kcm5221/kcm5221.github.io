@@ -5,7 +5,9 @@
 }
 
 body {
-    background-color: white;
+    margin: 0;
+    background-color: var(--bg-color, white);
+    color: var(--text-color, black);
 }
 
 header {
@@ -14,11 +16,18 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 .header-controls {
     display: flex;
     align-items: center;
+}
+
+.header-controls input {
+    padding: 5px 8px;
+    margin-right: 8px;
 }
 
 main {
@@ -35,6 +44,8 @@ nav {
     height: 100vh; /* 화면의 높이만큼 고정 */
     overflow: auto; /* 내용이 넘치면 스크롤이 생기게 */
     z-index: 1000; /* 다른 요소들 위로 배치 */
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 aside {
@@ -48,10 +59,14 @@ aside {
     overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
     z-index: 1000; /* 다른 요소들 위로 배치 */
     font-size: 14px; /* 글자 크기를 14px로 설정 */
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 footer {
     text-align: center;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 img {
@@ -77,7 +92,7 @@ main {
 
 a {
     text-decoration: none; /* 밑줄 제거 */
-    color: inherit; /* 부모 요소의 색상 그대로 사용 */
+    color: var(--link-color);
     font-weight: bolder; /* 부모보다 글씨 굵게*/
 }
 
@@ -118,18 +133,22 @@ pre {
 
 /* 라이트 모드 */
 html[theme="light-mode"] {
-    transition: 0.4s;
+    --bg-color: #ffffff;
+    --text-color: #222222;
+    --link-color: #0000ee;
+    transition: background-color 0.4s, color 0.4s;
 }
 
 html[theme="dark-mode"] {
-    filter: invert(100%) hue-rotate(180deg);
-    transition: 0.4s;
+    --bg-color: #121212;
+    --text-color: #f5f5f5;
+    --link-color: #9ecbff;
+    transition: background-color 0.4s, color 0.4s;
 }
 
-    /* 다크 모드에서 특정 요소 제외 */
-    html[theme="dark-mode"] img {
-        filter: invert(100%) hue-rotate(180deg); /* 이미지 반전 방지 */
-    }
+html[theme="dark-mode"] img {
+    filter: brightness(0.8);
+}
 
 #toggleTheme {
     margin-left: 10px;
@@ -137,6 +156,7 @@ html[theme="dark-mode"] {
 
 #HeaderSearch {
     margin-right: 0;
+    width: 160px;
 }
 
 #searchResults {
@@ -163,6 +183,7 @@ li {
         justify-content: flex-end;
         margin-top: 10px;
     }
+  
     nav,
     aside {
         position: static;
