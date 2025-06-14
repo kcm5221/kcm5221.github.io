@@ -1,5 +1,11 @@
 "use strict";
 
+// 페이지 로드 전에 저장된 테마 적용
+document.documentElement.setAttribute(
+    'theme',
+    localStorage.getItem('theme') || 'light-mode'
+);
+
 document.addEventListener('DOMContentLoaded', () => {
     // 모든 컴포넌트 로드
     Promise.all([
