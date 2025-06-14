@@ -12,10 +12,6 @@ body {
 
 header {
     font-size: 20px;
-    min-height: 10vh;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     background-color: var(--bg-color);
     color: var(--text-color);
 }
@@ -23,11 +19,18 @@ header {
 .header-controls {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
+    min-height: 10vh;
+    width: 100%;
 }
 
 .header-controls input {
     padding: 5px 8px;
     margin-right: 8px;
+}
+
+.site-logo {
+    margin-left: 8px;
 }
 
 main {
@@ -173,19 +176,18 @@ li {
 }
 
 @media (max-width: 768px) {
-    header {
+    .header-controls {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: flex-end;
     }
 
-    .header-controls {
+    #HeaderSearch {
         width: 100%;
-        justify-content: flex-end;
-        margin-top: 10px;
+        margin-right: 0;
+        margin-bottom: 5px;
     }
-  
-    nav,
-    aside {
+
+    nav {
         position: static;
         width: 100%;
         height: auto;
