@@ -1,23 +1,26 @@
-"use strict";
 
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('HeaderSearch');
+(() => {
+    "use strict";
 
-    if (searchInput) {
-        console.log("검색 입력란이 로드되었습니다.");
+    /**
+     * 검색 입력창에서 엔터 키 입력을 감지하여 검색 페이지로 이동합니다.
+     */
+    const initHeaderSearch = () => {
+        const input = document.getElementById("HeaderSearch");
+        if (!input) {
+            console.error("검색 입력란을 찾을 수 없습니다!");
+            return;
+        }
 
-        searchInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                console.log("엔터 키가 눌렸습니다.");
-                const query = searchInput.value.trim();
+        input.addEventListener("keypress", (event) => {
+            if (event.key === "Enter") {
+                const query = input.value.trim();
                 if (query) {
-                    console.log(`검색어: ${query}`);
-                    // 검색 결과 페이지로 이동하며 쿼리 전달
                     window.location.href = `./search.html?q=${encodeURIComponent(query)}`;
                 }
             }
         });
-    } else {
-        console.error("검색 입력란을 찾을 수 없습니다!");
-    }
-});
+    };
+
+    document.addEventListener("DOMContentLoaded", initHeaderSearch);
+})();
