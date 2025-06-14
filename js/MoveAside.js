@@ -1,40 +1,31 @@
-document.addEventListener("componentsLoaded", buildToc);
+"use strict";
 
-function buildToc() {
-    const mainContent = document.querySelector("main");
-    const asideContainer = document.querySelector("aside");
+document.addEventListener("componentsLoaded", () => {
+    const main = document.querySelector("main");
+    const aside = document.querySelector("aside");
 
-    if (!(mainContent && asideContainer)) {
-        return;
-    }
+    if (!main || !aside) return;
 
-    const headings = mainContent.querySelectorAll("h2, h3, h4, .profile th");
-    const tocList = document.createElement("ul");
+    const toc = document.createElement("ul");
 
-    headings.forEach((heading, index) => {
-        if (!heading.id) {
-            heading.id = `heading-${index}`;
-        }
+    main.querySelectorAll("h2, h3, h4, .profile th").forEach((heading, index) => {
+        if (!heading.id) heading.id = `heading-${index}`;
 
-        const listItem = document.createElement("li");
-        const anchor = document.createElement("a");
-        anchor.href = `#${heading.id}`;
-        anchor.textContent = heading.textContent;
-
-        anchor.addEventListener("click", (event) => {
-            event.preventDefault();
+        const link = document.createElement("a");
+        link.href = `#${heading.id}`;
+        link.textContent = heading.textContent;
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
             document.getElementById(heading.id).scrollIntoView({
                 behavior: "smooth",
                 block: "start",
             });
         });
 
-        listItem.appendChild(anchor);
-        tocList.appendChild(listItem);
+        const li = document.createElement("li");
+        li.appendChild(link);
+        toc.appendChild(li);
     });
 
-    asideContainer.appendChild(tocList);
-
-    asideContainer.style.position = "fixed";
-    asideContainer.style.top = "20px";
-}
+    aside.appendChild(toc);
+});
