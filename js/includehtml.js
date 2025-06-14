@@ -1,4 +1,12 @@
-document.addEventListener('DOMContentLoaded', function () {
+"use strict";
+
+// 페이지 로드 전에 저장된 테마 적용
+document.documentElement.setAttribute(
+    'theme',
+    localStorage.getItem('theme') || 'light-mode'
+);
+
+document.addEventListener('DOMContentLoaded', () => {
     // 모든 컴포넌트 로드
     Promise.all([
         loadComponent('/header.html', 'header', postHeaderLoad),
@@ -9,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(() => {
             console.log("모든 컴포넌트 로드 완료");
             initializeApp(); // 초기화 함수 실행
+            document.dispatchEvent(new Event('componentsLoaded'));
         })
         .catch(error => {
             console.error("컴포넌트 로드 중 오류 발생:", error);
@@ -16,24 +25,23 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // 컴포넌트 로드 함수
-function loadComponent(url, elementId, callback) {
-    return new Promise((resolve, reject) => {
+const loadComponent = (url, elementId, callback) =>
+    new Promise((resolve, reject) => {
         fetch(url)
-            .then(response => response.text())
-            .then(data => {
+            .then((r) => r.text())
+            .then((data) => {
                 document.getElementById(elementId).innerHTML = data;
                 if (callback) callback();
                 resolve();
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error(`${url} 로드 실패:`, error);
                 reject(error);
             });
     });
-}
 
  //헤더 로드 후 초기화 작업
-function postHeaderLoad() {
+const postHeaderLoad = () => {
     const currentPath = window.location.pathname; // 현재 경로 확인
     // 비밀번호 확인이 필요 없는 경우의 조건을 확인
     const isPasswordRequired = !(
@@ -114,21 +122,21 @@ function postHeaderLoad() {
 }
 
 // 초기화 함수
-function initializeApp() {
+const initializeApp = () => {
     console.log("애플리케이션 초기화");
     preventContextMenu();
     preventImageDrag();
 }
 
 // 오른쪽 클릭 방지
-function preventContextMenu() {
+const preventContextMenu = () => {
     document.addEventListener("contextmenu", (event) => {
         event.preventDefault();
     });
 }
 
 // 이미지 드래그 방지
-function preventImageDrag() {
+const preventImageDrag = () => {
     document.addEventListener("dragstart", (event) => {
         if (event.target.tagName === "IMG") {
             event.preventDefault();
