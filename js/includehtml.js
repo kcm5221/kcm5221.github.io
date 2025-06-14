@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(() => {
             console.log("모든 컴포넌트 로드 완료");
             initializeApp(); // 초기화 함수 실행
+            document.dispatchEvent(new Event('componentsLoaded'));
         })
         .catch(error => {
             console.error("컴포넌트 로드 중 오류 발생:", error);
