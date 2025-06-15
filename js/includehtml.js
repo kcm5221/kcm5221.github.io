@@ -5,9 +5,14 @@
      * 현재 스크립트 경로를 기반으로 컴포넌트 경로의 기본값을 계산합니다.
      */
     const basePath = (() => {
-        const script = document.currentScript || document.querySelector("script[src*='includehtml.js']");
+        const script =
+            document.currentScript ||
+            document.querySelector("script[src*='includehtml.js']");
         if (!script) return "";
-        return script.src.replace(/js\/includehtml\.js.*$/, "");
+
+        const rawSrc = script.getAttribute("src") || "";
+        const path = rawSrc.replace(/js\/includehtml\.js.*$/, "");
+        return path === "/" ? "" : path;
     })();
     // 이전 작업: 스크립트 위치를 기준으로 경로를 계산하여 모든 페이지에서 동작
 
@@ -62,7 +67,7 @@
      */
     const loadComponents = () =>
         Promise.all([
-            loadComponent(`${basePath}components/header.html`, "header", initHeader),
+            loadComponent(`${basePath}components/header.html`, "header"),
             loadComponent(`${basePath}components/footer.html`, "footer"),
             loadComponent(`${basePath}components/nav.html`, "nav"),
             loadComponent(`${basePath}components/aside.html`, "aside"),
@@ -72,9 +77,16 @@
      * 헤더 로드 후 초기화 작업을 수행합니다.
      */
     const initHeader = () => {
-        initPasswordPrompt();
         initThemeToggle();
         initSearch();
+    };
+
+    const markProfileLinks = () => {
+        document.querySelectorAll('.profile table a').forEach((link) => {
+            link.addEventListener('click', () => {
+                sessionStorage.setItem('fromProfile', 'true');
+            });
+        });
     };
 
     /**
@@ -82,15 +94,19 @@
      */
     const initPasswordPrompt = () => {
         const currentPath = window.location.pathname;
-        const fromIndex = sessionStorage.getItem("fromIndex");
-        if (fromIndex) sessionStorage.removeItem("fromIndex");
+        const fromProfile = sessionStorage.getItem("fromProfile");
+        if (fromProfile) {
+            const prompt = document.getElementById("passwordPrompt");
+            if (prompt) prompt.style.display = "none";
+            sessionStorage.removeItem("fromProfile");
+        }
 
         const requirePassword = !(
             currentPath === "/" ||
             currentPath === "/index.html" ||
             currentPath.startsWith("/html/Projects/") ||
             currentPath === "/html/Etc/KimchiRun.html" ||
-            fromIndex
+            fromProfile
         );
 
         if (!requirePassword) return;
@@ -109,6 +125,7 @@
             if (value === "Open") {
                 sessionStorage.setItem("authenticated", "true");
                 passwordPrompt.style.display = "none";
+                sessionStorage.removeItem("fromProfile");
             } else {
                 alert("비밀번호가 틀렸습니다!");
             }
@@ -192,6 +209,9 @@
         loadComponents()
             .then(() => {
                 initializeApp();
+                initHeader();
+                initPasswordPrompt();
+                markProfileLinks();
                 document.dispatchEvent(new Event("componentsLoaded"));
             })
             .catch((error) => console.error("컴포넌트 로드 중 오류 발생:", error));
