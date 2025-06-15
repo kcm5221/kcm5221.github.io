@@ -63,6 +63,15 @@
         );
 
         headings.forEach((h) => observer.observe(h));
+
+        // 현재 화면에 보이는 섹션을 즉시 강조합니다.
+        const visibleIndex = headings.findIndex((h) => {
+            const rect = h.getBoundingClientRect();
+            return rect.top <= window.innerHeight / 2 && rect.bottom >= 0;
+        });
+        if (visibleIndex !== -1) {
+            links[visibleIndex].classList.add("active");
+        }
     };
 
     document.addEventListener("componentsLoaded", buildTableOfContents);
