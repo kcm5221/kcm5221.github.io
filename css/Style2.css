@@ -45,6 +45,8 @@
 
 .profile a {
     text-decoration: none;
+    color: var(--link-color);
+    font-weight: bold;
 }
 
     .profile a:hover {
