@@ -150,6 +150,7 @@ html[theme="light-mode"] {
     --bg-color: #ffffff;
     --text-color: #222222;
     --link-color: #0000ee;
+    --link-active-color: #ff5722;
     transition: background-color 0.4s, color 0.4s;
 }
 
@@ -157,6 +158,7 @@ html[theme="dark-mode"] {
     --bg-color: #121212;
     --text-color: #f5f5f5;
     --link-color: #9ecbff;
+    --link-active-color: #ff9800;
     transition: background-color 0.4s, color 0.4s;
 }
 
@@ -184,6 +186,11 @@ html[theme="dark-mode"] img {
 
 li {
     margin-bottom: 10px;
+}
+
+aside a.active {
+    color: var(--link-active-color);
+    text-decoration: underline;
 }
 
 /* ===== 모바일 대응 ===== */
