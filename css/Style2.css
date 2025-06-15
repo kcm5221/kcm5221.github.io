@@ -2,6 +2,7 @@
 
 
 /* 프로필 영역 */
+/* 이전 작업: 테마 변수 적용으로 다크모드에서도 동일한 레이아웃 유지 */
 .profile {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -43,6 +44,8 @@
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
 }
 
+
+/* 링크 색상 역시 테마 변수에 따라 변경 */
 .profile a {
     text-decoration: none;
     color: var(--link-color);

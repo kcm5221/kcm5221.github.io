@@ -22,5 +22,6 @@
         });
     };
 
+    // 이전 작업: 헤더가 로드된 후에만 이벤트를 연결하도록 대기
     document.addEventListener("componentsLoaded", initHeaderSearch);
 })();

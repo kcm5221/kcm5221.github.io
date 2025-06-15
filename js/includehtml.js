@@ -9,6 +9,7 @@
         if (!script) return "";
         return script.src.replace(/js\/includehtml\.js.*$/, "");
     })();
+    // 이전 작업: 스크립트 위치를 기준으로 경로를 계산하여 모든 페이지에서 동작
 
     /**
      * 저장된 테마를 문서에 적용합니다.
@@ -27,9 +28,12 @@
      * @param {Function} [callback] 로드 후 실행할 콜백
      */
     const loadComponent = (url, elementId, callback) =>
-        new Promise((resolve, reject) => {
+        new Promise((resolve) => {
             fetch(url)
-                .then((r) => r.text())
+                .then((r) => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.text();
+                })
                 .then((data) => {
                     document.getElementById(elementId).innerHTML = data;
                     if (callback) callback();
@@ -37,7 +41,8 @@
                 })
                 .catch((error) => {
                     console.error(`${url} 로드 실패:`, error);
-                    reject(error);
+                    // 이전 작업: 오류가 발생해도 다른 컴포넌트 로드를 계속 진행
+                    resolve();
                 });
         });
 

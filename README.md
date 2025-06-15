@@ -15,4 +15,6 @@ All pages load common components through `js/includehtml.js`.
 The loader resolves paths relative to the script location so pages work
 whether served from the repository root or viewed locally.
 The sidebar table of contents now highlights the section currently in view.
+Link colors and other theme styles are controlled by CSS variables so dark mode
+applies consistently across pages.
 

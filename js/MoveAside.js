@@ -46,6 +46,7 @@
             .map((a) => document.getElementById(a.getAttribute("href").slice(1)))
             .filter(Boolean);
 
+        // 이전 작업: IntersectionObserver를 사용해 스크롤에 따라 활성 링크 갱신
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
@@ -64,7 +65,7 @@
 
         headings.forEach((h) => observer.observe(h));
 
-        // 현재 화면에 보이는 섹션을 즉시 강조합니다.
+        // 이전 작업: 페이지 로드 시 화면에 보이는 섹션을 즉시 강조
         const visibleIndex = headings.findIndex((h) => {
             const rect = h.getBoundingClientRect();
             return rect.top <= window.innerHeight / 2 && rect.bottom >= 0;
