@@ -32,6 +32,37 @@
         });
 
         aside.appendChild(toc);
+        highlightActiveSection();
+    };
+
+    /**
+     * 스크롤 위치에 따라 목차에서 활성 항목을 표시합니다.
+     */
+    const highlightActiveSection = () => {
+        const links = Array.from(document.querySelectorAll("aside a[href^='#']"));
+        if (links.length === 0) return;
+
+        const headings = links
+            .map((a) => document.getElementById(a.getAttribute("href").slice(1)))
+            .filter(Boolean);
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    const idx = headings.indexOf(entry.target);
+                    if (idx !== -1 && entry.isIntersecting) {
+                        links.forEach((l) => l.classList.remove("active"));
+                        links[idx].classList.add("active");
+                    }
+                });
+            },
+            {
+                rootMargin: "-50% 0px -50% 0px",
+                threshold: 0,
+            }
+        );
+
+        headings.forEach((h) => observer.observe(h));
     };
 
     document.addEventListener("componentsLoaded", buildTableOfContents);

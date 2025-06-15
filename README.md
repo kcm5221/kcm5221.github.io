@@ -12,4 +12,5 @@ Static site containing my blog posts and project notes.
 - **OtherProject/**: external project files
 
 All pages load common components through `js/includehtml.js`.
+The sidebar table of contents now highlights the section currently in view.
 
