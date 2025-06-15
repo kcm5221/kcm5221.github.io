@@ -2,6 +2,15 @@
     "use strict";
 
     /**
+     * 현재 스크립트 경로를 기반으로 컴포넌트 경로의 기본값을 계산합니다.
+     */
+    const basePath = (() => {
+        const script = document.currentScript || document.querySelector("script[src*='includehtml.js']");
+        if (!script) return "";
+        return script.src.replace(/js\/includehtml\.js.*$/, "");
+    })();
+
+    /**
      * 저장된 테마를 문서에 적용합니다.
      */
     const applyStoredTheme = () => {
@@ -37,10 +46,10 @@
      */
     const loadComponents = () =>
         Promise.all([
-            loadComponent("/components/header.html", "header", initHeader),
-            loadComponent("/components/footer.html", "footer"),
-            loadComponent("/components/nav.html", "nav"),
-            loadComponent("/components/aside.html", "aside"),
+            loadComponent(`${basePath}components/header.html`, "header", initHeader),
+            loadComponent(`${basePath}components/footer.html`, "footer"),
+            loadComponent(`${basePath}components/nav.html`, "nav"),
+            loadComponent(`${basePath}components/aside.html`, "aside"),
         ]);
 
     /**
