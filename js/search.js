@@ -22,5 +22,5 @@
         });
     };
 
-    document.addEventListener("DOMContentLoaded", initHeaderSearch);
+    document.addEventListener("componentsLoaded", initHeaderSearch);
 })();
