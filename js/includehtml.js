@@ -1,5 +1,3 @@
-HEAD
-
 (() => {
     "use strict";
 
@@ -32,22 +30,6 @@ HEAD
                     console.error(`${url} 로드 실패:`, error);
                     reject(error);
                 });
-
-document.addEventListener('DOMContentLoaded', function () {
-    // 모든 컴포넌트 로드
-    Promise.all([
-        loadComponent('/header.html', 'header', postHeaderLoad),
-        loadComponent('/footer.html', 'footer'),
-        loadComponent('/nav.html', 'nav'),
-        loadComponent('/aside.html', 'aside'),
-    ])
-        .then(() => {
-            console.log("모든 컴포넌트 로드 완료");
-            initializeApp(); // 초기화 함수 실행
-        })
-        .catch(error => {
-            console.error("컴포넌트 로드 중 오류 발생:", error);
->>>>>>> parent of ebe0c4a (Optimize component loading)
         });
 
     /**
@@ -55,10 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
      */
     const loadComponents = () =>
         Promise.all([
-            loadComponent("/header.html", "header", initHeader),
-            loadComponent("/footer.html", "footer"),
-            loadComponent("/nav.html", "nav"),
-            loadComponent("/aside.html", "aside"),
+            loadComponent("/components/header.html", "header", initHeader),
+            loadComponent("/components/footer.html", "footer"),
+            loadComponent("/components/nav.html", "nav"),
+            loadComponent("/components/aside.html", "aside"),
         ]);
 
     /**
@@ -83,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function () {
         );
 
         if (!requirePassword) return;
-
 
         const passwordPrompt = document.getElementById("passwordPrompt");
         const button = document.querySelector("#passwordPrompt button");
@@ -179,7 +160,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.dispatchEvent(new Event("componentsLoaded"));
             })
             .catch((error) => console.error("컴포넌트 로드 중 오류 발생:", error));
-
     });
 })();
 
