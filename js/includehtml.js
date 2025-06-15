@@ -75,6 +75,15 @@
         initPasswordPrompt();
         initThemeToggle();
         initSearch();
+        markProfileLinks();
+    };
+
+    const markProfileLinks = () => {
+        document.querySelectorAll('.profile table a').forEach((link) => {
+            link.addEventListener('click', () => {
+                sessionStorage.setItem('fromProfile', 'true');
+            });
+        });
     };
 
     /**
@@ -82,15 +91,19 @@
      */
     const initPasswordPrompt = () => {
         const currentPath = window.location.pathname;
-        const fromIndex = sessionStorage.getItem("fromIndex");
-        if (fromIndex) sessionStorage.removeItem("fromIndex");
+        const fromProfile = sessionStorage.getItem("fromProfile");
+        if (fromProfile) {
+            const prompt = document.getElementById("passwordPrompt");
+            if (prompt) prompt.style.display = "none";
+            sessionStorage.removeItem("fromProfile");
+        }
 
         const requirePassword = !(
             currentPath === "/" ||
             currentPath === "/index.html" ||
             currentPath.startsWith("/html/Projects/") ||
             currentPath === "/html/Etc/KimchiRun.html" ||
-            fromIndex
+            fromProfile
         );
 
         if (!requirePassword) return;
@@ -109,6 +122,7 @@
             if (value === "Open") {
                 sessionStorage.setItem("authenticated", "true");
                 passwordPrompt.style.display = "none";
+                sessionStorage.removeItem("fromProfile");
             } else {
                 alert("비밀번호가 틀렸습니다!");
             }
@@ -196,5 +210,7 @@
             })
             .catch((error) => console.error("컴포넌트 로드 중 오류 발생:", error));
     });
+
+    document.addEventListener("componentsLoaded", markProfileLinks);
 })();
 
