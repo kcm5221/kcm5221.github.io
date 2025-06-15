@@ -111,6 +111,18 @@
     }
 
     /**
+     * 프로필 테이블 링크 클릭 시 출처 플래그를 저장합니다.
+     * 중복 선언을 방지하기 위해 함수 선언문을 사용합니다.
+     */
+    const markProfileLinks = () => {
+        document.querySelectorAll(".profile table a").forEach((link) => {
+            link.addEventListener("click", () => {
+                sessionStorage.setItem("fromProfile", "true");
+            });
+        });
+    };
+
+    /**
      * 특정 페이지에 대한 비밀번호 입력을 처리합니다.
      */
     const initPasswordPrompt = () => {
