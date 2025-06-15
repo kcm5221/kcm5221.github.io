@@ -71,31 +71,41 @@
      */
     const initPasswordPrompt = () => {
         const currentPath = window.location.pathname;
+        const fromIndex = sessionStorage.getItem("fromIndex");
+        if (fromIndex) sessionStorage.removeItem("fromIndex");
+
         const requirePassword = !(
             currentPath === "/" ||
             currentPath === "/index.html" ||
             currentPath.startsWith("/html/Projects/") ||
-            currentPath === "/html/Etc/KimchiRun.html"
+            currentPath === "/html/Etc/KimchiRun.html" ||
+            fromIndex
         );
 
         if (!requirePassword) return;
 
         const passwordPrompt = document.getElementById("passwordPrompt");
         const button = document.querySelector("#passwordPrompt button");
-        if (!passwordPrompt || !button) return;
+        const input = document.getElementById("passwordInput");
+        if (!passwordPrompt || !button || !input) return;
 
         if (!sessionStorage.getItem("authenticated")) {
             passwordPrompt.style.display = "flex";
         }
 
-        button.addEventListener("click", () => {
-            const value = document.getElementById("passwordInput").value;
+        const handleConfirm = () => {
+            const value = input.value;
             if (value === "Open") {
                 sessionStorage.setItem("authenticated", "true");
                 passwordPrompt.style.display = "none";
             } else {
                 alert("비밀번호가 틀렸습니다!");
             }
+        };
+
+        button.addEventListener("click", handleConfirm);
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") handleConfirm();
         });
     };
 
