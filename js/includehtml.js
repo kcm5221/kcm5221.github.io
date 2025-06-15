@@ -37,10 +37,10 @@
      */
     const loadComponents = () =>
         Promise.all([
-            loadComponent("/header.html", "header", initHeader),
-            loadComponent("/footer.html", "footer"),
-            loadComponent("/nav.html", "nav"),
-            loadComponent("/aside.html", "aside"),
+            loadComponent("/components/header.html", "header", initHeader),
+            loadComponent("/components/footer.html", "footer"),
+            loadComponent("/components/nav.html", "nav"),
+            loadComponent("/components/aside.html", "aside"),
         ]);
 
     /**
