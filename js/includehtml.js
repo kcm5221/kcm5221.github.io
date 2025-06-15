@@ -35,7 +35,18 @@
                     return r.text();
                 })
                 .then((data) => {
-                    document.getElementById(elementId).innerHTML = data;
+                    const container = document.getElementById(elementId);
+                    container.innerHTML = data;
+                    container
+                        .querySelectorAll("script")
+                        .forEach((oldScript) => {
+                            const newScript = document.createElement("script");
+                            if (oldScript.src) newScript.src = oldScript.src;
+                            if (oldScript.type) newScript.type = oldScript.type;
+                            newScript.textContent = oldScript.textContent;
+                            document.head.appendChild(newScript);
+                            newScript.remove();
+                        });
                     if (callback) callback();
                     resolve();
                 })
