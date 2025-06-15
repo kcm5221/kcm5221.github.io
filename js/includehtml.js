@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+HEAD
 
 (() => {
     "use strict";
@@ -32,7 +32,7 @@
                     console.error(`${url} 로드 실패:`, error);
                     reject(error);
                 });
-=======
+
 document.addEventListener('DOMContentLoaded', function () {
     // 모든 컴포넌트 로드
     Promise.all([
