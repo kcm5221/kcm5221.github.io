@@ -106,13 +106,43 @@ main {
 a {
     text-decoration: none; /* 밑줄 제거 */
     color: var(--link-color);
-    font-weight: bolder; /* 부모보다 글씨 굵게*/
+    font-weight: bold;
 }
 
     a:hover {
         text-decoration: underline;
-        color: #BDBDBD;
+        color: var(--link-active-color);
     }
+
+/* ===== 재사용 클래스 ===== */
+/* 블로그 게시글의 메타 정보를 우측 정렬 */
+.post-meta{
+    text-align:right;
+    margin-right:100px;
+}
+/* 가운데 정렬 섹션 레이아웃 */
+.centered-section{
+    margin:20px 0;
+    text-align:center;
+}
+/* iframe 요소에 간단한 테두리 적용 */
+.iframe-bordered{
+    border:2px solid #000;
+    overflow:hidden;
+}
+/* 큰 링크 버튼 스타일 */
+.large-link{
+    font-size:18px;
+}
+/* 텍스트 중앙 정렬 */
+.text-center{
+    text-align:center;
+}
+/* 화면에서 숨겨야 할 요소 */
+.hidden{
+    display:none;
+}
+
 
 pre {
     font-family: sans-serif;
@@ -145,18 +175,21 @@ pre {
     }
 
 /* ===== 테마 설정 ===== */
+/* 이전 작업: 링크 색상과 활성 색상을 테마 변수에서 관리 */
 /* 라이트 모드 */
 html[theme="light-mode"] {
     --bg-color: #ffffff;
     --text-color: #222222;
-    --link-color: #0000ee;
+    --link-color: black;
+    --link-active-color: #ff5722;
     transition: background-color 0.4s, color 0.4s;
 }
 
 html[theme="dark-mode"] {
     --bg-color: #121212;
     --text-color: #f5f5f5;
-    --link-color: #9ecbff;
+    --link-color: #ffffff;
+    --link-active-color: #ff9800;
     transition: background-color 0.4s, color 0.4s;
 }
 
@@ -184,6 +217,11 @@ html[theme="dark-mode"] img {
 
 li {
     margin-bottom: 10px;
+}
+
+aside a.active {
+    color: var(--link-active-color);
+    text-decoration: underline;
 }
 
 /* ===== 모바일 대응 ===== */

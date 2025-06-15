@@ -1,4 +1,3 @@
-HEAD
 (() => {
     "use strict";
 
@@ -25,65 +24,7 @@ HEAD
                     behavior: "smooth",
                     block: "start",
                 });
-=======
-document.addEventListener("DOMContentLoaded", () => {
-    const mainContent = document.querySelector("main");
-    const asideContainer = document.querySelector("aside");
-
-    if (mainContent && asideContainer) {
-        // Fetch the aside.html content
-        fetch("/aside.html")
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to load aside.html");
-                }
-                return response.text();
-            })
-            .then((html) => {
-                // Load the fetched HTML into the aside container
-                asideContainer.innerHTML = html;
-
-                // Now proceed to generate the table of contents
-                const headings = mainContent.querySelectorAll("h2, h3, h4, .profile th");
-                const tocList = document.createElement("ul");
-
-                headings.forEach((heading, index) => {
-                    // Generate unique ID for each heading if not already present
-                    if (!heading.id) {
-                        heading.id = `heading-${index}`;
-                    }
-
-                    // Create list item with anchor link
-                    const listItem = document.createElement("li");
-                    const anchor = document.createElement("a");
-                    anchor.href = `#${heading.id}`;
-                    anchor.textContent = heading.textContent;
-
-                    // Add event listener for smooth scroll
-                    anchor.addEventListener("click", (event) => {
-                        event.preventDefault();
-                        document.getElementById(heading.id).scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                        });
-                    });
-
-                    listItem.appendChild(anchor);
-                    tocList.appendChild(listItem);
-                });
-
-                asideContainer.appendChild(tocList);
-            })
-            .catch((error) => {
-                console.error("Error loading aside:", error);
->>>>>>> parent of ebe0c4a (Optimize component loading)
             });
-
-<<<<<<< HEAD
-        const li = document.createElement("li");
-        li.appendChild(link);
-        toc.appendChild(li);
-    });
 
             const li = document.createElement("li");
             li.appendChild(link);
@@ -91,14 +32,48 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         aside.appendChild(toc);
+        highlightActiveSection();
+    };
+
+    /**
+     * 스크롤 위치에 따라 목차에서 활성 항목을 표시합니다.
+     */
+    const highlightActiveSection = () => {
+        const links = Array.from(document.querySelectorAll("aside a[href^='#']"));
+        if (links.length === 0) return;
+
+        const headings = links
+            .map((a) => document.getElementById(a.getAttribute("href").slice(1)))
+            .filter(Boolean);
+
+        // 이전 작업: IntersectionObserver를 사용해 스크롤에 따라 활성 링크 갱신
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    const idx = headings.indexOf(entry.target);
+                    if (idx !== -1 && entry.isIntersecting) {
+                        links.forEach((l) => l.classList.remove("active"));
+                        links[idx].classList.add("active");
+                    }
+                });
+            },
+            {
+                rootMargin: "-50% 0px -50% 0px",
+                threshold: 0,
+            }
+        );
+
+        headings.forEach((h) => observer.observe(h));
+
+        // 이전 작업: 페이지 로드 시 화면에 보이는 섹션을 즉시 강조
+        const visibleIndex = headings.findIndex((h) => {
+            const rect = h.getBoundingClientRect();
+            return rect.top <= window.innerHeight / 2 && rect.bottom >= 0;
+        });
+        if (visibleIndex !== -1) {
+            links[visibleIndex].classList.add("active");
+        }
     };
 
     document.addEventListener("componentsLoaded", buildTableOfContents);
 })();
-=======
-        // Fixed position for aside
-        asideContainer.style.position = "fixed";
-        asideContainer.style.top = "20px"; // Fixed position from the top of the viewport
-    }
-});
->>>>>>> parent of ebe0c4a (Optimize component loading)

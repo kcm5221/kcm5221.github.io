@@ -1,7 +1,15 @@
-HEAD
-
 (() => {
     "use strict";
+
+    /**
+     * 현재 스크립트 경로를 기반으로 컴포넌트 경로의 기본값을 계산합니다.
+     */
+    const basePath = (() => {
+        const script = document.currentScript || document.querySelector("script[src*='includehtml.js']");
+        if (!script) return "";
+        return script.src.replace(/js\/includehtml\.js.*$/, "");
+    })();
+    // 이전 작업: 스크립트 위치를 기준으로 경로를 계산하여 모든 페이지에서 동작
 
     /**
      * 저장된 테마를 문서에 적용합니다.
@@ -20,9 +28,12 @@ HEAD
      * @param {Function} [callback] 로드 후 실행할 콜백
      */
     const loadComponent = (url, elementId, callback) =>
-        new Promise((resolve, reject) => {
+        new Promise((resolve) => {
             fetch(url)
-                .then((r) => r.text())
+                .then((r) => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.text();
+                })
                 .then((data) => {
                     document.getElementById(elementId).innerHTML = data;
                     if (callback) callback();
@@ -30,24 +41,9 @@ HEAD
                 })
                 .catch((error) => {
                     console.error(`${url} 로드 실패:`, error);
-                    reject(error);
+                    // 이전 작업: 오류가 발생해도 다른 컴포넌트 로드를 계속 진행
+                    resolve();
                 });
-
-document.addEventListener('DOMContentLoaded', function () {
-    // 모든 컴포넌트 로드
-    Promise.all([
-        loadComponent('/header.html', 'header', postHeaderLoad),
-        loadComponent('/footer.html', 'footer'),
-        loadComponent('/nav.html', 'nav'),
-        loadComponent('/aside.html', 'aside'),
-    ])
-        .then(() => {
-            console.log("모든 컴포넌트 로드 완료");
-            initializeApp(); // 초기화 함수 실행
-        })
-        .catch(error => {
-            console.error("컴포넌트 로드 중 오류 발생:", error);
->>>>>>> parent of ebe0c4a (Optimize component loading)
         });
 
     /**
@@ -55,10 +51,10 @@ document.addEventListener('DOMContentLoaded', function () {
      */
     const loadComponents = () =>
         Promise.all([
-            loadComponent("/header.html", "header", initHeader),
-            loadComponent("/footer.html", "footer"),
-            loadComponent("/nav.html", "nav"),
-            loadComponent("/aside.html", "aside"),
+            loadComponent(`${basePath}components/header.html`, "header", initHeader),
+            loadComponent(`${basePath}components/footer.html`, "footer"),
+            loadComponent(`${basePath}components/nav.html`, "nav"),
+            loadComponent(`${basePath}components/aside.html`, "aside"),
         ]);
 
     /**
@@ -83,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function () {
         );
 
         if (!requirePassword) return;
-
 
         const passwordPrompt = document.getElementById("passwordPrompt");
         const button = document.querySelector("#passwordPrompt button");
@@ -179,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.dispatchEvent(new Event("componentsLoaded"));
             })
             .catch((error) => console.error("컴포넌트 로드 중 오류 발생:", error));
-
     });
 })();
 
