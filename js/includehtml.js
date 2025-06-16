@@ -10,6 +10,17 @@
         return path === "/" ? "" : path;
     })();
 
+    // 공용 유틸 스크립트 로드 보장
+    const ensureUtilsLoaded = () =>
+        new Promise((resolve) => {
+            if (window.utils) return resolve();
+            const s = document.createElement("script");
+            s.src = `${basePath}js/utils.js`;
+            s.onload = resolve;
+            s.onerror = resolve;
+            document.head.appendChild(s);
+        });
+
     // 저장된 테마를 문서에 적용합니다.
     const applyStoredTheme = () => {
         document.documentElement.setAttribute(
@@ -81,18 +92,6 @@
         });
     };
 
-    // 검색 입력 초기화
-    const initSearch = () => {
-        const input = document.getElementById("HeaderSearch");
-        if (!input) return;
-        input.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                const q = input.value.trim();
-                if (q) window.location.href = `${basePath}search.html?q=${encodeURIComponent(q)}`;
-            }
-        });
-    };
-
     // 프로필 링크 클릭 시 플래그 설정
     function markProfileLinks() {
         document.querySelectorAll('.profile table a').forEach((link) => {
@@ -150,13 +149,19 @@
     // 부트스트랩
     document.addEventListener('DOMContentLoaded', () => {
         applyStoredTheme();
-        loadConfig()
+        ensureUtilsLoaded()
+            .then(loadConfig)
             .then(loadComponents)
             .then(() => {
                 document.dispatchEvent(new Event('componentsLoaded'));
                 initializeApp();
                 initThemeToggle();
-                initSearch();
+                if (window.utils) {
+                    window.utils.initSearchInput(
+                        document.getElementById('HeaderSearch'),
+                        basePath
+                    );
+                }
                 initPasswordPrompt();
                 markProfileLinks();
             })
