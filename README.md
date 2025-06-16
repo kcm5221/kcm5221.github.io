@@ -52,6 +52,9 @@ Site behaviour is controlled by `json/config.json`.
 - **disableContextMenu** – when `true`, right‑click and image dragging are
   disabled.
 
+Scripts automatically resolve paths relative to their location so the search
+page and configuration load correctly from subdirectories or local files.
+
 ### Updating search data
 
 `json/SearchData.json` contains the index used by the search feature. Update it

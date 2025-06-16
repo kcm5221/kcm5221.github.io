@@ -88,7 +88,7 @@
         input.addEventListener("keypress", (e) => {
             if (e.key === "Enter") {
                 const q = input.value.trim();
-                if (q) window.location.href = `/search.html?q=${encodeURIComponent(q)}`;
+                if (q) window.location.href = `${basePath}search.html?q=${encodeURIComponent(q)}`;
             }
         });
     };

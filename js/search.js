@@ -2,6 +2,17 @@
 (() => {
     "use strict";
 
+    // 현재 스크립트 경로를 기반으로 검색 페이지 경로의 기본값을 계산합니다.
+    const basePath = (() => {
+        const script =
+            document.currentScript ||
+            document.querySelector("script[src*='search.js']");
+        if (!script) return "";
+        const rawSrc = script.getAttribute("src") || "";
+        const path = rawSrc.replace(/js\/search\.js.*$/, "");
+        return path === "/" ? "" : path;
+    })();
+
     /**
      * 검색 입력창에서 엔터 키 입력을 감지하여 검색 페이지로 이동합니다.
      */
@@ -16,7 +27,7 @@
             if (event.key === "Enter") {
                 const query = input.value.trim();
                 if (query) {
-                    window.location.href = `./search.html?q=${encodeURIComponent(query)}`;
+                    window.location.href = `${basePath}search.html?q=${encodeURIComponent(query)}`;
                 }
             }
         });
