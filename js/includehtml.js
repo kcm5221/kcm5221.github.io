@@ -108,13 +108,14 @@
         );
         if (!needPwd) return;
         const promptEl = document.getElementById('passwordPrompt');
-        const btn = document.querySelector('#passwordPrompt button');
+        const form = document.getElementById('passwordForm');
         const input = document.getElementById('passwordInput');
-        if (!promptEl || !btn || !input) return;
+        if (!promptEl || !form || !input) return;
         if (!sessionStorage.getItem('authenticated')) {
             promptEl.style.display = 'flex';
         }
-        const confirm = () => {
+        const handleSubmit = (e) => {
+            e.preventDefault();
             if (input.value === 'Open') {
                 sessionStorage.setItem('authenticated', 'true');
                 promptEl.style.display = 'none';
@@ -123,10 +124,7 @@
                 alert('비밀번호가 틀렸습니다!');
             }
         };
-        btn.addEventListener('click', confirm);
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') confirm();
-        });
+        form.addEventListener('submit', handleSubmit);
     };
 
     // 앱 초기화: 우클릭/이미지 드래그 방지
