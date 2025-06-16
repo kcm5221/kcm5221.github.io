@@ -22,6 +22,11 @@
         });
     };
 
-    // 이전 작업: 헤더가 로드된 후에만 이벤트를 연결하도록 대기
+    // 헤더가 로드된 후 이벤트를 연결하고, 이미 존재하면 바로 초기화
     document.addEventListener("componentsLoaded", initHeaderSearch);
+    document.addEventListener("DOMContentLoaded", () => {
+        if (document.getElementById("HeaderSearch")) {
+            initHeaderSearch();
+        }
+    });
 })();
