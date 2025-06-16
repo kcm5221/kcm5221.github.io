@@ -24,6 +24,8 @@ header {
     font-size: 20px;
     background-color: var(--bg-color);
     color: var(--text-color);
+    position: relative; /* nav/aside와 겹치지 않도록 */
+    z-index: 1100;      /* nav/aside(1000)보다 높게 */
 }
 
 .header-controls {
@@ -50,7 +52,7 @@ nav {
     padding: 20px;
     margin: 10px;
     position: fixed; /* 화면에 고정 */
-    top: 20px; /* 상단에서 떨어진 거리 */
+    top: 10vh; /* 헤더 높이만큼 아래로 */
     left: 0;
     width: 20%; /* 고정된 너비 */
     height: 100vh; /* 화면의 높이만큼 고정 */
@@ -65,7 +67,7 @@ aside {
     padding: 20px;
     margin: 10px;
     position: fixed; /* 화면에 고정 */
-    top: 30px; /* 상단에서 떨어진 거리 */
+    top: 10vh; /* 헤더 높이만큼 아래로 */
     bottom: 30px;
     right: 0; /* 오른쪽 고정 */
     width: 20%; /* 고정된 너비 */
