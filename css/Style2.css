@@ -10,6 +10,12 @@
     color: var(--text-color);
 }
 
+.profile img {
+    display: block;
+    margin: 0 auto;
+
+}
+
 .profile table {
     width: 80%;
     margin: 0 auto;

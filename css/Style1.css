@@ -51,14 +51,14 @@ main {
 /* ===== 왼쪽 내비게이션 ===== */
 nav {
     padding: 20px;
-    margin: 10px;
-    position: fixed; /* 화면에 고정 */
-    top: 10vh; /* 헤더 높이만큼 아래로 */
+    margin: 10px 0; /* 상하 10px, 좌우 0 */
+    position: fixed;
+    top: 10vh;
     left: 0;
-    width: 20%; /* 고정된 너비 */
-    height: 100vh; /* 화면의 높이만큼 고정 */
-    overflow: auto; /* 내용이 넘치면 스크롤이 생기게 */
-    z-index: 1000; /* 다른 요소들 위로 배치 */
+    width: 20%;
+    height: 100vh;
+    overflow: auto;
+    z-index: 1000;
     background-color: var(--bg-color);
     color: var(--text-color);
 }
@@ -66,7 +66,7 @@ nav {
 /* ===== 본문 우측 목차 ===== */
 aside {
     padding: 20px;
-    margin: 10px;
+    margin: 10px 0; /* 상/하 10px, 좌/우 0 */
     position: fixed; /* 화면에 고정 */
     top: 10vh; /* 헤더 높이만큼 아래로 */
     bottom: 30px;
@@ -225,6 +225,14 @@ li {
 aside a.active {
     color: var(--link-active-color);
     text-decoration: underline;
+}
+
+/* 북리뷰 페이지 본문 최상단 이미지만 반응형 처리 */
+.content-wrapper main > img {
+    display: block;
+    max-width: clamp(225px, 50%, 550px);
+    height: auto;
+    margin: 0 auto;
 }
 
 /* ===== 모바일 대응 ===== */
