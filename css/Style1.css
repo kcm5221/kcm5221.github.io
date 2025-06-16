@@ -24,8 +24,9 @@ header {
     font-size: 20px;
     background-color: var(--bg-color);
     color: var(--text-color);
-    position: relative; /* nav/aside와 겹치지 않도록 */
-    z-index: 1100;      /* nav/aside(1000)보다 높게 */
+    position: sticky; /* 화면 상단에 고정 */
+    top: 0;
+    z-index: 1100;    /* nav/aside(1000)보다 높게 */
 }
 
 .header-controls {
