@@ -20,7 +20,7 @@
 
     // 주어진 URL의 HTML 조각을 특정 요소에 삽입합니다.
     const loadComponent = (url, elementId) =>
-        new Promise((resolve) => {
+        new Promise((resolve, reject) => {
             fetch(url)
                 .then((r) => {
                     if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -42,7 +42,7 @@
                 })
                 .catch((error) => {
                     console.error(`${url} 로드 실패:`, error);
-                    resolve();
+                    reject(error);
                 });
         });
 
@@ -54,6 +54,16 @@
             loadComponent(`${basePath}components/aside.html`, "aside"),
             loadComponent(`${basePath}components/footer.html`, "footer"),
         ]);
+
+    let config = { password: "", disableContextMenu: false };
+
+    const loadConfig = () =>
+        fetch(`${basePath}json/config.json`)
+            .then((r) => r.json())
+            .then((data) => {
+                config = data;
+            })
+            .catch((err) => console.error('설정 로드 실패:', err));
 
     // 다크 모드 토글 초기화
     const initThemeToggle = () => {
@@ -116,7 +126,7 @@
         }
         const handleSubmit = (e) => {
             e.preventDefault();
-            if (input.value === 'Open') {
+            if (input.value === config.password) {
                 sessionStorage.setItem('authenticated', 'true');
                 promptEl.style.display = 'none';
                 sessionStorage.removeItem('fromProfile');
@@ -129,17 +139,21 @@
 
     // 앱 초기화: 우클릭/이미지 드래그 방지
     const initializeApp = () => {
-        document.addEventListener('contextmenu', (e) => e.preventDefault());
-        document.addEventListener('dragstart', (e) => {
-            if (e.target.tagName === 'IMG') e.preventDefault();
-        });
+        if (config.disableContextMenu) {
+            document.addEventListener('contextmenu', (e) => e.preventDefault());
+            document.addEventListener('dragstart', (e) => {
+                if (e.target.tagName === 'IMG') e.preventDefault();
+            });
+        }
     };
 
     // 부트스트랩
     document.addEventListener('DOMContentLoaded', () => {
         applyStoredTheme();
-        loadComponents()
+        loadConfig()
+            .then(loadComponents)
             .then(() => {
+                document.dispatchEvent(new Event('componentsLoaded'));
                 initializeApp();
                 initThemeToggle();
                 initSearch();
