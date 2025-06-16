@@ -10,6 +10,17 @@
         return path === "/" ? "" : path;
     })();
 
+    // 공용 유틸 스크립트 로드 보장
+    const ensureUtilsLoaded = () =>
+        new Promise((resolve) => {
+            if (window.utils) return resolve();
+            const s = document.createElement("script");
+            s.src = `${basePath}js/utils.js`;
+            s.onload = resolve;
+            s.onerror = resolve;
+            document.head.appendChild(s);
+        });
+
     // 저장된 테마를 문서에 적용합니다.
     const applyStoredTheme = () => {
         document.documentElement.setAttribute(
@@ -20,7 +31,7 @@
 
     // 주어진 URL의 HTML 조각을 특정 요소에 삽입합니다.
     const loadComponent = (url, elementId) =>
-        new Promise((resolve) => {
+        new Promise((resolve, reject) => {
             fetch(url)
                 .then((r) => {
                     if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -42,7 +53,7 @@
                 })
                 .catch((error) => {
                     console.error(`${url} 로드 실패:`, error);
-                    resolve();
+                    reject(error);
                 });
         });
 
@@ -54,6 +65,16 @@
             loadComponent(`${basePath}components/aside.html`, "aside"),
             loadComponent(`${basePath}components/footer.html`, "footer"),
         ]);
+
+    let config = { password: "", disableContextMenu: false };
+
+    const loadConfig = () =>
+        fetch(`${basePath}json/config.json`)
+            .then((r) => r.json())
+            .then((data) => {
+                config = data;
+            })
+            .catch((err) => console.error('설정 로드 실패:', err));
 
     // 다크 모드 토글 초기화
     const initThemeToggle = () => {
@@ -71,17 +92,6 @@
         });
     };
 
-    // 검색 입력 초기화
-    const initSearch = () => {
-        const input = document.getElementById("HeaderSearch");
-        if (!input) return;
-        input.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                const q = input.value.trim();
-                if (q) window.location.href = `/search.html?q=${encodeURIComponent(q)}`;
-            }
-        });
-    };
 
     // 프로필 링크 클릭 시 플래그 설정
     function markProfileLinks() {
@@ -116,7 +126,7 @@
         }
         const handleSubmit = (e) => {
             e.preventDefault();
-            if (input.value === 'Open') {
+            if (input.value === config.password) {
                 sessionStorage.setItem('authenticated', 'true');
                 promptEl.style.display = 'none';
                 sessionStorage.removeItem('fromProfile');
@@ -129,20 +139,30 @@
 
     // 앱 초기화: 우클릭/이미지 드래그 방지
     const initializeApp = () => {
-        document.addEventListener('contextmenu', (e) => e.preventDefault());
-        document.addEventListener('dragstart', (e) => {
-            if (e.target.tagName === 'IMG') e.preventDefault();
-        });
+        if (config.disableContextMenu) {
+            document.addEventListener('contextmenu', (e) => e.preventDefault());
+            document.addEventListener('dragstart', (e) => {
+                if (e.target.tagName === 'IMG') e.preventDefault();
+            });
+        }
     };
 
     // 부트스트랩
     document.addEventListener('DOMContentLoaded', () => {
         applyStoredTheme();
-        loadComponents()
+        ensureUtilsLoaded()
+            .then(loadConfig)
+            .then(loadComponents)
             .then(() => {
+                document.dispatchEvent(new Event('componentsLoaded'));
                 initializeApp();
                 initThemeToggle();
-                initSearch();
+                if (window.utils) {
+                    window.utils.initSearchInput(
+                        document.getElementById('HeaderSearch'),
+                        basePath
+                    );
+                }
                 initPasswordPrompt();
                 markProfileLinks();
             })
