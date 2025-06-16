@@ -11,6 +11,8 @@ Static site containing my blog posts and project notes.
 - **json/**: data used by JavaScript
 - **OtherProject/**: external project files
 
+Utility helpers are shared via `js/utils.js`.
+
 All pages load common components through `js/includehtml.js`.
 The loader resolves paths relative to the script location so pages work
 whether served from the repository root or viewed locally.
@@ -54,6 +56,7 @@ Site behaviour is controlled by `json/config.json`.
 
 Scripts automatically resolve paths relative to their location so the search
 page and configuration load correctly from subdirectories or local files.
+Common routines like this live in `js/utils.js`.
 
 ### Updating search data
 

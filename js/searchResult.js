@@ -14,7 +14,10 @@
             return;
         }
 
-        fetch(`json/SearchData.json?${Date.now()}`)
+        const basePath = window.utils
+            ? window.utils.getBasePath('searchResult.js')
+            : '';
+        fetch(`${basePath}json/SearchData.json?${Date.now()}`)
             .then((r) => r.json())
             .then((data) => displayResults(filterResults(data, query), query))
             .catch((err) => console.error("검색 데이터 로드 실패:", err));
