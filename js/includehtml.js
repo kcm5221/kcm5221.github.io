@@ -92,7 +92,6 @@
         });
     };
 
-
     // 프로필 링크 클릭 시 플래그 설정
     function markProfileLinks() {
         document.querySelectorAll('.profile table a').forEach((link) => {
