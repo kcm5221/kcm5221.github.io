@@ -165,6 +165,9 @@
                 initPasswordPrompt();
                 markProfileLinks();
             })
-            .catch((err) => console.error('컴포넌트 로드 중 오류:', err));
+            .catch((err) => {
+                console.error('컴포넌트 로드 중 오류:', err);
+                alert('일부 콘텐츠를 불러오지 못했습니다. 새로고침 후 다시 시도하세요.');
+            });
     });
 })();
