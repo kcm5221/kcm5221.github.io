@@ -43,6 +43,11 @@
     color: var(--text-color);
 }
 
+/* Style1.css 또는 Style2.css 끝부분(모바일 미디어쿼리 위) 추가 */
+.profile td.text-center {
+    text-align: center; /* .profile td 보다 특이도 우선 */
+}
+
 .profile img {
     max-width: 50%;
     height: auto;
