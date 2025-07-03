@@ -31,6 +31,18 @@
         "content": "프로젝트 Projects BTB"
     },
     {
+        "id": "P2",
+        "title": "gptbitcoin Trading Bot",
+        "url": "html/Projects/gptbitcoin.html",
+        "content": "프로젝트 Projects gptbitcoin Trading Bot 비트코인 자동매매"
+    },
+    {
+        "id": "P3",
+        "title": "RSS 뉴스 파이프라인",
+        "url": "html/rssnews.html",
+        "content": "프로젝트 Projects RSS 뉴스 파이프라인"
+    },
+    {
         "id": "E1",
         "title": "깃허브 블로그 만들기 Part 1",
         "url": "html/Etc/CreateBlog.html",
