@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>랜덤 숫자 생성하기</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../../css/Style1.css" />
+    <link rel="icon" href="../../image/favicon.ico" type="image/x-icon">
+    <style>
+        .result {
+            font-size: 20px;
+            color: blue;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>랜덤 숫자 생성하기</h1>
+            <div class="post-meta">2025.01.16</div>
+            <label for="max-number">숫자 입력:</label>
+            <input type="number" id="max-number" placeholder="Enter a number">
+            <button onclick="generateRandomNumber()">생성</button>
+            <div class="result" id="result"></div>
+
+            <p>입력한 숫자 범위(0부터 입력된 숫자까지)에서 랜덤 숫자를 생성</p>
+
+            <h3>1. 작동 방식</h3>
+            <ol>
+                <li>사용자가 입력란에 숫자를 입력</li>
+                <li>버튼을 누르면 <code>generateRandomNumber()</code> 함수가 실행됨</li>
+                <li>JavaScript가 입력값을 확인한 후, <code>Math.random()</code>과 <code>Math.floor()</code>를 사용하여 랜덤 숫자를 생성</li>
+                <li>결과가 페이지에 표시된다.</li>
+            </ol>
+            <h3>2. HTML 구조</h3>
+            <p>HTML에 입력란과 버튼을 추가하고 결과를 표시할 영역을 만든다.</p>
+            <pre><code>&lt;label for="max-number">숫자입력:&lt;/label>
+&lt;input type="number" id="max-number" placeholder="Enter a number">
+&lt;button onclick="generateRandomNumber()">생성&lt;/button>
+&lt;div class="result" id="result">&lt;/div></code></pre>
+
+            <h3>3. CSS</h3>
+            <pre><code>
+.result {
+    font-size: 20px;
+    color: blue;
+    margin-top: 20px;
+}</code></pre>
+
+            <h3>4. JavaScript</h3>
+            <p>JavaScript는 입력된 숫자를 가져와 랜덤 숫자를 계산하고 결과를 화면에 표시한다.</p>
+            <pre><code>function generateRandomNumber() {
+    const maxNumber = parseInt(document.getElementById('max-number').value);
+
+    if (isNaN(maxNumber) || maxNumber < 0) {
+        document.getElementById('result').textContent = "올바른 0 이상의 숫자를 입력해주세요.";
+        return;
+    }
+
+    const randomNumber = Math.floor(Math.random() * (maxNumber + 1));
+    document.getElementById('result').textContent = `랜덤 숫자: ${randomNumber}`;
+}</code></pre>
+
+        </main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+    <script>
+        function generateRandomNumber() {
+            const maxNumber = parseInt(document.getElementById('max-number').value);
+
+            if (isNaN(maxNumber) || maxNumber < 0) {
+                document.getElementById('result').textContent = "올바른 0 이상의 숫자를 입력해주세요.";
+                return;
+            }
+
+            const randomNumber = Math.floor(Math.random() * (maxNumber + 1));
+            document.getElementById('result').textContent = `랜덤 숫자: ${randomNumber}`;
+        }
+    </script>
+    <script src="../../js/includehtml.js"></script>
+    <script src="../../js/MoveAside.js"></script>
+</body>
+</html>

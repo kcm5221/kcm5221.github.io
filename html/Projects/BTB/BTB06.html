@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>멀티플레이어 HP UI 구현</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../../css/Style1.css" />
+    <link rel="icon" href="../../../image/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>멀티플레이어 HP UI 구현</h1>
+            <div class="post-meta">2025.04.01</div>
+            <br />
+
+            <h2>1. 구현 목표 및 구조</h2>
+            <ul>
+                <li><strong>목표:</strong> 멀티플레이어 환경에서 각 플레이어의 HP 상태를 UI로 표시</li>
+                <li><strong>구분:</strong> 본인의 HUD는 화면 고정, 다른 플레이어는 머리 위에 HP 바 생성</li>
+            </ul>
+
+            <h2>2. 시스템 구조</h2>
+            <ul>
+                <li><strong>PlayerHUDSetup</strong>: UI 생성 및 위치 설정 (Owner / NonOwner 구분)</li>
+                <li><strong>PlayerHP</strong>: HP 수치를 슬라이더로 표시</li>
+                <li><strong>캔버스 구성</strong>: 본인용은 Overlay, 타인용은 World Space 캔버스로 분리</li>
+            </ul>
+
+            <h2>3. 주요 코드 요약</h2>
+
+            <h3>PlayerHUDSetup.cs</h3>
+            <pre><code>
+public override void OnNetworkSpawn()
+{
+    if (IsOwner)
+    {
+        var canvas = GameObject.FindWithTag("OverlayCanvas");
+        m_SpawnedUI = Instantiate(m_HudPrefab, canvas.transform);
+    }
+    else
+    {
+        GameObject targetObj = new GameObject("AutoTarget_Head");
+        targetObj.transform.SetParent(transform);
+        targetObj.transform.localPosition = m_HeadOffset;
+        m_HeadTarget = targetObj.transform;
+
+        m_SpawnedUI = Instantiate(m_HpBarPrefab, transform);
+    }
+
+    var hpViewer = m_SpawnedUI.GetComponentInChildren&lt;PlayerHP&gt;();
+    if (hpViewer != null)
+        hpViewer.SetPlayerCharacter(m_Character.gameObject);
+}
+            </code></pre>
+
+            <h3>PlayerHP.cs</h3>
+            <pre><code>
+public void SetPlayerCharacter(GameObject playerCharacter)
+{
+    m_HealthStat = playerCharacter.GetComponent&lt;IHealthStat&gt;();
+
+    if (m_HealthStat != null)
+    {
+        HealthSlider.maxValue = m_HealthStat.MaxHealth;
+        UpdateHealthUI(m_HealthStat.Health, m_HealthStat.Health);
+        m_HealthStat.HealthChanged += OnHealthChanged;
+    }
+}
+            </code></pre>
+            <br />
+            <div class="post-meta"><a href="./BTB01.html">프로젝트 BTB</a></div>
+            <br />
+        </main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+
+    <script src="../../../js/includehtml.js"></script>
+    <script src="../../../js/MoveAside.js"></script>
+</body>
+</html>

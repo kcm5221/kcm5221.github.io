@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>gptbitcoin Trading Bot</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../css/Style1.css" />
+    <link rel="icon" href="../../image/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>gptbitcoin Trading Bot</h1>
+            <div class="post-meta">개발 기간 2025.05 ~ 2025.06</div>
+            <br />
+
+            <a href="https://github.com/kcm5221/gptbitcoin" target="_blank">깃허브 링크</a>
+
+            <h2>1. 프로젝트 개요</h2>
+            <p>
+                <strong>gptbitcoin</strong>은 <b>Upbit 현물 BTC</b> 마켓을 대상으로 15분봉·1시간봉 OHLCV를 분석하고,
+                Rule + GPT-4o AI 결정을 조합해 자동 매매를 수행하는 파이썬 봇입니다.<br>
+                구조를 모듈화하여 테스트·배포 자동화를 쉽게 했습니다.
+            </p>
+
+            <h2>2. 핵심 구현</h2>
+            <p><strong>2-1. AI 패턴 의사결정 &amp; 반성문</strong></p>
+<pre><code class="language-python"># trading_bot/ai_helpers.py
+async def ask_gpt(prompt: str) -&gt; str:
+    response = openai.ChatCompletion.acreate(
+        model="gpt-4o-mini",  # 비용 절감용
+        messages=[{ "role": "user", "content": prompt }],
+        temperature=0.2,
+    )
+    return response.choices[0].message.content
+</code></pre>
+            <p>
+                최근 100봉 + 지표를 JSON으로 GPT-4o에 보내 <em>buy / sell / hold</em> 결정을 받고,
+                토큰 비용 절감을 위해 신호가 없을 땐 로컬 룰만 사용합니다.
+            </p>
+
+            <p><strong>2-2. 주문 실행 &amp; 리스크 관리</strong></p>
+<pre><code class="language-python"># trading_bot/executor.py
+qty = calc_position_size(balance_krw, atr, risk=BASE_RISK)
+upbit.market_order(
+    uuid=str(uuid4()),
+    side="bid" if signal == "BUY" else "ask",
+    volume=qty,
+    price=None,
+)
+notify_discord(f"{signal} {qty} BTC @ {price}")
+</code></pre>
+
+            <h2>3. 문제 해결 &amp; 개선</h2>
+            <ul>
+                <li><b>API Rate Limit 초과</b> → 캐시 TTL·백오프 로직 추가</li>
+                <li><b>AI 비용 폭증</b> → 신호 없을 시 룰 전략만 구동, 프롬프트 축소</li>
+                <li><b>데이터 누락 및 오류</b> → REST 백업 엔드포인트 &amp; SQLite 로그 검증</li>
+            </ul>
+            <br />
+        </main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+
+    <script src="../../js/includehtml.js"></script>
+    <script src="../../js/MoveAside.js"></script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+@charset "utf-8";
+/* === 기본 리셋 === */
+* {
+    box-sizing: border-box;
+}
+
+/* 전체 배경 및 글씨 색상은 테마 변수 사용 */
+body {
+    margin: 0;
+    background-color: var(--bg-color, white);
+    color: var(--text-color, black);
+}
+
+.header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 10vh;
+    padding: 0 10px;
+}
+
+/* ===== 헤더 영역 ===== */
+header {
+    font-size: 20px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    position: sticky; /* 화면 상단에 고정 */
+    top: 0;
+    z-index: 1100;    /* nav/aside(1000)보다 높게 */
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.header-controls input {
+    padding: 5px 8px;
+    margin-right: 8px;
+}
+
+.site-logo {
+    margin-left: 8px;
+}
+
+main {
+    min-height: 90vh;
+}
+
+/* ===== 왼쪽 내비게이션 ===== */
+nav {
+    padding: 20px;
+    margin: 10px 0; /* 상하 10px, 좌우 0 */
+    position: fixed;
+    top: 10vh;
+    left: 0;
+    width: 20%;
+    height: 100vh;
+    overflow: auto;
+    z-index: 1000;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* ===== 본문 우측 목차 ===== */
+aside {
+    padding: 20px;
+    margin: 10px 0; /* 상/하 10px, 좌/우 0 */
+    position: fixed; /* 화면에 고정 */
+    top: 10vh; /* 헤더 높이만큼 아래로 */
+    bottom: 30px;
+    right: 0; /* 오른쪽 고정 */
+    width: 20%; /* 고정된 너비 */
+    overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
+    z-index: 1000; /* 다른 요소들 위로 배치 */
+    font-size: 14px; /* 글자 크기를 14px로 설정 */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+footer {
+    text-align: center;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+img {
+    width: 100%;
+    height: auto;
+    max-width: 600px;
+}
+
+.content-wrapper {
+    display: flex; /* 플렉스 레이아웃 활성화 */
+    justify-content: space-between; /* 항목 사이에 공간을 균등 배분 */
+    align-items: flex-start; /* 세로 정렬 */
+    margin-left: 20%; /* nav 고정 영역을 제외한 공간 */
+    margin-right: 20%; /* aside 고정 영역을 제외한 공간 */
+}
+
+/* main 영역 크기 조정 */
+main {
+    width: 100%; /* main 영역은 남은 공간을 차지 */
+    margin-left: 0; /* 왼쪽 마진 제거 */
+    margin-right: 0; /* 오른쪽 마진 제거 */
+}
+
+a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: var(--link-color);
+    font-weight: bold;
+}
+
+    a:hover {
+        text-decoration: underline;
+        color: var(--link-active-color);
+    }
+
+/* ===== 재사용 클래스 ===== */
+/* 블로그 게시글의 메타 정보를 우측 정렬 */
+.post-meta{
+    text-align:right;
+    margin-right:100px;
+}
+/* 가운데 정렬 섹션 레이아웃 */
+.centered-section{
+    margin:20px 0;
+    text-align:center;
+}
+/* iframe 요소에 간단한 테두리 적용 */
+.iframe-bordered{
+    border:2px solid #000;
+    overflow:hidden;
+}
+/* 큰 링크 버튼 스타일 */
+.large-link{
+    font-size:18px;
+}
+/* 텍스트 중앙 정렬 */
+.text-center{
+    text-align:center;
+}
+/* 화면에서 숨겨야 할 요소 */
+.hidden{
+    display:none;
+}
+
+
+pre {
+    font-family: sans-serif;
+}
+
+#passwordPrompt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+    #passwordPrompt input {
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    #passwordPrompt button {
+        padding: 10px;
+        font-size: 16px;
+        margin-left: 10px;
+    }
+
+/* ===== 테마 설정 ===== */
+/* 이전 작업: 링크 색상과 활성 색상을 테마 변수에서 관리 */
+/* 라이트 모드 */
+html[theme="light-mode"] {
+    --bg-color: #ffffff;
+    --text-color: #222222;
+    --link-color: black;
+    --link-active-color: #ff5722;
+    transition: background-color 0.4s, color 0.4s;
+}
+
+html[theme="dark-mode"] {
+    --bg-color: #121212;
+    --text-color: #f5f5f5;
+    --link-color: #ffffff;
+    --link-active-color: #ff9800;
+    transition: background-color 0.4s, color 0.4s;
+}
+
+html[theme="dark-mode"] img {
+    filter: brightness(0.8);
+}
+
+#toggleTheme {
+    margin-left: 10px;
+}
+
+#HeaderSearch {
+    margin-right: 0;
+    width: 160px;
+}
+
+#searchResults {
+    margin-top: 20px;
+}
+
+.highlight {
+    background-color: lightgreen;
+    font-weight: bold;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+aside a.active {
+    color: var(--link-active-color);
+    text-decoration: underline;
+}
+
+/* 북리뷰 페이지 본문 최상단 이미지만 반응형 처리 */
+.content-wrapper main > img {
+    display: block;
+    max-width: clamp(225px, 50%, 550px);
+    height: auto;
+    margin: 0 auto;
+}
+
+/* ===== 모바일 대응 ===== */
+@media (max-width: 768px) {
+    .header-main {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    #HeaderSearch {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+
+    nav {
+        position: static;
+        width: 100%;
+        height: auto;
+    }
+
+    .content-wrapper {
+        flex-direction: column;
+        margin: 0;
+    }
+}
+

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>RSS 뉴스 파이프라인</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../css/Style1.css" />
+    <link rel="icon" href="../../image/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>RSS 뉴스 파이프라인</h1>
+            <div class="post-meta">개발 기간 2025.06 ~ 2025.07.03</div>
+            <br />
+
+            <a href="https://github.com/kcm5221/rssnews" target="_blank">깃허브 링크</a>
+
+                <!-- 1. 프로젝트 개요 -->
+                <h2>1. 프로젝트 개요</h2>
+                <p>
+                    본 파이프라인은 다양한 <b>RSS 및 네이버 검색 API</b>로부터 기사를 수집한 뒤<br>
+                    <em>중복 제거 · 광고 필터링 · 요약 · 스크린샷</em>까지 자동 수행해 <b>깨끗한 뉴스 데이터셋</b>을 생성합니다.<br>
+                    결과물은 <code>raw_feeds/*.json</code> 과 <code>.txt</code> 로 저장되어<br>
+                    이후 LLM 프롬프트나 데이터 분석에 바로 활용할 수 있습니다.
+                </p>
+
+                <!-- 2. 핵심 구현 -->
+                <h2>2. 핵심 구현</h2>
+                <ul>
+                    <li><b>단일 소스 정의</b> – <code>rss_sources.yaml</code> 한 곳에서 RSS · 네이버 검색 목록 관리</li>
+                    <li><b>중복 제거 알고리즘</b> – <code>deduplicate_fuzzy()</code> 로 제목·본문 유사도 0.9 이상 기사 자동 제거</li>
+                    <li><b>네이버 검색 광고 필터링</b> – <code>_INCLUDE/EXCLUDE_KEYWORDS</code> 로 스팸 키워드 차단</li>
+                    <li><b>기사 요약 & 번역</b> – <code>process_blocks()</code> 유틸로 여러 블록을 한꺼번에 LLM 요약·번역</li>
+                    <li><b>스크린샷 저장</b> – <code>screenshot.py</code> 가 Headless Chrome 으로 기사 페이지 PNG 캡처</li>
+                </ul>
+
+                <!-- 3. 문제 해결 사례 -->
+                <h2>3. 문제 해결 사례</h2>
+                <ul>
+                    <li><b>중복 기사 봇물</b> – 링크 동일 외에도 <i>제목·본문 유사도</i> 기준 fuzzy dedup, 중복률 25% → 2%</li>
+                    <li><b>네이버 광고 기사</b> – 키워드 필터 + 출처 도메인 화이트리스트, 광고 비중 30% → 0%</li>
+                    <li><b>Feed 파싱 오류</b> – <code>feedparser</code> 예외 포착 후 <code>requests + bs4</code> 백업 파서로 페일오버</li>
+                    <li><b>스크린샷 실패</b> – Chromium not found → 실행 전 <code>shutil.which()</code> 로 브라우저 탐색 & 경로 자동 등록</li>
+                </ul>
+
+                <!-- 4. 회고 -->
+                <h2>4. 회고</h2>
+                <p>
+                    RSS 와 검색 API 조합은 범위를 넓히지만 <b>중복·스팸·포맷 불일치</b> 문제를 동반했습니다.<br>
+                    파이프라인을 <em>수집 ▶ 정제 ▶ 요약 ▶ 출력</em> 4단계로 분리해 각 단계에서 문제를 격리했고,<br>
+                    덕분에 코드 유지보수와 기능 확장이 쉬워졌습니다.
+                </p>
+
+                <br />
+</main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+
+    <script src="../../js/includehtml.js"></script>
+    <script src="../../js/MoveAside.js"></script>
+</body>
+</html>

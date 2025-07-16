@@ -1,0 +1,107 @@
+[
+
+    {
+        "id": "B1",
+        "title": "처음읽는 양자컴퓨터 이야기",
+        "url": "html/BookReview/Book001.html",
+        "content": "책 독서 양자 컴퓨터"
+    },
+    {
+        "id": "B2",
+        "title": "혼자 공부하는 얄팍한 코딩지식",
+        "url": "html/BookReview/Book002.html",
+        "content": "책 독서 코딩 입문 기초지식 개발자 it"
+    },
+    {
+        "id": "B3",
+        "title": "유니티 교과서",
+        "url": "html/BookReview/Book003.html",
+        "content": "유니티 게임개발 unity game"
+    },
+    {
+        "id": "B4",
+        "title": "그림과 작동 원리로 쉽게 이해하는 서버의 기초",
+        "url": "html/BookReview/Book004.html",
+        "content": "IP/포트/DNS 프로토콜"
+    },
+    {
+        "id": "P1",
+        "title": "프로젝트 BTB",
+        "url": "html/Projects/BTB/BTB01.html",
+        "content": "프로젝트 Projects BTB"
+    },
+    {
+        "id": "P2",
+        "title": "gptbitcoin Trading Bot",
+        "url": "html/Projects/gptbitcoin.html",
+        "content": "프로젝트 Projects gptbitcoin Trading Bot 비트코인 자동매매"
+    },
+    {
+        "id": "P3",
+        "title": "RSS 뉴스 파이프라인",
+        "url": "html/Projects/rssnews.html",
+        "content": "프로젝트 Projects RSS 뉴스 파이프라인"
+    },
+    {
+        "id": "P4",
+        "title": "AI Novel",
+        "url": "html/Projects/ainovel.html",
+        "content": "프로젝트 Projects AI Novel 소설생성"
+    },
+    {
+        "id": "E1",
+        "title": "깃허브 블로그 만들기 Part 1",
+        "url": "html/Etc/CreateBlog.html",
+        "content": "깃허브 페이지 생성 깃허브 로그인 리포지토리 생성 리포지토리Settings 깃허브Desktop 비주얼 스튜디오 설치"
+    },
+    {
+        "id": "E2",
+        "title": "깃허브 블로그 만들기 Part 2",
+        "url": "html/Etc/CreateBlog2.html",
+        "content": "라이브서버 설치 실시간 Node.js 노드.js npm i -D live-server 비주얼 스튜디오 인코딩 설정  utf-8 editorconfig 코드 텍스트 보기 Ctrl Shift R, Shift F5"
+    },
+    {
+        "id": "E3",
+        "title": "깃허브 블로그 만들기 Part 3",
+        "url": "html/Etc/CreateBlog3.html",
+        "content": "템플릿 형식 분리 공용 재사용"
+    },
+    {
+        "id": "E4",
+        "title": "깃허브 블로그 만들기 Part 4",
+        "url": "html/Etc/CreateBlog4.html",
+        "content": "비밀번호 설정 인증 암호 패스워드password 비번"
+    },
+    {
+        "id": "E5",
+        "title": "깃허브 블로그 만들기 Part 5",
+        "url": "html/Etc/CreateBlog5.html",
+        "content": "다크모드 전환 테마전환 토글버튼 dark"
+    },
+    {
+        "id": "E6",
+        "title": "깃허브 블로그 만들기 Part 6",
+        "url": "html/Etc/CreateBlog6.html",
+        "content": "검색기능 search 찾기 입력"
+    },
+    {
+        "id": "EA1",
+        "title": "WebUI 설치하기",
+        "url": "html/Etc/DownloadWebUI.html",
+        "content": "WebUI 설치 AI그림 웹유아이"
+    },
+    {
+        "id": "EA2",
+        "title": "랜덤 숫자 생성하기",
+        "url": "html/Etc/RandomNumber.html",
+        "content": "랜덤 숫자 생성 RandomNumber"
+    },
+    {
+        "id": "EA3",
+        "title": "유니티 - 김치런",
+        "url": "html/Etc/KimchiRun.html",
+        "content": "유니티게임 김치런 unitygame kimchirun"
+    }
+
+
+]
