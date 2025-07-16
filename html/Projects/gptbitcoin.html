@@ -16,29 +16,17 @@
             <div class="post-meta">개발 기간 2025.05 ~ 2025.06</div>
             <br />
 
+            <a href="https://github.com/kcm5221/gptbitcoin" target="_blank">깃허브 링크</a>
+
             <h2>1. 프로젝트 개요</h2>
             <p>
                 <strong>gptbitcoin</strong>은 <b>Upbit 현물 BTC</b> 마켓을 대상으로 15분봉·1시간봉 OHLCV를 분석하고,
                 Rule + GPT-4o AI 결정을 조합해 자동 매매를 수행하는 파이썬 봇입니다.<br>
-                <code>Netcode</code> 같은 게임 엔진이 아닌 <strong>Python &amp; REST API</strong> 환경이지만, 구조를 모듈화하여
-                테스트·배포 자동화를 쉽게 했습니다.
+                구조를 모듈화하여 테스트·배포 자동화를 쉽게 했습니다.
             </p>
 
-            <h2>2. 폴더 구조</h2>
-<pre><code>gptbitcoin/
-├── .env &nbsp;&nbsp;&nbsp;&nbsp;# 환경 변수 파일
-├── requirements.txt
-├── deploy_and_run.sh
-└── trading_bot/
-    ├── main.py (진입점)
-    ├── indicators_common.py | indicators_1h.py
-    ├── patterns.py | filters.py | strategies.py
-    ├── executor.py | ai_helpers.py
-    ├── data/ (캐시 & DB) | logs/
-</code></pre>
-
-            <h2>3. 핵심 구현</h2>
-            <p><strong>3-1. AI 패턴 의사결정 &amp; 반성문</strong></p>
+            <h2>2. 핵심 구현</h2>
+            <p><strong>2-1. AI 패턴 의사결정 &amp; 반성문</strong></p>
 <pre><code class="language-python"># trading_bot/ai_helpers.py
 async def ask_gpt(prompt: str) -&gt; str:
     response = openai.ChatCompletion.acreate(
@@ -53,7 +41,7 @@ async def ask_gpt(prompt: str) -&gt; str:
                 토큰 비용 절감을 위해 신호가 없을 땐 로컬 룰만 사용합니다.
             </p>
 
-            <p><strong>3-2. 주문 실행 &amp; 리스크 관리</strong></p>
+            <p><strong>2-2. 주문 실행 &amp; 리스크 관리</strong></p>
 <pre><code class="language-python"># trading_bot/executor.py
 qty = calc_position_size(balance_krw, atr, risk=BASE_RISK)
 upbit.market_order(
@@ -65,16 +53,7 @@ upbit.market_order(
 notify_discord(f"{signal} {qty} BTC @ {price}")
 </code></pre>
 
-            <h2>4. 배포 및 스케줄링</h2>
-<pre><code class="language-bash"># deploy_and_run.sh (발췌)
-cd ~/gptbitcoin
-source venv/bin/activate
-pip install -r requirements.txt --quiet
-python -m trading_bot.main --mode intraday >> logs/cron.log 2>&1
-</code></pre>
-            <p>Ubuntu VM에 배포 후 <code>cron</code>으로 15분마다 호출하여 데이터 캐시 + 실거래를 자동화했습니다.</p>
-
-            <h2>5. 문제 해결 &amp; 개선</h2>
+            <h2>3. 문제 해결 &amp; 개선</h2>
             <ul>
                 <li><b>API Rate Limit 초과</b> → 캐시 TTL·백오프 로직 추가</li>
                 <li><b>AI 비용 폭증</b> → 신호 없을 시 룰 전략만 구동, 프롬프트 축소</li>

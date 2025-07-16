@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>AI Novel</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../css/Style1.css" />
+    <link rel="icon" href="../../image/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>AI Novel</h1>
+            <div class="post-meta">개발 기간 2025.07.04 ~ 2025.07.16</div>
+            <br />
+
+            <a href="https://github.com/kcm5221/ainovel" target="_blank">깃허브 링크</a>
+
+            <!-- ========== 1. 프로젝트 개요 ========= -->
+            <h2>1. 프로젝트 개요</h2>
+            <p>
+                <strong>목표 :</strong> LLM(Gemini CLI)와 협업하여 장편 소설을 집필하면서 <b>일관된 설정·문체</b>를 유지하고,<br>
+                <code>ChromaDB</code>를 활용해 <em>플롯 · 캐릭터 · 스타일</em> 데이터를 벡터 형태로 관리합니다.<br>
+                <span class="text-center">“사람이 쓰는 원본 Markdown” ↔️ “AI 참고용 벡터DB” 이중 구조</span> 로 효율적인 집필·검색·수정 워크플로우를 구축했습니다.
+            </p>
+
+            <!-- ========== 2. 핵심 구현 ========= -->
+            <h2>2. 핵심 구현</h2>
+            <ul>
+                <li><b>소설 원본 ↔ 파생 데이터 분리</b> – <code>novels/*.md</code> 원본은 영구 보존, <code>corpus_segments_v1</code> 컬렉션은 스크립트로 재생성</li>
+                <li><b>Novel CLI</b> – <code>novel_cli.py</code> 하나로 <i>load · generate · review · update‑plot · status</i> 통합 관리</li>
+                <li><b>AIHub 코퍼스 이용</b> – <code>split_aihub_story.py</code>로 YAML 변환 후 Chroma 적재, 스타일 프롬프트에 자동 삽입</li>
+                <li><b>LLM 프롬프트 자동 생성</b> – 현재 플롯·캐릭터·이전 N 챕터 요약을 불러와 ‘다음 챕터’ 프롬프트 구성</li>
+                <li><b>챕터 스냅샷 & 메타데이터</b> – 생성된 챕터는 파일 저장 + DB current_chapter 업데이트로 작업 재개 용이</li>
+            </ul>
+
+            <!-- ========== 3. 문제 해결 사례 ========= -->
+            <h2>3. 문제 해결 사례</h2>
+            <ul>
+                <li><b>스타일 일관성 붕괴</b> – AIHub style 태그 필터 + <code>macros.json</code> 사전 정의 → 문체 변동 70% 감소</li>
+                <li><b>플롯 순서 오류</b> – <code>status</code> 명령으로 현황 확인 + <code>update-plot</code> 자동 문서화</li>
+                <li><b>DB 용량 증가</b> – 챕터 통째 적재 대신 문단 단위 세분화, 메타 압축으로 1/4 절감</li>
+                <li><b>세션 이어쓰기 문제</b> – <code>current_chapter</code> 메타 업데이트로 다른 PC에서도 바로 이어서 집필 가능</li>
+            </ul>
+
+            <!-- ========== 4. 회고 ========= -->
+            <h2>4. 회고</h2>
+            <p>
+                “원본 Markdown ↔ AI 벡터DB” 이원화 설계로 사람과 LLM이 동시에 협업해도 충돌 없이 작업을 이어갈 수 있었습니다.
+            </p>
+
+
+            <br />
+        </main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+
+    <script src="../../js/includehtml.js"></script>
+    <script src="../../js/MoveAside.js"></script>
+</body>
+</html>

@@ -39,8 +39,14 @@
     {
         "id": "P3",
         "title": "RSS 뉴스 파이프라인",
-        "url": "html/rssnews.html",
+        "url": "html/Projects/rssnews.html",
         "content": "프로젝트 Projects RSS 뉴스 파이프라인"
+    },
+    {
+        "id": "P4",
+        "title": "AI Novel",
+        "url": "html/Projects/ainovel.html",
+        "content": "프로젝트 Projects AI Novel 소설생성"
     },
     {
         "id": "E1",
