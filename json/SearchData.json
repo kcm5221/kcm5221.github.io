@@ -25,6 +25,18 @@
         "content": "IP/포트/DNS 프로토콜"
     },
     {
+        "id": "B5",
+        "title": "개발자를 위한 챗GPT 활용법",
+        "url": "html/BookReview/Book005.html",
+        "content": "LLM AI ChatGPT 챗지피티 채찍피티"
+    },
+    {
+        "id": "B6",
+        "title": "시드 마이어 : 컴퓨터 게임과 함께한 인생",
+        "url": "html/BookReview/Book006.html",
+        "content": "게임디자인 문명"
+    },
+    {
         "id": "P1",
         "title": "프로젝트 BTB",
         "url": "html/Projects/BTB/BTB01.html",
