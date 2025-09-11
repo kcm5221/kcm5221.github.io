@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>플레이어, 장애물 충돌 판정 구현</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../../css/Style1.css" />
+    <link rel="icon" href="../../../image/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>플레이어, 장애물 충돌 판정 구현</h1>
+            <div class="post-meta">2025.09.08</div>
+            <br />
+
+            <h2>1. 구현한 내용</h2>
+            <p>
+                이번 단계의 목표는 <strong>플레이어와 장애물의 충돌 판정</strong>을 구현하고, 충돌 시
+                <strong>게임오버 처리 후 로비로 전환</strong>하는 전체 흐름을 완성하는 것이었다.
+            </p>
+            <ul>
+                <li>플레이어와 장애물을 각각 독립된 파일(<code>Player.js</code>, <code>Obstacle.js</code>)로 관리</li>
+                <li>도로는 유사 3D 방식(사다리꼴 세그먼트)을 유지하며, 장애물이 깊이에 따라 커지도록 구현</li>
+                <li>충돌은 히트박스 겹침 여부로 판정하며, 단순 레인 체크에만 의존하지 않음</li>
+                <li>게임오버 시 이펙트(플래시/쉐이크) 후 로비 씬으로 전환</li>
+            </ul>
+
+            <h2>2. 문제 해결 및 개선</h2>
+            <p><strong>충돌 반응이 없던 문제</strong></p>
+            <ul>
+                <li><strong>원인:</strong> 레인 조건이 지나치게 엄격하거나, 파괴된 객체에 <code>getHitbox()</code> 호출</li>
+                <li>
+                    <strong>해결:</strong>
+                    <ul>
+                        <li>레인 체크 대신 실제 히트박스 겹침을 우선</li>
+                        <li>y축 근접 조건(<code>nearThresh</code>)으로 불필요한 판정 감소</li>
+                        <li>파괴 후 <code>this.player = null</code> 처리 및 가드 코드 추가</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <p><strong>디버깅 지원</strong></p>
+            <ul>
+                <li><code>this.DEBUG_HIT = true</code> 설정 시 히트박스 시각화</li>
+                <li>빨강 = 충돌, 초록/노랑 = 정상, 회색 = 멀리 있는 장애물</li>
+            </ul>
+
+            <br /><br />
+            <div class="post-meta"><a href="./NemoRun01.html">NemoRun</a></div>
+            <br />
+        </main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+
+    <script src="../../../js/includehtml.js"></script>
+    <script src="../../../js/MoveAside.js"></script>
+</body>
+</html>
