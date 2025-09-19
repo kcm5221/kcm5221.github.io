@@ -20,9 +20,9 @@
 
             <h2>1. 프로젝트 개요</h2>
             <p>
-                <strong>gptbitcoin</strong>은 <b>Upbit 현물 BTC</b> 마켓을 대상으로 15분봉·1시간봉 OHLCV를 분석하고,
-                Rule + GPT-4o AI 결정을 조합해 자동 매매를 수행하는 파이썬 봇입니다.<br>
-                구조를 모듈화하여 테스트·배포 자동화를 쉽게 했습니다.
+                <strong>gptbitcoin</strong>은 <b>AI 바이브코딩</b> 방식으로 구현한 파이썬 자동 매매 봇입니다.<br>
+                전체 코드 작성은 AI의 도움을 받았으며, 저는 실행·테스트·구조 이해·실험을 담당했습니다.<br>
+                Rule + GPT-4o AI 결정을 조합해 자동 매매를 수행하며, 모듈화를 통해 테스트·배포 자동화를 쉽게 설계했습니다.
             </p>
 
             <h2>2. 핵심 구현</h2>
@@ -37,8 +37,8 @@ async def ask_gpt(prompt: str) -&gt; str:
     return response.choices[0].message.content
 </code></pre>
             <p>
-                최근 100봉 + 지표를 JSON으로 GPT-4o에 보내 <em>buy / sell / hold</em> 결정을 받고,
-                토큰 비용 절감을 위해 신호가 없을 땐 로컬 룰만 사용합니다.
+                최근 100봉 + 지표를 JSON으로 GPT-4o에 보내 <em>buy / sell / hold</em> 결정을 받고,<br>
+                토큰 비용 절감을 위해 신호가 없을 땐 로컬 룰만 사용하도록 AI 로직을 구성했습니다.
             </p>
 
             <p><strong>2-2. 주문 실행 &amp; 리스크 관리</strong></p>
@@ -59,6 +59,13 @@ notify_discord(f"{signal} {qty} BTC @ {price}")
                 <li><b>AI 비용 폭증</b> → 신호 없을 시 룰 전략만 구동, 프롬프트 축소</li>
                 <li><b>데이터 누락 및 오류</b> → REST 백업 엔드포인트 &amp; SQLite 로그 검증</li>
             </ul>
+
+            <h2>4. 배운 점</h2>
+            <p>
+                - AI가 생성한 코드를 실행하고 수정하면서 <b>비동기 요청</b>, <b>API 연동</b>, <b>리스크 관리</b> 개념을 익혔습니다.<br>
+                - 실제 거래소 API를 사용해 본 경험으로 <b>실전 환경에서의 예외 처리</b>와 <b>비용 최적화</b>의 중요성을 배웠습니다.
+            </p>
+
             <br />
         </main>
         <aside id="aside"></aside>
