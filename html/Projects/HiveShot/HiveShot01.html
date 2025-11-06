@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <title>HiveShot 프로젝트 개요</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../../css/Style1.css" />
+    <link rel="icon" href="../../../image/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="header"></div>
+    <div class="content-wrapper">
+        <nav id="nav"></nav>
+        <main>
+            <h1>HiveShot</h1>
+            <div class="post-meta">기간: 2025.10.29 ~ 2025.11.15(예정)</div>
+            <br />
+
+            링크
+
+            <h2>프로젝트 개요</h2>
+            <p><strong>게임명:</strong> HiveShot</p>
+            <p><strong>장르:</strong> 자동 전투 디펜스</p>
+            <p><strong>플랫폼:</strong> 토스</p>
+            <p><strong>목표 유저층:</strong> 토스 사용자</p>
+            <p><strong>플레이타임 목표:</strong> 1회 평균 4~6분</p>
+
+            <h3>핵심 차별화 요소</h3>
+            <ul>
+                <li>직접 조작 없이 전투가 진행되는 <strong>자동 공격 기반 전략형 디펜스</strong></li>
+                <li>매 판마다 다른 빌드와 강화 조합으로 <strong>전략적 선택의 재미</strong></li>
+            </ul>
+
+            <h3>게임 시스템</h3>
+            <ul>
+                <li><strong>전투 구조:</strong> 하이브에서 적이 지속적으로 생성 → 플레이어 자동 공격</li>
+                <li><strong>웨이브 구성:</strong> 총 5웨이브, 각 웨이브 종료 시 난이도 상승</li>
+                <li><strong>경험치 및 강화:</strong> 적 처치 시 경험치 획득 → 레벨업 시 3가지 강화 중 선택</li>
+                <li><strong>체력 시스템:</strong> 플레이어 HP가 0이 되면 게임오버, 하이브 파괴 시 클리어</li>
+                <li><strong>재화:</strong> 적 처치 시 일정 확률로 드랍, 게임 종료 후 로비에서 누적</li>
+                <li><strong>티켓 시스템:</strong> 1판당 1장 소모 / 10분마다 1장 회복 / 광고 시 1장 추가</li>
+                <li><strong>상점 시스템:</strong> 로비에서 영구 강화 구매 가능</li>
+            </ul>
+
+            <h3>게임 루프 구조</h3>
+            <ol>
+                <li>로비: 티켓 보유 확인 → 게임 시작</li>
+                <li>플레이: 자동 전투 / 경험치 획득 / 강화 선택</li>
+                <li>웨이브 종료: 적 정리 후 다음 웨이브 진행</li>
+                <li>하이브 변화 → 최종 파괴 연출 (낮으로 전환)</li>
+                <li>결과 화면: 클리어 / 오버 판단 및 보상 정산</li>
+                <li>로비 복귀 → 재도전 또는 상점 접근</li>
+            </ol>
+        </main>
+        <aside id="aside"></aside>
+    </div>
+    <div id="footer"></div>
+
+    <script src="../../../js/includehtml.js"></script>
+    <script src="../../../js/MoveAside.js"></script>
+</body>
+</html>
