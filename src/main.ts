@@ -1,7 +1,53 @@
-﻿// src/main.ts
 import "./style.css";
 import { loadInitialFeed } from "./api/feed";
 import type { FeedItem } from "./types/Feed";
+
+type Route = "home" | "search" | "write";
+type Tab = "posts" | "saved" | "tagged";
+
+type SidebarItem = {
+    id: string;
+    label: string;
+    icon: IconName;
+    route?: Route;
+};
+
+type BottomNavItem = {
+    id: string;
+    icon: IconName;
+    route?: Route;
+};
+
+interface HighlightItem {
+    id: string;
+    title: string;
+    image: string;
+}
+
+interface InfoCard {
+    title: string;
+    lines: string[];
+}
+
+interface ProfileStat {
+    label: string;
+    value: string;
+}
+
+type IconName =
+    | "home"
+    | "search"
+    | "compass"
+    | "film"
+    | "message"
+    | "heart"
+    | "plus"
+    | "user"
+    | "menu"
+    | "grid"
+    | "bookmark"
+    | "tagged"
+    | "chevron";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -9,292 +55,544 @@ if (!app) {
     throw new Error("#app element not found");
 }
 
-// 라우트 타입
-type Route = "home" | "search" | "write";
+const HIGHLIGHTS: HighlightItem[] = [
+    {
+        id: "travel",
+        title: "Cloudflare",
+        image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=200",
+    },
+    {
+        id: "food",
+        title: "GitHub",
+        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200",
+    },
+    {
+        id: "city",
+        title: "Workers",
+        image: "https://images.unsplash.com/photo-1617121346253-43ef95179ac9?w=200",
+    },
+    {
+        id: "nature",
+        title: "Actions",
+        image: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=200",
+    },
+    {
+        id: "fitness",
+        title: "Pages",
+        image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200",
+    },
+];
 
-// 전역 상태
+const SIDEBAR_ITEMS: SidebarItem[] = [
+    { id: "home", label: "Home", icon: "home", route: "home" },
+    { id: "search", label: "Search", icon: "search", route: "search" },
+    { id: "explore", label: "Explore", icon: "compass" },
+    { id: "reels", label: "Reels", icon: "film" },
+    { id: "messages", label: "Messages", icon: "message" },
+    { id: "notifications", label: "Notifications", icon: "heart" },
+    { id: "create", label: "Create", icon: "plus", route: "write" },
+    { id: "profile", label: "Profile", icon: "user" },
+];
+
+const BOTTOM_NAV: BottomNavItem[] = [
+    { id: "home", icon: "home", route: "home" },
+    { id: "search", icon: "search", route: "search" },
+    { id: "reels", icon: "film" },
+    { id: "create", icon: "plus", route: "write" },
+    { id: "profile", icon: "user" },
+];
+
+const ROUTE_DESCRIPTIONS: Record<Route, string> = {
+    home: "GitHub Pages + Cloudflare Workers + GitHub Actions 로 이어지는 개발 로그를 인스타그램 뷰로 묶었습니다.",
+    search:
+        "태그, 제목, 내용으로 DevLog 를 검색하는 전용 탐색 화면을 준비 중입니다. PKCE 기반 인증 완료 후 알파 기능이 열립니다.",
+    write:
+        "Cloudflare Worker 의 /content/commit 엔드포인트에 연결되는 작성 도구입니다. GitHub App 권한 확인 후 브라우저에서 바로 글을 발행합니다.",
+};
+
+const INFO_CARDS: Record<Exclude<Route, "home">, InfoCard[]> = {
+    search: [
+        {
+            title: "검색 화면 준비 중",
+            lines: [
+                "태그, 제목, 요약을 동시에 검색하는 통합 입력창",
+                "기간과 컬렉션 필터, 즐겨찾기 저장",
+                "PKCE 기반 GitHub OAuth 로 권한 제어",
+            ],
+        },
+        {
+            title: "릴리스 계획",
+            lines: [
+                "v0.2 - 전체 검색 API 연결",
+                "v0.3 - 저장된 검색 & 공유",
+                "v1.0 - Cloudflare Worker 확장",
+            ],
+        },
+    ],
+    write: [
+        {
+            title: "작성 도구",
+            lines: [
+                "제목 · 슬러그 · 요약 입력 UI",
+                "컬렉션/태그 선택 및 미리보기",
+                "Cloudflare Worker 로 커밋",
+            ],
+        },
+        {
+            title: "보안 메모",
+            lines: [
+                "PKCE + GitHub App 권한 확인",
+                "JWT 1시간 유효",
+                "Audit 로그 저장",
+            ],
+        },
+    ],
+};
+
+const TAB_LABELS: Record<Tab, { label: string; icon: IconName }> = {
+    posts: { label: "Posts", icon: "grid" },
+    saved: { label: "Saved", icon: "bookmark" },
+    tagged: { label: "Tagged", icon: "tagged" },
+};
+
+const ICONS: Record<IconName, string> = {
+    home: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+        <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      </svg>
+    `,
+    search: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+    `,
+    compass: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z" />
+        <circle cx="12" cy="12" r="10" />
+      </svg>
+    `,
+    film: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+        <path d="M7 3v18" />
+        <path d="M3 7.5h4" />
+        <path d="M3 12h18" />
+        <path d="M3 16.5h4" />
+        <path d="M17 3v18" />
+        <path d="M17 7.5h4" />
+        <path d="M17 16.5h4" />
+      </svg>
+    `,
+    message: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+      </svg>
+    `,
+    heart: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+      </svg>
+    `,
+    plus: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+        <path d="M8 12h8" />
+        <path d="M12 8v8" />
+      </svg>
+    `,
+    user: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    `,
+    menu: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" x2="20" y1="12" y2="12" />
+        <line x1="4" x2="20" y1="6" y2="6" />
+        <line x1="4" x2="20" y1="18" y2="18" />
+      </svg>
+    `,
+    grid: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+        <path d="M3 9h18" />
+        <path d="M3 15h18" />
+        <path d="M9 3v18" />
+        <path d="M15 3v18" />
+      </svg>
+    `,
+    bookmark: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+      </svg>
+    `,
+    tagged: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 21a6 6 0 0 0-12 0" />
+        <circle cx="12" cy="11" r="4" />
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+      </svg>
+    `,
+    chevron: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    `,
+};
+
 let currentItems: FeedItem[] = [];
 let currentTag: string | null = null;
-let currentCollection: string | null = null;
+let activeTab: Tab = "posts";
 
-// 디버그용 로그
-console.log(">>> DevLog Instagram-like layout version <<<");
-
-/**
- * 현재 hash → Route
- */
 function getCurrentRouteFromHash(): Route {
     const hash = window.location.hash || "#/";
-    if (hash.startsWith("#/write")) return "write";
     if (hash.startsWith("#/search")) return "search";
+    if (hash.startsWith("#/write")) return "write";
     return "home";
 }
 
-/**
- * 왼쪽 네비 버튼
- */
-function renderSideNavButton(label: string, route: Route, active: Route): string {
-    const isActive = route === active;
-    const base =
-        "w-full flex items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-medium transition";
-    const activeCls = "bg-slate-900 text-slate-50";
-    const inactiveCls =
-        "bg-transparent text-slate-700 hover:bg-slate-100";
+function renderAppShell(route: Route, bodyHtml: string) {
+    app!.innerHTML = `
+      <div class="app-shell">
+        ${renderSidebar(route)}
+        <div class="main-area">
+          ${renderMobileHeader()}
+          <div class="main-inner">${bodyHtml}</div>
+        </div>
+        ${renderBottomNav(route)}
+      </div>
+    `;
 
-    return `
-    <button
-      type="button"
-      class="${base} ${isActive ? activeCls : inactiveCls}"
-      data-nav="${route}"
-    >
-      <span class="w-5 h-5 rounded-full border border-slate-400 bg-white/40"></span>
-      <span>${label}</span>
-    </button>
-  `;
+    setupRouteHandlers();
 }
 
-/**
- * 공통 레이아웃
- * - 바깥은 흰 배경
- * - 안쪽은 max-width 1024px, 가운데 정렬
- * - 왼쪽 네비는 얇은 패널, 가운데는 피드 컬럼
- */
-function renderAppShell(
-    route: Route,
-    mainContentHtml: string,
-    filtersHtml: string | null
-) {
-    app!.innerHTML = `
-    <div
-      style="
-        min-height: 100vh;
-        background: #fafafa;
-        color: #020617;
-        padding: 1.5rem 0.75rem;
-        box-sizing: border-box;
-      "
-    >
-      <div
-        style="
-          width: 100%;
-          max-width: 1024px;
-          margin: 0 auto;
-          display: flex;
-          flex-direction: row;
-          gap: 1.5rem;
-          align-items: flex-start;
-        "
+function renderSidebar(route: Route): string {
+    return `
+      <aside class="left-sidebar">
+        <div class="sidebar-logo">Instagram</div>
+        <nav class="sidebar-nav">
+          ${SIDEBAR_ITEMS.map((item) => renderSidebarButton(item, route)).join("")}
+        </nav>
+        <button class="sidebar-link" type="button">
+          ${iconMarkup("menu")}
+          <span>More</span>
+        </button>
+      </aside>
+    `;
+}
+
+function renderSidebarButton(item: SidebarItem, activeRoute: Route): string {
+    const isActive = !!item.route && item.route === activeRoute;
+    return `
+      <button
+        class="sidebar-link ${isActive ? "is-active" : ""}"
+        type="button"
+        ${item.route ? `data-route="${item.route}"` : ""}
       >
-        <!-- 왼쪽 네비게이션 -->
-        <aside
-          style="
-            width: 220px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-          "
-        >
-          <!-- 로고 영역 -->
-          <div
-            style="
-              display:flex;
-              align-items:center;
-              gap:0.5rem;
-              padding:0.75rem 0.5rem;
-              box-sizing:border-box;
-            "
-          >
-            <div
-              style="
-                width: 32px;
-                height: 32px;
-                border-radius: 8px;
-                background: radial-gradient(circle at 30% 20%, #4f46e5, #ec4899);
-              "
-            ></div>
-            <div style="font-size:1rem;font-weight:700;">DevLog</div>
-          </div>
+        ${iconMarkup(item.icon)}
+        <span>${item.label}</span>
+      </button>
+    `;
+}
 
-          <!-- 네비 버튼 카드 -->
-          <div
-            style="
-              border-radius: 1rem;
-              border: 1px solid #e5e7eb;
-              background:#ffffff;
-              padding:0.75rem 0.5rem;
-              box-sizing:border-box;
-              display:flex;
-              flex-direction:column;
-              gap:0.25rem;
-            "
-          >
-            ${renderSideNavButton("홈", "home", route)}
-            ${renderSideNavButton("검색", "search", route)}
-            ${renderSideNavButton("작성", "write", route)}
-          </div>
+function renderMobileHeader(): string {
+    return `
+      <header class="mobile-header">
+        <div class="mobile-username">devlog.feed ${iconMarkup("chevron")}</div>
+        <div class="mobile-actions">
+          <button class="icon-button" type="button">${iconMarkup("heart")}</button>
+          <button class="icon-button" type="button">${iconMarkup("message")}</button>
+        </div>
+      </header>
+    `;
+}
 
-          <!-- 아래쪽 작은 정보 -->
-          <div style="font-size:11px;color:#9ca3af;line-height:1.4;">
-            GitHub + Cloudflare + Actions<br />
-            인스타그램 느낌의 개발 로그 UI
-          </div>
-        </aside>
+function renderBottomNav(route: Route): string {
+    return `
+      <nav class="bottom-nav">
+        ${BOTTOM_NAV.map((item) => {
+            const isActive = !!item.route && item.route === route;
+            return `
+              <button
+                type="button"
+                class="bottom-nav-btn ${isActive ? "is-active" : ""}"
+                ${item.route ? `data-route="${item.route}"` : ""}
+              >
+                ${iconMarkup(item.icon)}
+              </button>
+            `;
+        }).join("")}
+      </nav>
+    `;
+}
 
-        <!-- 가운데 메인 컬럼 -->
-        <div
-          style="
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-          "
-        >
-          <!-- 상단 헤더 / 필터 바 -->
-          <header
-            style="
-              display:flex;
-              flex-direction:column;
-              gap:0.75rem;
-            "
-          >
-            <div
-              style="
-                display:flex;
-                align-items:center;
-                justify-content:space-between;
-                gap:0.75rem;
-              "
-            >
-              <div>
-                <div style="font-size:18px;font-weight:700;">타임라인</div>
-                <div style="font-size:11px;color:#6b7280;">
-                  최신 개발 로그가 시간 순으로 정렬됩니다.
+function iconMarkup(name: IconName): string {
+    return `<span class="icon">${ICONS[name]}</span>`;
+}
+
+function renderProfileHeader(stats: ProfileStat[], description: string): string {
+    return `
+      <section class="profile-header">
+        <div class="profile-avatar">
+          <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=300" alt="Profile" loading="lazy" />
+        </div>
+        <div class="profile-details">
+          <div class="profile-top-row">
+            <h2 class="profile-username">devlog.feed</h2>
+            <div class="profile-actions">
+              <button class="primary" type="button">Follow</button>
+              <button class="secondary" type="button">Message</button>
+              <button class="icon-button" type="button" aria-label="더보기">${iconMarkup("menu")}</button>
+            </div>
+          </div>
+          <div class="profile-stat-row">
+            ${stats
+                .map(
+                    (stat) => `
+                      <div class="stat">
+                        <span class="stat-value">${escapeHtml(stat.value)}</span>
+                        ${escapeHtml(stat.label)}
+                      </div>
+                    `
+                )
+                .join("")}
+          </div>
+          <div class="profile-bio">
+            <p><strong>DevLog Studio</strong></p>
+            <p>${escapeHtml(description)}</p>
+            <p>✉️ contact@devlog.example</p>
+          </div>
+        </div>
+      </section>
+    `;
+}
+
+function renderHighlights(): string {
+    return `
+      <section class="highlights" aria-label="피드 하이라이트">
+        ${HIGHLIGHTS.map(
+            (item) => `
+              <div class="highlight" data-highlight="${item.id}">
+                <div class="highlight-ring">
+                  <img src="${item.image}" alt="${escapeHtml(item.title)}" loading="lazy" />
                 </div>
+                <span>${escapeHtml(item.title)}</span>
               </div>
-              ${route === "home"
-            ? `
-              <button
-                id="refresh-feed"
-                style="
-                  border-radius:9999px;
-                  border:1px solid #e5e7eb;
-                  background:#ffffff;
-                  padding:0.35rem 0.9rem;
-                  font-size:11px;
-                  font-weight:500;
-                  color:#111827;
-                  cursor:pointer;
-                "
-              >
-                새로고침
-              </button>
-              `
-            : ""
-        }
-            </div>
-
-            <!-- 상단 고정 필터 (전체 / 컬렉션 자리) -->
-            <div
-              style="
-                display:flex;
-                flex-wrap:wrap;
-                gap:0.5rem;
-                align-items:center;
-              "
-            >
-              <button
-                type="button"
-                data-collection="__all"
-                style="
-                  border-radius:9999px;
-                  border:1px solid #0ea5e9;
-                  background:rgba(56,189,248,0.08);
-                  padding:0.35rem 0.75rem;
-                  font-size:11px;
-                  font-weight:500;
-                  color:#0369a1;
-                  cursor:pointer;
-                "
-              >
-                전체 보기
-              </button>
-              <button
-                type="button"
-                style="
-                  border-radius:9999px;
-                  border:1px solid #e5e7eb;
-                  background:#ffffff;
-                  padding:0.35rem 0.75rem;
-                  font-size:11px;
-                  font-weight:500;
-                  color:#6b7280;
-                  cursor:default;
-                "
-              >
-                컬렉션 선택 (향후)
-              </button>
-            </div>
-
-            <!-- 홈일 때만 태그 필터 등 -->
-            ${filtersHtml ?? ""}
-          </header>
-
-          <!-- 메인 피드 컨텐츠 -->
-          <main id="main-view" style="display:flex;flex-direction:column;gap:0.75rem;">
-            ${mainContentHtml}
-          </main>
-
-          <!-- 하단 푸터 -->
-          <footer
-            style="
-              margin-top:0.75rem;
-              padding-top:0.75rem;
-              border-top:1px solid #e5e7eb;
-              font-size:11px;
-              color:#9ca3af;
-            "
-          >
-            ${route === "home"
-            ? `
-              태그 필터는 1페이지 범위에서만 적용 (임시).<br />
-              나중에 여러 페이지 + 태그/컬렉션 라우팅으로 확장 예정.
             `
-            : "DevLog UI prototype · GitHub Pages"
-        }
-          </footer>
+        ).join("")}
+      </section>
+    `;
+}
+
+function renderTabStrip(): string {
+    return `
+      <div class="tab-strip" role="tablist">
+        ${Object.entries(TAB_LABELS)
+            .map(([tab, meta]) => {
+                const typed = tab as Tab;
+                const isActive = activeTab === typed;
+                return `
+                  <button
+                    class="tab-btn ${isActive ? "is-active" : ""}"
+                    role="tab"
+                    data-tab="${typed}"
+                    type="button"
+                  >
+                    ${iconMarkup(meta.icon)}
+                    <span>${meta.label}</span>
+                  </button>
+                `;
+            })
+            .join("")}
+      </div>
+    `;
+}
+
+function renderFilterRail(tags: string[]): string {
+    return `
+      <div class="filter-rail">
+        <button class="secondary" type="button" data-refresh>
+          새로고침
+        </button>
+        <div class="tag-rail">
+          ${renderTagChip("전체 태그", null, currentTag)}
+          ${tags.map((tag) => renderTagChip(`#${tag}`, tag, currentTag)).join("")}
         </div>
       </div>
-    </div>
-  `;
-
-    setupNavigationHandlers(route);
-
-    // 홈일 때만 새로고침 / 전체 컬렉션 버튼
-    if (route === "home") {
-        const refreshBtn = document.querySelector<HTMLButtonElement>("#refresh-feed");
-        refreshBtn?.addEventListener("click", () => {
-            bootstrap();
-        });
-
-        const allCollectionBtn = document.querySelector<HTMLButtonElement>(
-            '[data-collection="__all"]'
-        );
-        allCollectionBtn?.addEventListener("click", () => {
-            currentCollection = null;
-            renderHomeView();
-        });
-    }
+    `;
 }
 
-/**
- * 왼쪽 네비 버튼 이벤트
- */
-function setupNavigationHandlers(_currentRoute: Route) {
-    const navButtons = document.querySelectorAll<HTMLButtonElement>("[data-nav]");
-    navButtons.forEach((btn) => {
+function renderTagChip(label: string, tag: string | null, activeTag: string | null): string {
+    const isActive = (tag === null && activeTag === null) || (tag !== null && tag === activeTag);
+    const dataTag = tag ?? "__all";
+    return `
+      <button class="tag-chip ${isActive ? "is-active" : ""}" data-tag="${dataTag}" type="button">
+        ${escapeHtml(label)}
+      </button>
+    `;
+}
+
+function renderPostGrid(items: FeedItem[]): string {
+    if (items.length === 0) {
+        return `<div class="empty-state">조건에 맞는 글이 없습니다.</div>`;
+    }
+
+    return `
+      <div class="post-grid">
+        ${items.map((item) => renderPostTile(item)).join("")}
+      </div>
+    `;
+}
+
+function renderPostTile(item: FeedItem): string {
+    const tags = item.tags.length ? item.tags.map((tag) => `#${escapeHtml(tag)}`).join(" ") : "태그 없음";
+    const createdDate = new Date(item.created);
+    const createdLabel = isNaN(createdDate.getTime())
+        ? "작성일 미정"
+        : createdDate.toLocaleDateString("ko-KR", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+          });
+    const pseudoLikes = 100 + (item.summary?.length ?? 20);
+    const pseudoComments = item.tags.length * 5 + 12;
+    const cover = item.cover ? `<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(item.title)}" loading="lazy" />` : "";
+
+    return `
+      <article class="post-card">
+        <div class="post-media ${cover ? "" : "is-fallback"}" ${cover ? "" : `style="background:${fallbackGradient(item.slug)}"`}>
+          ${cover || `<span>${escapeHtml(item.title.charAt(0).toUpperCase())}</span>`}
+        </div>
+        <div class="post-overlay">
+          <p class="overlay-title">${escapeHtml(item.title)}</p>
+          <p class="overlay-tags">${tags}</p>
+          <div class="overlay-meta">
+            <span>❤️ ${pseudoLikes.toLocaleString()}</span>
+            <span>💬 ${pseudoComments}</span>
+          </div>
+          <p class="overlay-date">${createdLabel} · ${escapeHtml(item.slug)}</p>
+        </div>
+      </article>
+    `;
+}
+
+function fallbackGradient(seed: string): string {
+    const colors = ["#fee2e2", "#dbeafe", "#ede9fe", "#dcfce7", "#fef3c7"];
+    const index = Math.abs(seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)) % colors.length;
+    return `linear-gradient(135deg, ${colors[index]}, #fff)`;
+}
+
+function renderInfoCards(cards: InfoCard[]): string {
+    return `
+      <section class="info-grid">
+        ${cards
+            .map(
+                (card) => `
+                  <article class="info-card">
+                    <h3>${escapeHtml(card.title)}</h3>
+                    <ul>
+                      ${card.lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}
+                    </ul>
+                  </article>
+                `
+            )
+            .join("")}
+      </section>
+    `;
+}
+
+function renderHomeView() {
+    const route: Route = "home";
+    const visibleItems = currentTag
+        ? currentItems.filter((item) => item.tags.includes(currentTag!))
+        : currentItems;
+    const allTags = getAllTags(currentItems);
+
+    const stats: ProfileStat[] = [
+        { label: "posts", value: `${currentItems.length}` },
+        { label: "tags", value: `${allTags.length}` },
+        { label: "filters", value: currentTag ? `#${currentTag}` : "전체" },
+    ];
+
+    const mainContent = `
+      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
+      ${renderHighlights()}
+      ${renderTabStrip()}
+      ${renderFilterRail(allTags)}
+      ${activeTab === "posts"
+          ? renderPostGrid(visibleItems)
+          : `<div class="empty-state">${TAB_LABELS[activeTab].label} 뷰는 준비 중입니다.</div>`}
+    `;
+
+    renderAppShell(route, mainContent);
+    bindHomeInteractions();
+}
+
+function renderSearchView() {
+    const stats: ProfileStat[] = [
+        { label: "버전", value: "v0.2" },
+        { label: "상태", value: "개발" },
+        { label: "릴리스", value: "Soon" },
+    ];
+
+    const mainContent = `
+      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.search)}
+      ${renderInfoCards(INFO_CARDS.search)}
+    `;
+
+    renderAppShell("search", mainContent);
+}
+
+function renderWriteView() {
+    const stats: ProfileStat[] = [
+        { label: "Worker", value: "연결" },
+        { label: "JWT", value: "60분" },
+        { label: "상태", value: "Prototype" },
+    ];
+
+    const mainContent = `
+      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.write)}
+      ${renderInfoCards(INFO_CARDS.write)}
+    `;
+
+    renderAppShell("write", mainContent);
+}
+
+function bindHomeInteractions() {
+    const tagButtons = document.querySelectorAll<HTMLButtonElement>("[data-tag]");
+    tagButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
-            const target = btn.dataset.nav as Route | undefined;
+            const tag = btn.dataset.tag ?? "__all";
+            currentTag = tag === "__all" ? null : tag;
+            renderHomeView();
+        });
+    });
+
+    const tabButtons = document.querySelectorAll<HTMLButtonElement>("[data-tab]");
+    tabButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const tab = btn.dataset.tab as Tab | undefined;
+            if (!tab) return;
+            activeTab = tab;
+            renderHomeView();
+        });
+    });
+
+    const refreshBtn = document.querySelector<HTMLButtonElement>("[data-refresh]");
+    refreshBtn?.addEventListener("click", () => {
+        bootstrap();
+    });
+}
+
+function setupRouteHandlers() {
+    const routeButtons = document.querySelectorAll<HTMLButtonElement>("[data-route]");
+    routeButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const target = btn.dataset.route as Route | undefined;
             if (!target) return;
 
             if (target === "home") {
@@ -308,287 +606,39 @@ function setupNavigationHandlers(_currentRoute: Route) {
     });
 }
 
-/**
- * 로딩 화면 (레이아웃 없이)
- */
-function renderLoading() {
-    app!.innerHTML = `
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fafafa;color:#374151;">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:0.75rem;">
-        <div style="height:32px;width:32px;border-radius:9999px;border:2px solid #9ca3af;border-top-color:transparent;animation:spin 1s linear infinite;"></div>
-        <p style="font-size:0.875rem;color:#6b7280;">피드를 불러오는 중입니다...</p>
-      </div>
-    </div>
-  `;
+function getAllTags(items: FeedItem[]): string[] {
+    const set = new Set<string>();
+    items.forEach((item) => item.tags.forEach((tag) => set.add(tag)));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
 }
 
-/**
- * 에러 화면 (레이아웃 없이)
- */
+function renderLoading() {
+    app!.innerHTML = `
+      <div class="view-state">
+        <div class="loader"></div>
+        <p>피드를 불러오는 중입니다...</p>
+      </div>
+    `;
+}
+
 function renderError(message: string) {
     app!.innerHTML = `
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fafafa;color:#111827;padding:1rem;">
-      <div style="max-width:384px;width:100%;border-radius:1rem;background:#ffffff;border:1px solid rgba(248,113,113,0.4);padding:1.25rem;box-sizing:border-box;">
-        <h1 style="font-size:1.125rem;font-weight:600;color:#b91c1c;margin-bottom:0.5rem;">문제가 발생했어요</h1>
-        <p style="font-size:0.875rem;color:#374151;">${message}</p>
-        <button
-          id="reload-btn"
-          style="margin-top:0.75rem;border-radius:0.75rem;border:1px solid #d1d5db;background:#111827;padding:0.375rem 0.75rem;font-size:0.875rem;font-weight:500;color:#f9fafb;cursor:pointer;">
-          다시 시도
-        </button>
+      <div class="view-state">
+        <p>${escapeHtml(message)}</p>
+        <button class="primary" id="reload" type="button">다시 시도</button>
       </div>
-    </div>
-  `;
+    `;
 
-    const btn = document.querySelector<HTMLButtonElement>("#reload-btn");
+    const btn = document.querySelector<HTMLButtonElement>("#reload");
     btn?.addEventListener("click", () => {
         bootstrap();
     });
 }
 
-/**
- * 모든 태그 집합 만들기
- */
-function getAllTags(items: FeedItem[]): string[] {
-    const set = new Set<string>();
-    for (const item of items) {
-        for (const t of item.tags) {
-            set.add(t);
-        }
-    }
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-}
-
-/**
- * 태그 chip
- */
-function renderTagChip(label: string, tag: string | null, activeTag: string | null): string {
-    const isActive =
-        (tag === null && activeTag === null) || (tag !== null && tag === activeTag);
-
-    const baseClasses =
-        "inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-medium whitespace-nowrap transition";
-
-    const activeClasses = "border-sky-400 bg-sky-500/10 text-sky-600";
-    const inactiveClasses =
-        "border-slate-200 bg-white text-slate-600 hover:bg-slate-100";
-
-    const cls = isActive ? activeClasses : inactiveClasses;
-    const dataTag = tag === null ? "__all" : tag;
-
-    return `
-    <button
-      class="${baseClasses} ${cls}"
-      data-tag="${escapeHtml(dataTag)}"
-      type="button"
-    >
-      ${escapeHtml(label)}
-    </button>
-  `;
-}
-
-/**
- * 카드 하나 (인스타 카드 느낌으로 약간 여백/그림자)
- */
-function renderFeedCard(item: FeedItem): string {
-    const createdDate = new Date(item.created);
-    const createdLabel = isNaN(createdDate.getTime())
-        ? ""
-        : createdDate.toLocaleDateString("ko-KR", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-        });
-
-    const tagsLabel =
-        item.tags.length > 0 ? item.tags.map((t) => `#${t}`).join(" ") : "";
-
-    return `
-    <article
-      style="
-        border-radius:1rem;
-        border:1px solid #e5e7eb;
-        background:#ffffff;
-        padding:0.9rem 1rem;
-        box-sizing:border-box;
-        box-shadow:0 1px 2px rgba(15,23,42,0.04);
-      "
-    >
-      <!-- 카드 상단: 제목 / 날짜 -->
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:0.5rem;
-          margin-bottom:0.35rem;
-        "
-      >
-        <div
-          style="
-            font-size:13px;
-            font-weight:600;
-            white-space:nowrap;
-            overflow:hidden;
-            text-overflow:ellipsis;
-          "
-        >
-          ${escapeHtml(item.title)}
-        </div>
-        ${createdLabel
-            ? `<div style="font-size:11px;color:#9ca3af;white-space:nowrap;">${createdLabel}</div>`
-            : ""
-        }
-      </div>
-
-      <!-- 요약 -->
-      ${item.summary
-            ? `<p style="font-size:12px;color:#4b5563;line-height:1.5;margin-bottom:0.35rem;">
-               ${escapeHtml(item.summary)}
-             </p>`
-            : ""
-        }
-
-      <!-- 태그 / 컬렉션 -->
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:0.5rem;
-          margin-top:0.25rem;
-        "
-      >
-        <div style="font-size:11px;color:#0ea5e9;">
-          ${tagsLabel ? escapeHtml(tagsLabel) : ""}
-        </div>
-        ${item.collection
-            ? `<div
-                 style="
-                   font-size:10px;
-                   padding:0.15rem 0.45rem;
-                   border-radius:9999px;
-                   background:#f3f4f6;
-                   color:#4b5563;
-                   border:1px solid #e5e7eb;
-                 "
-               >
-                 ${escapeHtml(item.collection)}
-               </div>`
-            : ""
-        }
-      </div>
-    </article>
-  `;
-}
-
-/**
- * 홈 화면
- */
-function renderHomeView() {
-    const route: Route = "home";
-
-    const afterCollection = currentCollection
-        ? currentItems.filter((item) => item.collection === currentCollection)
-        : currentItems;
-
-    const afterTag = currentTag
-        ? afterCollection.filter((item) => item.tags.includes(currentTag!))
-        : afterCollection;
-
-    const allTags = getAllTags(afterCollection);
-
-    const filtersHtml = `
-    <div class="flex items-center gap-2 overflow-x-auto scrollbar-none pr-1">
-      ${renderTagChip("전체 태그", null, currentTag)}
-      ${allTags.map((tag) => renderTagChip(tag, tag, currentTag)).join("")}
-    </div>
-  `;
-
-    const mainContentHtml =
-        afterTag.length === 0
-            ? `<p style="font-size:13px;color:#6b7280;">해당 조건에 맞는 글이 없습니다.</p>`
-            : afterTag.map((item) => renderFeedCard(item)).join("");
-
-    renderAppShell(route, mainContentHtml, filtersHtml);
-
-    const tagButtons = document.querySelectorAll<HTMLButtonElement>("[data-tag]");
-    tagButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const tag = btn.dataset.tag || null;
-            currentTag = tag === "__all" ? null : tag;
-            renderHomeView();
-        });
-    });
-}
-
-/**
- * 검색 화면 (임시)
- */
-function renderSearchView() {
-    const route: Route = "search";
-
-    const mainContentHtml = `
-    <section style="display:flex;flex-direction:column;gap:0.75rem;">
-      <div
-        style="
-          border-radius:1rem;
-          border:1px solid #e5e7eb;
-          background:#ffffff;
-          padding:0.9rem 1rem;
-          box-sizing:border-box;
-        "
-      >
-        <h2 style="font-size:13px;font-weight:600;margin-bottom:0.25rem;">검색 화면 준비 중</h2>
-        <p style="font-size:12px;color:#4b5563;line-height:1.5;">
-          /search 에서는 태그, 제목, 내용 등을 기준으로 글을 검색하는 UI를 구현할 예정입니다.
-        </p>
-      </div>
-    </section>
-  `;
-
-    renderAppShell(route, mainContentHtml, null);
-}
-
-/**
- * 작성 화면 (임시)
- */
-function renderWriteView() {
-    const route: Route = "write";
-
-    const mainContentHtml = `
-    <section style="display:flex;flex-direction:column;gap:0.75rem;">
-      <div
-        style="
-          border-radius:1rem;
-          border:1px solid #e5e7eb;
-          background:#ffffff;
-          padding:0.9rem 1rem;
-          box-sizing:border-box;
-        "
-      >
-        <h2 style="font-size:13px;font-weight:600;margin-bottom:0.25rem;">작성 화면 준비 중</h2>
-        <p style="font-size:12px;color:#4b5563;line-height:1.5;">
-          /write 에서는 제목, 슬러그, 태그, 컬렉션, 본문을 입력하고 Worker /content/commit 으로 전송하는
-          작성 UI를 이 영역에 구현할 예정입니다.
-        </p>
-      </div>
-    </section>
-  `;
-
-    renderAppShell(route, mainContentHtml, null);
-}
-
-/**
- * 단순 escape
- */
 function escapeHtml(str: string): string {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/**
- * 라우터
- */
 function renderRoute() {
     const route = getCurrentRouteFromHash();
 
@@ -605,30 +655,22 @@ function renderRoute() {
     }
 }
 
-/**
- * 초기 부트스트랩
- */
 async function bootstrap() {
     renderLoading();
     currentTag = null;
-    currentCollection = null;
+    activeTab = "posts";
 
     try {
-        const { current, page } = await loadInitialFeed(1);
-        console.log("✅ current:", current);
-        console.log("✅ page:", page);
-
+        const { page } = await loadInitialFeed(1);
         currentItems = page.items;
         renderRoute();
-    } catch (err) {
-        console.error(err);
-        renderError(
-            err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-        );
+    } catch (error) {
+        console.error(error);
+        const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+        renderError(message);
     }
 }
 
-// hash 변경 시
 window.addEventListener("hashchange", () => {
     if (getCurrentRouteFromHash() === "home" && currentItems.length === 0) {
         bootstrap();
@@ -637,5 +679,4 @@ window.addEventListener("hashchange", () => {
     }
 });
 
-// 시작
 bootstrap();
