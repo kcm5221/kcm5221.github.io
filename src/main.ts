@@ -1,9 +1,10 @@
+// src/main.ts
 import "./style.css";
 import { loadInitialFeed } from "./api/feed";
 import type { FeedItem } from "./types/Feed";
 
-type Route = "home" | "search" | "write";
-type Tab = "posts" | "saved" | "tagged";
+type Route = "home" | "search" | "profile" | "write";
+type Tab = "posts" | "saved";
 
 type SidebarItem = {
     id: string;
@@ -17,12 +18,6 @@ type BottomNavItem = {
     icon: IconName;
     route?: Route;
 };
-
-interface HighlightItem {
-    id: string;
-    title: string;
-    image: string;
-}
 
 interface InfoCard {
     title: string;
@@ -55,62 +50,25 @@ if (!app) {
     throw new Error("#app element not found");
 }
 
-const HIGHLIGHTS: HighlightItem[] = [
-    {
-        id: "travel",
-        title: "Cloudflare",
-        image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=200",
-    },
-    {
-        id: "food",
-        title: "GitHub",
-        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200",
-    },
-    {
-        id: "city",
-        title: "Workers",
-        image: "https://images.unsplash.com/photo-1617121346253-43ef95179ac9?w=200",
-    },
-    {
-        id: "nature",
-        title: "Actions",
-        image: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=200",
-    },
-    {
-        id: "fitness",
-        title: "Pages",
-        image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200",
-    },
-];
-
 const SIDEBAR_ITEMS: SidebarItem[] = [
     { id: "home", label: "Home", icon: "home", route: "home" },
     { id: "search", label: "Search", icon: "search", route: "search" },
-    { id: "explore", label: "Explore", icon: "compass" },
-    { id: "reels", label: "Reels", icon: "film" },
-    { id: "messages", label: "Messages", icon: "message" },
-    { id: "notifications", label: "Notifications", icon: "heart" },
+    { id: "profile", label: "Profile", icon: "user", route: "profile" },
     { id: "create", label: "Create", icon: "plus", route: "write" },
-    { id: "profile", label: "Profile", icon: "user" },
 ];
 
 const BOTTOM_NAV: BottomNavItem[] = [
     { id: "home", icon: "home", route: "home" },
     { id: "search", icon: "search", route: "search" },
-    { id: "reels", icon: "film" },
+    { id: "profile", icon: "user", route: "profile" },
     { id: "create", icon: "plus", route: "write" },
-    { id: "profile", icon: "user" },
 ];
 
-const ROUTE_DESCRIPTIONS: Record<Route, string> = {
-    home: "GitHub Pages + Cloudflare Workers + GitHub Actions 로 이어지는 개발 로그를 인스타그램 뷰로 묶었습니다.",
-    search:
-        "태그, 제목, 내용으로 DevLog 를 검색하는 전용 탐색 화면을 준비 중입니다. PKCE 기반 인증 완료 후 알파 기능이 열립니다.",
-    write:
-        "Cloudflare Worker 의 /content/commit 엔드포인트에 연결되는 작성 도구입니다. GitHub App 권한 확인 후 브라우저에서 바로 글을 발행합니다.",
-};
+const ROUTE_DESCRIPTIONS = {
+    home: "Developer",
+} as const;
 
-const INFO_CARDS: Record<Exclude<Route, "home">, InfoCard[]> = {
+const INFO_CARDS: Record<"search" | "write", InfoCard[]> = {
     search: [
         {
             title: "검색 화면 준비 중",
@@ -152,7 +110,6 @@ const INFO_CARDS: Record<Exclude<Route, "home">, InfoCard[]> = {
 const TAB_LABELS: Record<Tab, { label: string; icon: IconName }> = {
     posts: { label: "Posts", icon: "grid" },
     saved: { label: "Saved", icon: "bookmark" },
-    tagged: { label: "Tagged", icon: "tagged" },
 };
 
 const ICONS: Record<IconName, string> = {
@@ -251,6 +208,7 @@ let activeTab: Tab = "posts";
 function getCurrentRouteFromHash(): Route {
     const hash = window.location.hash || "#/";
     if (hash.startsWith("#/search")) return "search";
+    if (hash.startsWith("#/profile")) return "profile";
     if (hash.startsWith("#/write")) return "write";
     return "home";
 }
@@ -273,14 +231,10 @@ function renderAppShell(route: Route, bodyHtml: string) {
 function renderSidebar(route: Route): string {
     return `
       <aside class="left-sidebar">
-        <div class="sidebar-logo">Instagram</div>
+        <div class="sidebar-logo">Gitstagram</div>
         <nav class="sidebar-nav">
           ${SIDEBAR_ITEMS.map((item) => renderSidebarButton(item, route)).join("")}
         </nav>
-        <button class="sidebar-link" type="button">
-          ${iconMarkup("menu")}
-          <span>More</span>
-        </button>
       </aside>
     `;
 }
@@ -302,11 +256,7 @@ function renderSidebarButton(item: SidebarItem, activeRoute: Route): string {
 function renderMobileHeader(): string {
     return `
       <header class="mobile-header">
-        <div class="mobile-username">devlog.feed ${iconMarkup("chevron")}</div>
-        <div class="mobile-actions">
-          <button class="icon-button" type="button">${iconMarkup("heart")}</button>
-          <button class="icon-button" type="button">${iconMarkup("message")}</button>
-        </div>
+        <div class="mobile-username">Cheolmin Kim${iconMarkup("chevron")}</div>
       </header>
     `;
 }
@@ -315,8 +265,8 @@ function renderBottomNav(route: Route): string {
     return `
       <nav class="bottom-nav">
         ${BOTTOM_NAV.map((item) => {
-            const isActive = !!item.route && item.route === route;
-            return `
+        const isActive = !!item.route && item.route === route;
+        return `
               <button
                 type="button"
                 class="bottom-nav-btn ${isActive ? "is-active" : ""}"
@@ -325,7 +275,7 @@ function renderBottomNav(route: Route): string {
                 ${iconMarkup(item.icon)}
               </button>
             `;
-        }).join("")}
+    }).join("")}
       </nav>
     `;
 }
@@ -338,52 +288,108 @@ function renderProfileHeader(stats: ProfileStat[], description: string): string 
     return `
       <section class="profile-header">
         <div class="profile-avatar">
-          <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=300" alt="Profile" loading="lazy" />
+          <img src="/profile/profile.jpg" alt="Profile" loading="lazy" />
         </div>
         <div class="profile-details">
           <div class="profile-top-row">
-            <h2 class="profile-username">devlog.feed</h2>
-            <div class="profile-actions">
-              <button class="primary" type="button">Follow</button>
-              <button class="secondary" type="button">Message</button>
-              <button class="icon-button" type="button" aria-label="더보기">${iconMarkup("menu")}</button>
-            </div>
+            <h2 class="profile-username">Cheolmin Kim</h2>
           </div>
           <div class="profile-stat-row">
             ${stats
-                .map(
-                    (stat) => `
+            .map(
+                (stat) => `
                       <div class="stat">
                         <span class="stat-value">${escapeHtml(stat.value)}</span>
                         ${escapeHtml(stat.label)}
                       </div>
                     `
-                )
-                .join("")}
+            )
+            .join("")}
           </div>
           <div class="profile-bio">
-            <p><strong>DevLog Studio</strong></p>
+            <p><strong>김철민</strong></p>
             <p>${escapeHtml(description)}</p>
-            <p>✉️ contact@devlog.example</p>
+            <p>✉️ kimcm5221@naver.com</p>
           </div>
         </div>
       </section>
     `;
 }
 
-function renderHighlights(): string {
+function renderProfileDetails(): string {
     return `
-      <section class="highlights" aria-label="피드 하이라이트">
-        ${HIGHLIGHTS.map(
-            (item) => `
-              <div class="highlight" data-highlight="${item.id}">
-                <div class="highlight-ring">
-                  <img src="${item.image}" alt="${escapeHtml(item.title)}" loading="lazy" />
-                </div>
-                <span>${escapeHtml(item.title)}</span>
-              </div>
-            `
-        ).join("")}
+      <section class="profile-section">
+        <div class="profile-section-block">
+          <h3>기본 정보</h3>
+          <div class="profile-section-body">
+            <div class="profile-row">
+              <span class="profile-label">이름</span>
+              <span class="profile-value">김철민</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">출생</span>
+              <span class="profile-value">1996년</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">학력</span>
+              <span class="profile-value">원광대학교 원예산업학과 학사</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section-block">
+          <h3>교육 이력</h3>
+          <div class="profile-section-body">
+            <div class="profile-row">
+              <span class="profile-label">2023.05 ~ 2023.11</span>
+              <span class="profile-value">
+                AWS를 활용한 Java/Spring 기반 풀스택 개발자 양성과정<br />
+                이젠컴퓨터아트서비스학원 (전주)
+              </span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">2024.03 ~ 2024.10</span>
+              <span class="profile-value">
+                언리얼엔진 기반 게임 개발자 양성과정<br />
+                GCC 사관학교 (광주)
+              </span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">2025.01 ~ 2025.02</span>
+              <span class="profile-value">
+                42경산 라피신
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section-block">
+          <h3>경력</h3>
+          <div class="profile-section-body">
+            <div class="profile-row">
+              <span class="profile-label">2024.10 ~ 2024.12</span>
+              <span class="profile-value">루노소프트 기획팀 인턴</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section-block">
+          <h3>스킬</h3>
+          <div class="profile-section-body">
+            <div class="profile-row">
+              <span class="profile-label">언어</span>
+              <span class="profile-value">C++</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">게임 엔진</span>
+              <span class="profile-value">Unreal Engine / Unity</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">웹</span>
+              <span class="profile-value">HTML / CSS</span>
+            </div>
+          </div>
+        </div>
       </section>
     `;
 }
@@ -415,9 +421,6 @@ function renderTabStrip(): string {
 function renderFilterRail(tags: string[]): string {
     return `
       <div class="filter-rail">
-        <button class="secondary" type="button" data-refresh>
-          새로고침
-        </button>
         <div class="tag-rail">
           ${renderTagChip("전체 태그", null, currentTag)}
           ${tags.map((tag) => renderTagChip(`#${tag}`, tag, currentTag)).join("")}
@@ -449,22 +452,29 @@ function renderPostGrid(items: FeedItem[]): string {
 }
 
 function renderPostTile(item: FeedItem): string {
-    const tags = item.tags.length ? item.tags.map((tag) => `#${escapeHtml(tag)}`).join(" ") : "태그 없음";
+    const tags = item.tags.length
+        ? item.tags.map((tag) => `#${escapeHtml(tag)}`).join(" ")
+        : "태그 없음";
     const createdDate = new Date(item.created);
     const createdLabel = isNaN(createdDate.getTime())
         ? "작성일 미정"
         : createdDate.toLocaleDateString("ko-KR", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-          });
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        });
     const pseudoLikes = 100 + (item.summary?.length ?? 20);
     const pseudoComments = item.tags.length * 5 + 12;
-    const cover = item.cover ? `<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(item.title)}" loading="lazy" />` : "";
+    const cover = item.cover
+        ? `<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(
+            item.title
+        )}" loading="lazy" />`
+        : "";
 
     return `
       <article class="post-card">
-        <div class="post-media ${cover ? "" : "is-fallback"}" ${cover ? "" : `style="background:${fallbackGradient(item.slug)}"`}>
+        <div class="post-media ${cover ? "" : "is-fallback"}" ${cover ? "" : `style="background:${fallbackGradient(item.slug)}"`
+        }>
           ${cover || `<span>${escapeHtml(item.title.charAt(0).toUpperCase())}</span>`}
         </div>
         <div class="post-overlay">
@@ -482,7 +492,9 @@ function renderPostTile(item: FeedItem): string {
 
 function fallbackGradient(seed: string): string {
     const colors = ["#fee2e2", "#dbeafe", "#ede9fe", "#dcfce7", "#fef3c7"];
-    const index = Math.abs(seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)) % colors.length;
+    const index = Math.abs(
+        seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    ) % colors.length;
     return `linear-gradient(135deg, ${colors[index]}, #fff)`;
 }
 
@@ -505,6 +517,15 @@ function renderInfoCards(cards: InfoCard[]): string {
     `;
 }
 
+function buildCommonProfileStats(): ProfileStat[] {
+    const allTags = getAllTags(currentItems);
+
+    return [
+        { label: "posts", value: `${currentItems.length}` },
+        { label: "tags", value: `${allTags.length}` },
+    ];
+}
+
 function renderHomeView() {
     const route: Route = "home";
     const visibleItems = currentTag
@@ -512,20 +533,16 @@ function renderHomeView() {
         : currentItems;
     const allTags = getAllTags(currentItems);
 
-    const stats: ProfileStat[] = [
-        { label: "posts", value: `${currentItems.length}` },
-        { label: "tags", value: `${allTags.length}` },
-        { label: "filters", value: currentTag ? `#${currentTag}` : "전체" },
-    ];
+    const stats = buildCommonProfileStats();
 
     const mainContent = `
       ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
-      ${renderHighlights()}
       ${renderTabStrip()}
       ${renderFilterRail(allTags)}
       ${activeTab === "posts"
-          ? renderPostGrid(visibleItems)
-          : `<div class="empty-state">${TAB_LABELS[activeTab].label} 뷰는 준비 중입니다.</div>`}
+            ? renderPostGrid(visibleItems)
+            : `<div class="empty-state">${TAB_LABELS[activeTab].label} 뷰는 준비 중입니다.</div>`
+        }
     `;
 
     renderAppShell(route, mainContent);
@@ -533,29 +550,32 @@ function renderHomeView() {
 }
 
 function renderSearchView() {
-    const stats: ProfileStat[] = [
-        { label: "버전", value: "v0.2" },
-        { label: "상태", value: "개발" },
-        { label: "릴리스", value: "Soon" },
-    ];
+    const stats = buildCommonProfileStats();
 
     const mainContent = `
-      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.search)}
+      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
       ${renderInfoCards(INFO_CARDS.search)}
     `;
 
     renderAppShell("search", mainContent);
 }
 
-function renderWriteView() {
-    const stats: ProfileStat[] = [
-        { label: "Worker", value: "연결" },
-        { label: "JWT", value: "60분" },
-        { label: "상태", value: "Prototype" },
-    ];
+function renderProfileView() {
+    const stats = buildCommonProfileStats();
 
     const mainContent = `
-      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.write)}
+      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
+      ${renderProfileDetails()}
+    `;
+
+    renderAppShell("profile", mainContent);
+}
+
+function renderWriteView() {
+    const stats = buildCommonProfileStats();
+
+    const mainContent = `
+      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
       ${renderInfoCards(INFO_CARDS.write)}
     `;
 
@@ -581,11 +601,6 @@ function bindHomeInteractions() {
             renderHomeView();
         });
     });
-
-    const refreshBtn = document.querySelector<HTMLButtonElement>("[data-refresh]");
-    refreshBtn?.addEventListener("click", () => {
-        bootstrap();
-    });
 }
 
 function setupRouteHandlers() {
@@ -599,6 +614,8 @@ function setupRouteHandlers() {
                 window.location.hash = "#/";
             } else if (target === "search") {
                 window.location.hash = "#/search";
+            } else if (target === "profile") {
+                window.location.hash = "#/profile";
             } else if (target === "write") {
                 window.location.hash = "#/write";
             }
@@ -652,6 +669,8 @@ function renderRoute() {
         renderSearchView();
     } else if (route === "write") {
         renderWriteView();
+    } else if (route === "profile") {
+        renderProfileView();
     }
 }
 
@@ -666,7 +685,8 @@ async function bootstrap() {
         renderRoute();
     } catch (error) {
         console.error(error);
-        const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+        const message =
+            error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
         renderError(message);
     }
 }
