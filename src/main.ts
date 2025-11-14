@@ -86,26 +86,27 @@ function getJwtToken(): string | null {
 }
 
 // 🔐 GitHub OAuth 콜백(#auth=...)에서 토큰 회수
-function consumeAuthFromHash() {
-    const hash = window.location.hash || "";
-    // 예: #auth=eyJhbGc... 또는 #auth=...&route=/write 이런 것도 대비
-    const match = hash.match(/^#auth=([^&]+)/);
+// URL 해시에서 #auth=토큰 형태를 소비해서 localStorage에 저장
+function consumeAuthFromHash(): void {
+    const raw = window.location.hash || "";
+
+    // #auth=... 또는 #/auth=... 둘 다 허용
+    const match = raw.match(/^#\/?auth=(.+)$/);
     if (!match) return;
 
-    const raw = match[1];
+    const token = match[1];
+    if (!token) return;
 
     try {
-        const token = decodeURIComponent(raw);
-        // JWT 저장
         localStorage.setItem(JWT_STORAGE_KEY, token);
-        console.log("✅ JWT 저장 완료");
-    } catch (e) {
-        console.error("JWT 저장 실패", e);
+    } catch {
+        // localStorage 막힌 환경이면 무시
     }
 
-    // URL 깨끗하게 정리 + 로그인 후 이동할 화면
-    window.location.hash = "#/write"; // 로그인 후 바로 글쓰기 화면
+    // 해시를 깔끔하게 정리하면서 작성 페이지로 이동
+    window.location.replace("#/write");
 }
+
 
 
 function isLoggedIn(): boolean {
@@ -1009,7 +1010,9 @@ function handleAuthCallbackRoute() {
 
 
 async function bootstrap() {
+    // 🔐 GitHub OAuth에서 되돌아온 #auth=토큰 처리
     consumeAuthFromHash();
+
     renderLoading();
     activeTab = "posts";
 
@@ -1024,6 +1027,7 @@ async function bootstrap() {
         renderError(message);
     }
 }
+
 
 function consumeAuthTokenFromHash() {
     const hash = window.location.hash || "";
