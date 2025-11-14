@@ -3,7 +3,7 @@ import "./style.css";
 import { loadInitialFeed } from "./api/feed";
 import type { FeedItem } from "./types/Feed";
 
-type Route = "home" | "search" | "profile" | "write";
+type Route = "home" | "search" | "profile" | "write" | "authCallback";
 type Tab = "posts" | "saved";
 
 type SidebarItem = {
@@ -67,6 +67,27 @@ const BOTTOM_NAV: BottomNavItem[] = [
 const ROUTE_DESCRIPTIONS = {
     home: "Developer",
 } as const;
+
+// Worker 베이스 URL (env 우선, 없으면 기본값)
+const API_BASE =
+    (import.meta as any).env?.VITE_API_BASE ??
+    "https://blog-auth-worker.kimcm5221.workers.dev";
+
+// JWT 저장 키 & 로그인 여부 헬퍼
+const JWT_STORAGE_KEY = "devlog_jwt";
+
+
+function getJwtToken(): string | null {
+    try {
+        return localStorage.getItem(JWT_STORAGE_KEY);
+    } catch {
+        return null;
+    }
+}
+
+function isLoggedIn(): boolean {
+    return !!getJwtToken();
+}
 
 const INFO_CARDS: Record<"search" | "write", InfoCard[]> = {
     search: [
@@ -202,7 +223,6 @@ const ICONS: Record<IconName, string> = {
 };
 
 let currentItems: FeedItem[] = [];
-let currentTag: string | null = null;
 let activeTab: Tab = "posts";
 
 function getCurrentRouteFromHash(): Route {
@@ -210,8 +230,20 @@ function getCurrentRouteFromHash(): Route {
     if (hash.startsWith("#/search")) return "search";
     if (hash.startsWith("#/profile")) return "profile";
     if (hash.startsWith("#/write")) return "write";
+    if (hash.startsWith("#/auth/callback")) return "authCallback";
     return "home";
 }
+
+function extractTokenFromHash(): string | null {
+    const hash = window.location.hash; // "#/auth/callback?token=...."
+    const qIndex = hash.indexOf("?");
+    if (qIndex === -1) return null;
+
+    const query = hash.slice(qIndex + 1); // "token=...."
+    const params = new URLSearchParams(query);
+    return params.get("token");
+}
+
 
 function renderAppShell(route: Route, bodyHtml: string) {
     app!.innerHTML = `
@@ -418,27 +450,6 @@ function renderTabStrip(): string {
     `;
 }
 
-function renderFilterRail(tags: string[]): string {
-    return `
-      <div class="filter-rail">
-        <div class="tag-rail">
-          ${renderTagChip("전체 태그", null, currentTag)}
-          ${tags.map((tag) => renderTagChip(`#${tag}`, tag, currentTag)).join("")}
-        </div>
-      </div>
-    `;
-}
-
-function renderTagChip(label: string, tag: string | null, activeTag: string | null): string {
-    const isActive = (tag === null && activeTag === null) || (tag !== null && tag === activeTag);
-    const dataTag = tag ?? "__all";
-    return `
-      <button class="tag-chip ${isActive ? "is-active" : ""}" data-tag="${dataTag}" type="button">
-        ${escapeHtml(label)}
-      </button>
-    `;
-}
-
 function renderPostGrid(items: FeedItem[]): string {
     if (items.length === 0) {
         return `<div class="empty-state">조건에 맞는 글이 없습니다.</div>`;
@@ -490,6 +501,18 @@ function renderPostTile(item: FeedItem): string {
     `;
 }
 
+function slugifyTitle(title: string): string {
+    return title
+        .trim()
+        .toLowerCase()
+        // 문자/숫자/공백/하이픈만 남기고 나머지 제거 (한글은 그대로 둠)
+        .replace(/[^\p{Letter}\p{Number}\s-]/gu, "")
+        // 공백을 하이픈으로
+        .replace(/\s+/g, "-")
+        // 하이픈 중복 제거
+        .replace(/-+/g, "-");
+}
+
 function fallbackGradient(seed: string): string {
     const colors = ["#fee2e2", "#dbeafe", "#ede9fe", "#dcfce7", "#fef3c7"];
     const index = Math.abs(
@@ -518,27 +541,18 @@ function renderInfoCards(cards: InfoCard[]): string {
 }
 
 function buildCommonProfileStats(): ProfileStat[] {
-    const allTags = getAllTags(currentItems);
-
-    return [
-        { label: "posts", value: `${currentItems.length}` },
-        { label: "tags", value: `${allTags.length}` },
-    ];
+    return [{ label: "posts", value: `${currentItems.length}` }];
 }
 
 function renderHomeView() {
     const route: Route = "home";
-    const visibleItems = currentTag
-        ? currentItems.filter((item) => item.tags.includes(currentTag!))
-        : currentItems;
-    const allTags = getAllTags(currentItems);
+    const visibleItems = currentItems;
 
     const stats = buildCommonProfileStats();
 
     const mainContent = `
       ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
       ${renderTabStrip()}
-      ${renderFilterRail(allTags)}
       ${activeTab === "posts"
             ? renderPostGrid(visibleItems)
             : `<div class="empty-state">${TAB_LABELS[activeTab].label} 뷰는 준비 중입니다.</div>`
@@ -574,24 +588,149 @@ function renderProfileView() {
 function renderWriteView() {
     const stats = buildCommonProfileStats();
 
+    // 1) 로그인 안 되어 있으면: 로그인 유도 화면
+    if (!isLoggedIn()) {
+        const mainContent = `
+          ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
+          <section class="profile-section">
+            <article class="info-card">
+              <h3>로그인이 필요합니다</h3>
+              <div class="profile-section-body">
+                <p class="write-hint">
+                  GitHub OAuth로 본인 확인 후, 이 블로그에서 글을 작성할 수 있습니다.
+                  (현재는 소유자 계정만 작성 가능하도록 제한되어 있습니다.)
+                </p>
+                <div class="write-actions">
+                  <button type="button" id="write-login-btn" class="primary">
+                    GitHub로 로그인
+                  </button>
+                </div>
+              </div>
+            </article>
+          </section>
+        `;
+
+        renderAppShell("write", mainContent);
+
+        const loginBtn = document.querySelector<HTMLButtonElement>("#write-login-btn");
+        loginBtn?.addEventListener("click", () => {
+            // Worker의 /auth/login 으로 이동 → PKCE + OAuth 시작
+            window.location.href = `${API_BASE}/auth/login`;
+        });
+
+        return;
+    }
+
+    // 2) 로그인 되어 있으면: 작성 폼 렌더
     const mainContent = `
       ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
-      ${renderInfoCards(INFO_CARDS.write)}
+      <section class="profile-section">
+        <article class="info-card">
+          <h3>새 글 작성</h3>
+          <form id="write-form" class="write-form">
+            <div class="profile-section-body">
+              
+              <!-- 제목 -->
+              <div class="profile-row">
+                <div class="profile-label">제목 *</div>
+                <div class="profile-value">
+                  <input
+                    id="write-title"
+                    type="text"
+                    placeholder="예: Cloudflare Workers로 GitHub 블로그 자동화"
+                    class="write-input"
+                  />
+                </div>
+              </div>
+
+              <!-- 슬러그 -->
+              <div class="profile-row">
+                <div class="profile-label">슬러그 *</div>
+                <div class="profile-value">
+                  <input
+                    id="write-slug"
+                    type="text"
+                    placeholder="예: cloudflare-workers-github-blog"
+                    class="write-input"
+                  />
+                  <p class="write-hint">제목을 입력하면 자동으로 생성되며, 직접 수정도 가능합니다.</p>
+                </div>
+              </div>
+
+              <!-- 요약 -->
+              <div class="profile-row">
+                <div class="profile-label">요약</div>
+                <div class="profile-value">
+                  <textarea
+                    id="write-summary"
+                    rows="3"
+                    placeholder="이 글에서 다루는 내용을 한두 문장으로 정리해 주세요."
+                    class="write-textarea"
+                  ></textarea>
+                </div>
+              </div>
+
+              <!-- 태그 -->
+              <div class="profile-row">
+                <div class="profile-label">태그 *</div>
+                <div class="profile-value">
+                  <input
+                    id="write-tags"
+                    type="text"
+                    placeholder="예: devlog, cloudflare, github"
+                    class="write-input"
+                  />
+                  <p class="write-hint">쉼표 또는 공백으로 여러 태그를 구분합니다. (최소 1개 이상)</p>
+                </div>
+              </div>
+
+              <!-- 컬렉션 -->
+              <div class="profile-row">
+                <div class="profile-label">컬렉션</div>
+                <div class="profile-value">
+                  <input
+                    id="write-collection"
+                    type="text"
+                    placeholder="예: 게임개발, 블로그 인프라, 코테 기록"
+                    class="write-input"
+                  />
+                  <p class="write-hint">선택 사항입니다. 나중에 상세 페이지에서 변경할 수 있습니다.</p>
+                </div>
+              </div>
+
+              <!-- 본문 -->
+              <div class="profile-row">
+                <div class="profile-label">본문 *</div>
+                <div class="profile-value">
+                  <textarea
+                    id="write-body"
+                    rows="10"
+                    placeholder="Markdown 형식으로 본문을 작성해 주세요."
+                    class="write-textarea"
+                  ></textarea>
+                  <p class="write-hint">지금은 미리보기 없이 textarea만 사용합니다. (나중에 Preview 탭 추가 예정)</p>
+                </div>
+              </div>
+
+              <!-- 에러 메시지 -->
+              <div id="write-error" class="write-error" style="display:none;"></div>
+
+              <!-- 액션 버튼 -->
+              <div class="write-actions">
+                <button type="button" id="write-reset" class="secondary">초기화</button>
+                <button type="submit" id="write-submit" class="primary">게시</button>
+              </div>
+            </div>
+          </form>
+        </article>
+      </section>
     `;
 
     renderAppShell("write", mainContent);
+    setupWriteViewInteractions();
 }
 
 function bindHomeInteractions() {
-    const tagButtons = document.querySelectorAll<HTMLButtonElement>("[data-tag]");
-    tagButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const tag = btn.dataset.tag ?? "__all";
-            currentTag = tag === "__all" ? null : tag;
-            renderHomeView();
-        });
-    });
-
     const tabButtons = document.querySelectorAll<HTMLButtonElement>("[data-tab]");
     tabButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -600,6 +739,118 @@ function bindHomeInteractions() {
             activeTab = tab;
             renderHomeView();
         });
+    });
+}
+
+function setupWriteViewInteractions() {
+    const form = document.querySelector<HTMLFormElement>("#write-form");
+    if (!form) return;
+
+    const titleInput = form.querySelector<HTMLInputElement>("#write-title");
+    const slugInput = form.querySelector<HTMLInputElement>("#write-slug");
+    const summaryInput = form.querySelector<HTMLTextAreaElement>("#write-summary");
+    const tagsInput = form.querySelector<HTMLInputElement>("#write-tags");
+    const collectionInput = form.querySelector<HTMLInputElement>("#write-collection");
+    const bodyInput = form.querySelector<HTMLTextAreaElement>("#write-body");
+    const submitBtn = form.querySelector<HTMLButtonElement>("#write-submit");
+    const resetBtn = form.querySelector<HTMLButtonElement>("#write-reset");
+    const errorBox = form.querySelector<HTMLDivElement>("#write-error");
+
+    if (!titleInput || !slugInput || !tagsInput || !bodyInput || !submitBtn || !errorBox) {
+        return;
+    }
+
+    // 제목 입력 시 슬러그 자동 생성 (사용자가 슬러그를 직접 수정한 후에는 자동 변경 중단)
+    titleInput.addEventListener("input", () => {
+        if (slugInput.dataset.userEdited === "1") return;
+        slugInput.value = slugifyTitle(titleInput.value);
+    });
+
+    slugInput.addEventListener("input", () => {
+        slugInput.dataset.userEdited = "1";
+    });
+
+    // 초기화 버튼
+    resetBtn?.addEventListener("click", () => {
+        form.reset();
+        slugInput.dataset.userEdited = "0";
+        errorBox.style.display = "none";
+        errorBox.textContent = "";
+    });
+
+    // 폼 제출
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const title = titleInput.value.trim();
+        const slug = slugInput.value.trim();
+        const summary = summaryInput?.value.trim() ?? "";
+        const tagsRaw = tagsInput.value;
+        const collection = collectionInput?.value.trim() ?? "";
+        const body = bodyInput.value.trim();
+
+        const errors: string[] = [];
+
+        if (!title) errors.push("제목을 입력해 주세요.");
+        if (!slug) errors.push("슬러그를 입력해 주세요.");
+
+        const tags = tagsRaw
+            .split(/[,\s]+/)
+            .map((t) => t.trim())
+            .filter(Boolean);
+
+        if (tags.length === 0) {
+            errors.push("태그를 한 개 이상 입력해 주세요.");
+        }
+
+        if (body.length < 10) {
+            errors.push(
+                "본문을 10자 이상 작성해 주세요. (현재 글자 수: " + body.length + ")"
+            );
+        }
+
+        if (errors.length > 0) {
+            errorBox.textContent = errors.join(" / ");
+            errorBox.style.display = "block";
+            return;
+        }
+
+        errorBox.style.display = "none";
+
+        const payload: CommitPayload = {
+            title,
+            slug,
+            summary,
+            tags,
+            collection: collection || null,
+            body,
+        };
+
+        console.log("✏️ 새 글 작성 payload:", payload);
+
+        submitBtn.disabled = true;
+        const originalLabel = submitBtn.textContent;
+        submitBtn.textContent = "게시 중...";
+
+        try {
+            const result = await submitPostToWorker(payload);
+            console.log("✅ Worker 응답:", result);
+
+            submitBtn.textContent = "게시 완료";
+            window.alert(
+                "작성 요청이 성공적으로 전송되었습니다.\n잠시 후 피드에서 확인할 수 있습니다."
+            );
+            window.location.hash = "#/"; // 홈으로 이동
+        } catch (err) {
+            const msg =
+                err instanceof Error
+                    ? err.message
+                    : "작성 중 알 수 없는 오류가 발생했습니다.";
+            errorBox.textContent = msg;
+            errorBox.style.display = "block";
+            submitBtn.textContent = originalLabel;
+            submitBtn.disabled = false;
+        }
     });
 }
 
@@ -621,12 +872,6 @@ function setupRouteHandlers() {
             }
         });
     });
-}
-
-function getAllTags(items: FeedItem[]): string[] {
-    const set = new Set<string>();
-    items.forEach((item) => item.tags.forEach((tag) => set.add(tag)));
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
 }
 
 function renderLoading() {
@@ -656,6 +901,54 @@ function escapeHtml(str: string): string {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+// 글 커밋 요청에 사용할 페이로드 타입
+interface CommitPayload {
+    title: string;
+    slug: string;
+    summary: string;
+    tags: string[];
+    collection: string | null;
+    body: string;
+}
+
+// Worker /content/commit 호출 헬퍼
+async function submitPostToWorker(payload: CommitPayload): Promise<unknown> {
+    const token = getJwtToken();
+    if (!token) {
+        throw new Error("로그인 정보가 없습니다. 먼저 로그인 후 다시 시도해 주세요.");
+    }
+
+    const res = await fetch(`${API_BASE}/content/commit`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+        let detail = "";
+        try {
+            const data = await res.json();
+            if (data && typeof data.message === "string") {
+                detail = data.message;
+            }
+        } catch {
+            // JSON이 아닐 수도 있으니 조용히 무시
+        }
+
+        const baseMsg = `작성 요청 실패: ${res.status} ${res.statusText}`;
+        throw new Error(detail ? `${baseMsg} - ${detail}` : baseMsg);
+    }
+
+    try {
+        return await res.json();
+    } catch {
+        return {};
+    }
+}
+
 function renderRoute() {
     const route = getCurrentRouteFromHash();
 
@@ -671,12 +964,29 @@ function renderRoute() {
         renderWriteView();
     } else if (route === "profile") {
         renderProfileView();
+    } else if (route === "authCallback") {
+        handleAuthCallbackRoute();
     }
 }
+function handleAuthCallbackRoute() {
+    const token = extractTokenFromHash();
+
+    if (token) {
+        try {
+            localStorage.setItem(JWT_STORAGE_KEY, token);
+        } catch {
+            // localStorage 차단된 경우 등
+            console.error("Failed to save token to localStorage");
+        }
+    }
+
+    // URL 정리하면서 write 화면으로 이동
+    window.location.hash = "#/write";
+}
+
 
 async function bootstrap() {
     renderLoading();
-    currentTag = null;
     activeTab = "posts";
 
     try {
@@ -690,6 +1000,27 @@ async function bootstrap() {
         renderError(message);
     }
 }
+
+function consumeAuthTokenFromHash() {
+    const hash = window.location.hash || "";
+    const m = hash.match(/auth=([^&]+)/);
+    if (!m) return;
+
+    const token = decodeURIComponent(m[1]);
+
+    try {
+        localStorage.setItem(JWT_STORAGE_KEY, token);
+    } catch {
+        // 로컬스토리지 막힌 브라우저는 그냥 무시
+    }
+
+    // URL에서 auth=... 제거 (깔끔하게)
+    const base = window.location.href.split("#")[0];
+    window.history.replaceState(null, "", base + "#/write");
+}
+
+consumeAuthTokenFromHash();
+bootstrap();
 
 window.addEventListener("hashchange", () => {
     if (getCurrentRouteFromHash() === "home" && currentItems.length === 0) {
