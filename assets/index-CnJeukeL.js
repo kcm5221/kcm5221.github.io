@@ -1,4 +1,4 @@
-(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const o of document.querySelectorAll('link[rel="modulepreload"]'))s(o);new MutationObserver(o=>{for(const i of o)if(i.type==="childList")for(const a of i.addedNodes)a.tagName==="LINK"&&a.rel==="modulepreload"&&s(a)}).observe(document,{childList:!0,subtree:!0});function r(o){const i={};return o.integrity&&(i.integrity=o.integrity),o.referrerPolicy&&(i.referrerPolicy=o.referrerPolicy),o.crossOrigin==="use-credentials"?i.credentials="include":o.crossOrigin==="anonymous"?i.credentials="omit":i.credentials="same-origin",i}function s(o){if(o.ep)return;o.ep=!0;const i=r(o);fetch(o.href,i)}})();const E="/data";async function B(e){const t=await fetch(e,{cache:"no-store"});if(!t.ok)throw new Error(`Request failed: ${t.status} ${t.statusText} (${e})`);return await t.json()}async function G(){const e=`${E}/current.json`;return await B(e)}async function F(e,t){const r=`${E}/feed/page-${t}@${e}.json`;return await B(r)}async function V(e=1){const t=await G(),r=await F(t.sha,e);return{current:t,page:r}}const z={},g=document.querySelector("#app");if(!g)throw new Error("#app element not found");const K=[{id:"home",label:"Home",icon:"home",route:"home"},{id:"search",label:"Search",icon:"search",route:"search"},{id:"profile",label:"Profile",icon:"user",route:"profile"},{id:"create",label:"Create",icon:"plus",route:"write"}],U=[{id:"home",icon:"home",route:"home"},{id:"search",icon:"search",route:"search"},{id:"profile",icon:"user",route:"profile"},{id:"create",icon:"plus",route:"write"}],p={home:"Developer"},L=z?.VITE_API_BASE??"https://blog-auth-worker.kimcm5221.workers.dev",$="devlog_jwt";function j(){try{return localStorage.getItem($)}catch{return null}}function J(){return!!j()}const Z={search:[{title:"검색 화면 준비 중",lines:["태그, 제목, 요약을 동시에 검색하는 통합 입력창","기간과 컬렉션 필터, 즐겨찾기 저장","PKCE 기반 GitHub OAuth 로 권한 제어"]},{title:"릴리스 계획",lines:["v0.2 - 전체 검색 API 연결","v0.3 - 저장된 검색 & 공유","v1.0 - Cloudflare Worker 확장"]}]},M={posts:{label:"Posts",icon:"grid"},saved:{label:"Saved",icon:"bookmark"}},Y={home:`
+(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const r of document.querySelectorAll('link[rel="modulepreload"]'))s(r);new MutationObserver(r=>{for(const i of r)if(i.type==="childList")for(const a of i.addedNodes)a.tagName==="LINK"&&a.rel==="modulepreload"&&s(a)}).observe(document,{childList:!0,subtree:!0});function o(r){const i={};return r.integrity&&(i.integrity=r.integrity),r.referrerPolicy&&(i.referrerPolicy=r.referrerPolicy),r.crossOrigin==="use-credentials"?i.credentials="include":r.crossOrigin==="anonymous"?i.credentials="omit":i.credentials="same-origin",i}function s(r){if(r.ep)return;r.ep=!0;const i=o(r);fetch(r.href,i)}})();const E="/data";async function B(e){const t=await fetch(e,{cache:"no-store"});if(!t.ok)throw new Error(`Request failed: ${t.status} ${t.statusText} (${e})`);return await t.json()}async function F(){const e=`${E}/current.json`;return await B(e)}async function G(e,t){const o=`${E}/feed/page-${t}@${e}.json`;return await B(o)}async function V(e=1){const t=await F(),o=await G(t.sha,e);return{current:t,page:o}}const J={},g=document.querySelector("#app");if(!g)throw new Error("#app element not found");const U=[{id:"home",label:"Home",icon:"home",route:"home"},{id:"search",label:"Search",icon:"search",route:"search"},{id:"profile",label:"Profile",icon:"user",route:"profile"},{id:"create",label:"Create",icon:"plus",route:"write"}],z=[{id:"home",icon:"home",route:"home"},{id:"search",icon:"search",route:"search"},{id:"profile",icon:"user",route:"profile"},{id:"create",icon:"plus",route:"write"}],p={home:"Developer"},L=J?.VITE_API_BASE??"https://blog-auth-worker.kimcm5221.workers.dev",m="devlog_jwt";function j(){try{return localStorage.getItem(m)}catch{return null}}function K(){const t=(window.location.hash||"").match(/^#auth=([^&]+)/);if(!t)return;const o=t[1];try{const s=decodeURIComponent(o);localStorage.setItem(m,s),console.log("✅ JWT 저장 완료")}catch(s){console.error("JWT 저장 실패",s)}window.location.hash="#/write"}function Z(){return!!j()}const Y={search:[{title:"검색 화면 준비 중",lines:["태그, 제목, 요약을 동시에 검색하는 통합 입력창","기간과 컬렉션 필터, 즐겨찾기 저장","PKCE 기반 GitHub OAuth 로 권한 제어"]},{title:"릴리스 계획",lines:["v0.2 - 전체 검색 API 연결","v0.3 - 저장된 검색 & 공유","v1.0 - Cloudflare Worker 확장"]}]},I={posts:{label:"Posts",icon:"grid"},saved:{label:"Saved",icon:"bookmark"}},Q={home:`
       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
         <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -71,48 +71,48 @@
       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="m6 9 6 6 6-6" />
       </svg>
-    `};let w=[],v="posts";function I(){const e=window.location.hash||"#/";return e.startsWith("#/search")?"search":e.startsWith("#/profile")?"profile":e.startsWith("#/write")?"write":e.startsWith("#/auth/callback")?"authCallback":"home"}function Q(){const e=window.location.hash,t=e.indexOf("?");if(t===-1)return null;const r=e.slice(t+1);return new URLSearchParams(r).get("token")}function h(e,t){g.innerHTML=`
+    `};let w=[],h="posts";function M(){const e=window.location.hash||"#/";return e.startsWith("#/search")?"search":e.startsWith("#/profile")?"profile":e.startsWith("#/write")?"write":e.startsWith("#/auth/callback")?"authCallback":"home"}function X(){const e=window.location.hash,t=e.indexOf("?");if(t===-1)return null;const o=e.slice(t+1);return new URLSearchParams(o).get("token")}function v(e,t){g.innerHTML=`
       <div class="app-shell">
-        ${X(e)}
+        ${ee(e)}
         <div class="main-area">
-          ${te()}
+          ${oe()}
           <div class="main-inner">${t}</div>
         </div>
         ${re(e)}
       </div>
-    `,fe()}function X(e){return`
+    `,we()}function ee(e){return`
       <aside class="left-sidebar">
         <div class="sidebar-logo">Gitstagram</div>
         <nav class="sidebar-nav">
-          ${K.map(t=>ee(t,e)).join("")}
+          ${U.map(t=>te(t,e)).join("")}
         </nav>
       </aside>
-    `}function ee(e,t){return`
+    `}function te(e,t){return`
       <button
         class="sidebar-link ${!!e.route&&e.route===t?"is-active":""}"
         type="button"
         ${e.route?`data-route="${e.route}"`:""}
       >
-        ${m(e.icon)}
+        ${b(e.icon)}
         <span>${e.label}</span>
       </button>
-    `}function te(){return`
+    `}function oe(){return`
       <header class="mobile-header">
-        <div class="mobile-username">Cheolmin Kim${m("chevron")}</div>
+        <div class="mobile-username">Cheolmin Kim${b("chevron")}</div>
       </header>
     `}function re(e){return`
       <nav class="bottom-nav">
-        ${U.map(t=>`
+        ${z.map(t=>`
               <button
                 type="button"
                 class="bottom-nav-btn ${!!t.route&&t.route===e?"is-active":""}"
                 ${t.route?`data-route="${t.route}"`:""}
               >
-                ${m(t.icon)}
+                ${b(t.icon)}
               </button>
             `).join("")}
       </nav>
-    `}function m(e){return`<span class="icon">${Y[e]}</span>`}function f(e,t){return`
+    `}function b(e){return`<span class="icon">${Q[e]}</span>`}function f(e,t){return`
       <section class="profile-header">
         <div class="profile-avatar">
           <img src="/profile/profile.jpg" alt="Profile" loading="lazy" />
@@ -122,10 +122,10 @@
             <h2 class="profile-username">Cheolmin Kim</h2>
           </div>
           <div class="profile-stat-row">
-            ${e.map(r=>`
+            ${e.map(o=>`
                       <div class="stat">
-                        <span class="stat-value">${n(r.value)}</span>
-                        ${n(r.label)}
+                        <span class="stat-value">${n(o.value)}</span>
+                        ${n(o.label)}
                       </div>
                     `).join("")}
           </div>
@@ -136,7 +136,7 @@
           </div>
         </div>
       </section>
-    `}function oe(){return`
+    `}function se(){return`
       <section class="profile-section">
         <div class="profile-section-block">
           <h3>기본 정보</h3>
@@ -210,61 +210,61 @@
           </div>
         </div>
       </section>
-    `}function se(){return`
+    `}function ie(){return`
       <div class="tab-strip" role="tablist">
-        ${Object.entries(M).map(([e,t])=>{const r=e;return`
+        ${Object.entries(I).map(([e,t])=>{const o=e;return`
                   <button
-                    class="tab-btn ${v===r?"is-active":""}"
+                    class="tab-btn ${h===o?"is-active":""}"
                     role="tab"
-                    data-tab="${r}"
+                    data-tab="${o}"
                     type="button"
                   >
-                    ${m(t.icon)}
+                    ${b(t.icon)}
                     <span>${t.label}</span>
                   </button>
                 `}).join("")}
       </div>
-    `}function ie(e){return e.length===0?'<div class="empty-state">조건에 맞는 글이 없습니다.</div>':`
+    `}function ne(e){return e.length===0?'<div class="empty-state">조건에 맞는 글이 없습니다.</div>':`
       <div class="post-grid">
-        ${e.map(t=>ne(t)).join("")}
+        ${e.map(t=>ae(t)).join("")}
       </div>
-    `}function ne(e){const t=e.tags.length?e.tags.map(l=>`#${n(l)}`).join(" "):"태그 없음",r=new Date(e.created),s=isNaN(r.getTime())?"작성일 미정":r.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"}),o=100+(e.summary?.length??20),i=e.tags.length*5+12,a=e.cover?`<img src="${n(e.cover)}" alt="${n(e.title)}" loading="lazy" />`:"";return`
+    `}function ae(e){const t=e.tags.length?e.tags.map(l=>`#${n(l)}`).join(" "):"태그 없음",o=new Date(e.created),s=isNaN(o.getTime())?"작성일 미정":o.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"}),r=100+(e.summary?.length??20),i=e.tags.length*5+12,a=e.cover?`<img src="${n(e.cover)}" alt="${n(e.title)}" loading="lazy" />`:"";return`
       <article class="post-card">
-        <div class="post-media ${a?"":"is-fallback"}" ${a?"":`style="background:${le(e.slug)}"`}>
+        <div class="post-media ${a?"":"is-fallback"}" ${a?"":`style="background:${ce(e.slug)}"`}>
           ${a||`<span>${n(e.title.charAt(0).toUpperCase())}</span>`}
         </div>
         <div class="post-overlay">
           <p class="overlay-title">${n(e.title)}</p>
           <p class="overlay-tags">${t}</p>
           <div class="overlay-meta">
-            <span>❤️ ${o.toLocaleString()}</span>
+            <span>❤️ ${r.toLocaleString()}</span>
             <span>💬 ${i}</span>
           </div>
           <p class="overlay-date">${s} · ${n(e.slug)}</p>
         </div>
       </article>
-    `}function ae(e){return e.trim().toLowerCase().replace(/[^\p{Letter}\p{Number}\s-]/gu,"").replace(/\s+/g,"-").replace(/-+/g,"-")}function le(e){const t=["#fee2e2","#dbeafe","#ede9fe","#dcfce7","#fef3c7"],r=Math.abs(e.split("").reduce((s,o)=>s+o.charCodeAt(0),0))%t.length;return`linear-gradient(135deg, ${t[r]}, #fff)`}function ce(e){return`
+    `}function le(e){return e.trim().toLowerCase().replace(/[^\p{Letter}\p{Number}\s-]/gu,"").replace(/\s+/g,"-").replace(/-+/g,"-")}function ce(e){const t=["#fee2e2","#dbeafe","#ede9fe","#dcfce7","#fef3c7"],o=Math.abs(e.split("").reduce((s,r)=>s+r.charCodeAt(0),0))%t.length;return`linear-gradient(135deg, ${t[o]}, #fff)`}function de(e){return`
       <section class="info-grid">
         ${e.map(t=>`
                   <article class="info-card">
                     <h3>${n(t.title)}</h3>
                     <ul>
-                      ${t.lines.map(r=>`<li>${n(r)}</li>`).join("")}
+                      ${t.lines.map(o=>`<li>${n(o)}</li>`).join("")}
                     </ul>
                   </article>
                 `).join("")}
       </section>
-    `}function b(){return[{label:"posts",value:`${w.length}`}]}function T(){const e="home",t=w,r=b(),s=`
-      ${f(r,p.home)}
+    `}function y(){return[{label:"posts",value:`${w.length}`}]}function T(){const e="home",t=w,o=y(),s=`
+      ${f(o,p.home)}
+      ${ie()}
+      ${h==="posts"?ne(t):`<div class="empty-state">${I[h].label} 뷰는 준비 중입니다.</div>`}
+    `;v(e,s),ve()}function ue(){const e=y(),t=`
+      ${f(e,p.home)}
+      ${de(Y.search)}
+    `;v("search",t)}function pe(){const e=y(),t=`
+      ${f(e,p.home)}
       ${se()}
-      ${v==="posts"?ie(t):`<div class="empty-state">${M[v].label} 뷰는 준비 중입니다.</div>`}
-    `;h(e,s),ve()}function de(){const e=b(),t=`
-      ${f(e,p.home)}
-      ${ce(Z.search)}
-    `;h("search",t)}function ue(){const e=b(),t=`
-      ${f(e,p.home)}
-      ${oe()}
-    `;h("profile",t)}function pe(){const e=b();if(!J()){const r=`
+    `;v("profile",t)}function he(){const e=y();if(!Z()){const o=`
           ${f(e,p.home)}
           <section class="profile-section">
             <article class="info-card">
@@ -282,7 +282,7 @@
               </div>
             </article>
           </section>
-        `;h("write",r),document.querySelector("#write-login-btn")?.addEventListener("click",()=>{window.location.href=`${L}/auth/login`});return}const t=`
+        `;v("write",o),document.querySelector("#write-login-btn")?.addEventListener("click",()=>{window.location.href=`${L}/auth/login`});return}const t=`
       ${f(e,p.home)}
       <section class="profile-section">
         <article class="info-card">
@@ -384,15 +384,15 @@
           </form>
         </article>
       </section>
-    `;h("write",t),he()}function ve(){document.querySelectorAll("[data-tab]").forEach(t=>{t.addEventListener("click",()=>{const r=t.dataset.tab;r&&(v=r,T())})})}function he(){const e=document.querySelector("#write-form");if(!e)return;const t=e.querySelector("#write-title"),r=e.querySelector("#write-slug"),s=e.querySelector("#write-summary"),o=e.querySelector("#write-tags"),i=e.querySelector("#write-collection"),a=e.querySelector("#write-body"),l=e.querySelector("#write-submit"),q=e.querySelector("#write-reset"),c=e.querySelector("#write-error");!t||!r||!o||!a||!l||!c||(t.addEventListener("input",()=>{r.dataset.userEdited!=="1"&&(r.value=ae(t.value))}),r.addEventListener("input",()=>{r.dataset.userEdited="1"}),q?.addEventListener("click",()=>{e.reset(),r.dataset.userEdited="0",c.style.display="none",c.textContent=""}),e.addEventListener("submit",async O=>{O.preventDefault();const x=t.value.trim(),C=r.value.trim(),_=s?.value.trim()??"",R=o.value,N=i?.value.trim()??"",k=a.value.trim(),d=[];x||d.push("제목을 입력해 주세요."),C||d.push("슬러그를 입력해 주세요.");const S=R.split(/[,\s]+/).map(u=>u.trim()).filter(Boolean);if(S.length===0&&d.push("태그를 한 개 이상 입력해 주세요."),k.length<10&&d.push("본문을 10자 이상 작성해 주세요. (현재 글자 수: "+k.length+")"),d.length>0){c.textContent=d.join(" / "),c.style.display="block";return}c.style.display="none";const A={title:x,slug:C,summary:_,tags:S,collection:N||null,body:k};console.log("✏️ 새 글 작성 payload:",A),l.disabled=!0;const W=l.textContent;l.textContent="게시 중...";try{const u=await ge(A);console.log("✅ Worker 응답:",u),l.textContent="게시 완료",window.alert(`작성 요청이 성공적으로 전송되었습니다.
-잠시 후 피드에서 확인할 수 있습니다.`),window.location.hash="#/"}catch(u){const D=u instanceof Error?u.message:"작성 중 알 수 없는 오류가 발생했습니다.";c.textContent=D,c.style.display="block",l.textContent=W,l.disabled=!1}}))}function fe(){document.querySelectorAll("[data-route]").forEach(t=>{t.addEventListener("click",()=>{const r=t.dataset.route;r&&(r==="home"?window.location.hash="#/":r==="search"?window.location.hash="#/search":r==="profile"?window.location.hash="#/profile":r==="write"&&(window.location.hash="#/write"))})})}function P(){g.innerHTML=`
+    `;v("write",t),fe()}function ve(){document.querySelectorAll("[data-tab]").forEach(t=>{t.addEventListener("click",()=>{const o=t.dataset.tab;o&&(h=o,T())})})}function fe(){const e=document.querySelector("#write-form");if(!e)return;const t=e.querySelector("#write-title"),o=e.querySelector("#write-slug"),s=e.querySelector("#write-summary"),r=e.querySelector("#write-tags"),i=e.querySelector("#write-collection"),a=e.querySelector("#write-body"),l=e.querySelector("#write-submit"),q=e.querySelector("#write-reset"),c=e.querySelector("#write-error");!t||!o||!r||!a||!l||!c||(t.addEventListener("input",()=>{o.dataset.userEdited!=="1"&&(o.value=le(t.value))}),o.addEventListener("input",()=>{o.dataset.userEdited="1"}),q?.addEventListener("click",()=>{e.reset(),o.dataset.userEdited="0",c.style.display="none",c.textContent=""}),e.addEventListener("submit",async O=>{O.preventDefault();const x=t.value.trim(),C=o.value.trim(),_=s?.value.trim()??"",R=r.value,W=i?.value.trim()??"",$=a.value.trim(),d=[];x||d.push("제목을 입력해 주세요."),C||d.push("슬러그를 입력해 주세요.");const S=R.split(/[,\s]+/).map(u=>u.trim()).filter(Boolean);if(S.length===0&&d.push("태그를 한 개 이상 입력해 주세요."),$.length<10&&d.push("본문을 10자 이상 작성해 주세요. (현재 글자 수: "+$.length+")"),d.length>0){c.textContent=d.join(" / "),c.style.display="block";return}c.style.display="none";const A={title:x,slug:C,summary:_,tags:S,collection:W||null,body:$};console.log("✏️ 새 글 작성 payload:",A),l.disabled=!0;const N=l.textContent;l.textContent="게시 중...";try{const u=await me(A);console.log("✅ Worker 응답:",u),l.textContent="게시 완료",window.alert(`작성 요청이 성공적으로 전송되었습니다.
+잠시 후 피드에서 확인할 수 있습니다.`),window.location.hash="#/"}catch(u){const D=u instanceof Error?u.message:"작성 중 알 수 없는 오류가 발생했습니다.";c.textContent=D,c.style.display="block",l.textContent=N,l.disabled=!1}}))}function we(){document.querySelectorAll("[data-route]").forEach(t=>{t.addEventListener("click",()=>{const o=t.dataset.route;o&&(o==="home"?window.location.hash="#/":o==="search"?window.location.hash="#/search":o==="profile"?window.location.hash="#/profile":o==="write"&&(window.location.hash="#/write"))})})}function P(){g.innerHTML=`
       <div class="view-state">
         <div class="loader"></div>
         <p>피드를 불러오는 중입니다...</p>
       </div>
-    `}function we(e){g.innerHTML=`
+    `}function ge(e){g.innerHTML=`
       <div class="view-state">
         <p>${n(e)}</p>
         <button class="primary" id="reload" type="button">다시 시도</button>
       </div>
-    `,document.querySelector("#reload")?.addEventListener("click",()=>{y()})}function n(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}async function ge(e){const t=j();if(!t)throw new Error("로그인 정보가 없습니다. 먼저 로그인 후 다시 시도해 주세요.");const r=await fetch(`${L}/content/commit`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${t}`},body:JSON.stringify(e)});if(!r.ok){let s="";try{const i=await r.json();i&&typeof i.message=="string"&&(s=i.message)}catch{}const o=`작성 요청 실패: ${r.status} ${r.statusText}`;throw new Error(s?`${o} - ${s}`:o)}try{return await r.json()}catch{return{}}}function H(){const e=I();if(e==="home"){if(w.length===0){P();return}T()}else e==="search"?de():e==="write"?pe():e==="profile"?ue():e==="authCallback"&&me()}function me(){const e=Q();if(e)try{localStorage.setItem($,e)}catch{console.error("Failed to save token to localStorage")}window.location.hash="#/write"}async function y(){P(),v="posts";try{const{page:e}=await V(1);w=e.items,H()}catch(e){console.error(e);const t=e instanceof Error?e.message:"알 수 없는 오류가 발생했습니다.";we(t)}}function be(){const t=(window.location.hash||"").match(/auth=([^&]+)/);if(!t)return;const r=decodeURIComponent(t[1]);try{localStorage.setItem($,r)}catch{}const s=window.location.href.split("#")[0];window.history.replaceState(null,"",s+"#/write")}be();y();window.addEventListener("hashchange",()=>{I()==="home"&&w.length===0?y():H()});y();
+    `,document.querySelector("#reload")?.addEventListener("click",()=>{k()})}function n(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}async function me(e){const t=j();if(!t)throw new Error("로그인 정보가 없습니다. 먼저 로그인 후 다시 시도해 주세요.");const o=await fetch(`${L}/content/commit`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${t}`},body:JSON.stringify(e)});if(!o.ok){let s="";try{const i=await o.json();i&&typeof i.message=="string"&&(s=i.message)}catch{}const r=`작성 요청 실패: ${o.status} ${o.statusText}`;throw new Error(s?`${r} - ${s}`:r)}try{return await o.json()}catch{return{}}}function H(){const e=M();if(e==="home"){if(w.length===0){P();return}T()}else e==="search"?ue():e==="write"?he():e==="profile"?pe():e==="authCallback"&&be()}function be(){const e=X();if(e)try{localStorage.setItem(m,e)}catch{console.error("Failed to save token to localStorage")}window.location.hash="#/write"}async function k(){K(),P(),h="posts";try{const{page:e}=await V(1);w=e.items,H()}catch(e){console.error(e);const t=e instanceof Error?e.message:"알 수 없는 오류가 발생했습니다.";ge(t)}}function ye(){const t=(window.location.hash||"").match(/auth=([^&]+)/);if(!t)return;const o=decodeURIComponent(t[1]);try{localStorage.setItem(m,o)}catch{}const s=window.location.href.split("#")[0];window.history.replaceState(null,"",s+"#/write")}ye();k();window.addEventListener("hashchange",()=>{M()==="home"&&w.length===0?k():H()});k();

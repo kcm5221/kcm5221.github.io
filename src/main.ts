@@ -85,6 +85,29 @@ function getJwtToken(): string | null {
     }
 }
 
+// 🔐 GitHub OAuth 콜백(#auth=...)에서 토큰 회수
+function consumeAuthFromHash() {
+    const hash = window.location.hash || "";
+    // 예: #auth=eyJhbGc... 또는 #auth=...&route=/write 이런 것도 대비
+    const match = hash.match(/^#auth=([^&]+)/);
+    if (!match) return;
+
+    const raw = match[1];
+
+    try {
+        const token = decodeURIComponent(raw);
+        // JWT 저장
+        localStorage.setItem(JWT_STORAGE_KEY, token);
+        console.log("✅ JWT 저장 완료");
+    } catch (e) {
+        console.error("JWT 저장 실패", e);
+    }
+
+    // URL 깨끗하게 정리 + 로그인 후 이동할 화면
+    window.location.hash = "#/write"; // 로그인 후 바로 글쓰기 화면
+}
+
+
 function isLoggedIn(): boolean {
     return !!getJwtToken();
 }
@@ -986,6 +1009,7 @@ function handleAuthCallbackRoute() {
 
 
 async function bootstrap() {
+    consumeAuthFromHash();
     renderLoading();
     activeTab = "posts";
 
