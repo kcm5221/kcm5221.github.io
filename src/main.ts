@@ -879,60 +879,42 @@ function renderPostDetailView(slug: string | null) {
     const nextItem = index >= 0 && index < currentItems.length - 1 ? currentItems[index + 1] : null;
 
     const buildNavBtn = (direction: "prev" | "next", target: FeedItem | null) => {
+        const dirClass = `post-detail-nav-btn-${direction}`;
+        const arrow = direction === "prev" ? "‹" : "›";
+        const label = direction === "prev" ? "이전 게시물" : "다음 게시물";
         if (!target) {
-            return `<span class="post-detail-nav-btn is-disabled">${direction === "prev" ? "첫 글입니다" : "마지막 글입니다"}</span>`;
+            return `<span class="post-detail-nav-btn is-disabled ${dirClass}" aria-disabled="true" aria-label="${label}"><span aria-hidden="true">${arrow}</span></span>`;
         }
-        const arrow = direction === "prev" ? "←" : "→";
         return `
-        <a class="post-detail-nav-btn" href="#/post/${encodeURIComponent(target.slug)}">
-          ${arrow} ${escapeHtml(truncateText(target.title, 28))}
+        <a class="post-detail-nav-btn ${dirClass}" href="#/post/${encodeURIComponent(target.slug)}" aria-label="${label}" title="${escapeHtml(truncateText(target.title, 48))}">
+          <span aria-hidden="true">${arrow}</span>
         </a>
       `;
     };
 
-    const buildMobileMediaNavBtn = (direction: "prev" | "next", target: FeedItem | null) => {
-        if (!target) {
-            return `<span class="post-detail-media-mobile-btn is-disabled">${direction === "prev" ? "첫 글" : "마지막 글"}</span>`;
-        }
-        const label = direction === "prev" ? "‹ 이전 글" : "다음 글 ›";
-        return `
-        <button type="button" class="post-detail-media-mobile-btn" data-target-slug="${escapeHtml(target.slug)}">
-          ${label}
-        </button>
-      `;
-    };
-
-    const mediaNavButtons = `
-      ${prevItem
-            ? `<button type="button" class="post-detail-media-nav is-prev" data-target-slug="${escapeHtml(
-                  prevItem.slug
-              )}" aria-label="이전 게시물">‹</button>`
-            : ""}
-      ${nextItem
-            ? `<button type="button" class="post-detail-media-nav is-next" data-target-slug="${escapeHtml(
-                  nextItem.slug
-              )}" aria-label="다음 게시물">›</button>`
-            : ""}
+    const prevNav = `
+      <nav class="post-detail-nav post-detail-nav-prev" aria-label="이전 게시물">
+        ${buildNavBtn("prev", prevItem)}
+      </nav>
     `;
 
-    const mobileMediaNav = `
-      <div class="post-detail-media-mobile-nav" role="group" aria-label="게시물 빠르게 넘기기">
-        ${buildMobileMediaNavBtn("prev", prevItem)}
-        ${buildMobileMediaNavBtn("next", nextItem)}
-      </div>
+    const nextNav = `
+      <nav class="post-detail-nav post-detail-nav-next" aria-label="다음 게시물">
+        ${buildNavBtn("next", nextItem)}
+      </nav>
     `;
 
     const sectionContent = `
       <section class="post-detail" ${prevItem ? `data-prev-slug="${escapeHtml(prevItem.slug)}"` : ""} ${nextItem
             ? `data-next-slug="${escapeHtml(nextItem.slug)}"`
             : ""}>
-        <div class="post-detail-container">
-          <div class="post-detail-media">
-            ${cover}
-            ${mediaNavButtons}
-            ${mobileMediaNav}
-          </div>
-          <div class="post-detail-panel">
+        <div class="post-detail-frame">
+          ${prevNav}
+          <div class="post-detail-container">
+            <div class="post-detail-media">
+              ${cover}
+            </div>
+            <div class="post-detail-panel">
             <header class="post-detail-header">
               <div class="post-detail-author">
                 <img src="/profile/profile.jpg" alt="Cheolmin Kim" loading="lazy" />
@@ -945,10 +927,6 @@ function renderPostDetailView(slug: string | null) {
                 <button type="button" class="post-detail-action-btn" aria-label="모든 메뉴">${iconMarkup("menu")}</button>
               </div>
             </header>
-            <div class="post-detail-nav">
-              ${buildNavBtn("prev", prevItem)}
-              ${buildNavBtn("next", nextItem)}
-            </div>
             <div class="post-detail-scroll">
               <div class="post-detail-summary">
                 ${escapeHtml(summaryText)}
@@ -1003,6 +981,7 @@ function renderPostDetailView(slug: string | null) {
               </div>
             </div>
           </div>
+          ${nextNav}
         </div>
       </section>
     `;
@@ -1054,10 +1033,6 @@ function bindPostDetailInteractions() {
     const submitBtn = document.querySelector<HTMLButtonElement>("#post-comment-submit");
     const likeBtn = document.querySelector<HTMLButtonElement>("#post-like-btn");
     const saveBtn = document.querySelector<HTMLButtonElement>("#post-save-btn");
-    const mediaNavBtns = document.querySelectorAll<HTMLButtonElement>(".post-detail-media-nav[data-target-slug]");
-    const mobileMediaNavBtns = document.querySelectorAll<HTMLButtonElement>(
-        ".post-detail-media-mobile-btn[data-target-slug]"
-    );
 
     if (commentInput && submitBtn) {
         const syncState = () => {
@@ -1084,23 +1059,6 @@ function bindPostDetailInteractions() {
         });
     }
 
-    const wireMediaNav = (btns: NodeListOf<HTMLButtonElement>) => {
-        btns.forEach((btn) => {
-            const targetSlug = btn.dataset.targetSlug;
-            if (!targetSlug) return;
-            btn.addEventListener("click", () => {
-                window.location.hash = `#/post/${encodeURIComponent(targetSlug)}`;
-            });
-        });
-    };
-
-    if (mediaNavBtns.length) {
-        wireMediaNav(mediaNavBtns);
-    }
-
-    if (mobileMediaNavBtns.length) {
-        wireMediaNav(mobileMediaNavBtns);
-    }
 }
 
 function renderProfileView() {
