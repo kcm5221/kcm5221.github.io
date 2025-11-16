@@ -53,7 +53,8 @@ type IconName =
     | "tagged"
     | "chevron"
     | "send"
-    | "smile";
+    | "smile"
+    | "close";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -363,10 +364,17 @@ const ICONS: Record<IconName, string> = {
         <path d="M15 9h.01" />
       </svg>
     `,
+    close: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18" />
+        <path d="M6 6l12 12" />
+      </svg>
+    `,
 };
 
 let currentItems: FeedItem[] = [];
 let activeTab: Tab = "posts";
+let modalEscapeHandler: ((event: KeyboardEvent) => void) | null = null;
 
 function getCurrentRouteFromHash(): Route {
     const hash = window.location.hash || "#/";
@@ -409,6 +417,7 @@ function renderAppShell(route: Route, bodyHtml: string) {
           <div class="main-inner">${bodyHtml}</div>
         </div>
         ${renderBottomNav(route)}
+        <div id="post-detail-modal-root" aria-live="polite"></div>
       </div>
     `;
 
@@ -458,13 +467,71 @@ function renderBottomNav(route: Route): string {
                 type="button"
                 class="bottom-nav-btn ${isActive ? "is-active" : ""}"
                 ${item.route ? `data-route="${item.route}"` : ""}
-              >
+            >
                 ${iconMarkup(item.icon)}
               </button>
             `;
     }).join("")}
       </nav>
     `;
+}
+
+function getPostDetailModalRoot(): HTMLDivElement | null {
+    return document.querySelector<HTMLDivElement>("#post-detail-modal-root");
+}
+
+function closePostDetailModal() {
+    const modalRoot = getPostDetailModalRoot();
+    if (!modalRoot) return;
+    modalRoot.innerHTML = "";
+    modalRoot.classList.remove("is-active");
+    if (modalEscapeHandler) {
+        document.removeEventListener("keydown", modalEscapeHandler);
+        modalEscapeHandler = null;
+    }
+}
+
+function setupModalCloseInteractions() {
+    const modalRoot = getPostDetailModalRoot();
+    if (!modalRoot) return;
+
+    const closeTargets = modalRoot.querySelectorAll<HTMLElement>("[data-close-modal='true']");
+    closeTargets.forEach((target) => {
+        target.addEventListener("click", (event) => {
+            event.preventDefault();
+            window.location.hash = "#/";
+        });
+    });
+
+    if (modalEscapeHandler) {
+        document.removeEventListener("keydown", modalEscapeHandler);
+    }
+    modalEscapeHandler = (event) => {
+        if (event.key === "Escape") {
+            window.location.hash = "#/";
+        }
+    };
+    document.addEventListener("keydown", modalEscapeHandler);
+}
+
+function renderPostDetailMessage(message: string) {
+    const modalRoot = getPostDetailModalRoot();
+    if (!modalRoot) return;
+
+    modalRoot.innerHTML = `
+      <div class="post-detail-modal is-visible" role="dialog" aria-modal="true">
+        <div class="post-detail-modal-backdrop" data-close-modal="true"></div>
+        <div class="post-detail-modal-surface">
+          <button type="button" class="post-detail-close" aria-label="게시물 닫기" data-close-modal="true">
+            ${iconMarkup("close")}
+          </button>
+          <div class="post-detail-empty">${escapeHtml(message)}</div>
+        </div>
+      </div>
+    `;
+
+    modalRoot.classList.add("is-active");
+    setupModalCloseInteractions();
 }
 
 function iconMarkup(name: IconName): string {
@@ -764,22 +831,21 @@ function renderSearchView() {
 
 function renderPostDetailView(slug: string | null) {
     if (!slug) {
-        renderError("잘못된 주소입니다. 슬러그를 찾을 수 없습니다.");
+        renderPostDetailMessage("잘못된 주소입니다. 슬러그를 찾을 수 없습니다.");
         return;
     }
 
     if (!currentItems.length) {
-        renderError("아직 피드를 불러오지 못했습니다. 홈 화면을 한 번 연 뒤 다시 시도해 주세요.");
+        renderPostDetailMessage("아직 피드를 불러오지 못했습니다. 홈 화면을 연 뒤 다시 시도해 주세요.");
         return;
     }
 
     const item = currentItems.find((it) => it.slug === slug);
     if (!item) {
-        renderError(`슬러그가 '${slug}'인 글을 찾을 수 없습니다.`);
+        renderPostDetailMessage(`슬러그가 '${escapeHtml(slug)}'인 글을 찾을 수 없습니다.`);
         return;
     }
 
-    const stats = buildCommonProfileStats();
     const createdDate = new Date(item.created);
     const createdLabel = isNaN(createdDate.getTime())
         ? "작성일 미정"
@@ -824,8 +890,7 @@ function renderPostDetailView(slug: string | null) {
       `;
     };
 
-    const mainContent = `
-      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
+    const sectionContent = `
       <section class="post-detail">
         <div class="post-detail-container">
           <div class="post-detail-media">
@@ -906,9 +971,29 @@ function renderPostDetailView(slug: string | null) {
       </section>
     `;
 
-    // 상세 페이지에서도 프로필 탭이 활성화된 느낌을 주기 위해 route는 "profile"로 사용
-    renderAppShell("profile", mainContent);
+    const modalRoot = getPostDetailModalRoot();
+    if (!modalRoot) return;
+
+    modalRoot.innerHTML = `
+      <div class="post-detail-modal is-visible" role="dialog" aria-modal="true">
+        <div class="post-detail-modal-backdrop" data-close-modal="true"></div>
+        <div class="post-detail-modal-surface">
+          <button type="button" class="post-detail-close" aria-label="게시물 닫기" data-close-modal="true">
+            ${iconMarkup("close")}
+          </button>
+          ${sectionContent}
+        </div>
+      </div>
+    `;
+
+    modalRoot.classList.add("is-active");
+    requestAnimationFrame(() => {
+        const modal = modalRoot.querySelector<HTMLElement>(".post-detail-modal");
+        modal?.classList.add("is-open");
+    });
+
     bindPostDetailInteractions();
+    setupModalCloseInteractions();
     loadAndRenderPostBody(item);
 }
 
@@ -1488,6 +1573,10 @@ async function submitPostToWorker(payload: CommitPayload): Promise<unknown> {
 function renderRoute() {
     const route = getCurrentRouteFromHash();
 
+    if (route !== "postDetail") {
+        closePostDetailModal();
+    }
+
     if (route === "home") {
         if (currentItems.length === 0) {
             renderLoading();
@@ -1501,6 +1590,11 @@ function renderRoute() {
     } else if (route === "profile") {
         renderProfileView();
     } else if (route === "postDetail") {
+        if (currentItems.length === 0) {
+            renderLoading();
+            return;
+        }
+        renderHomeView();
         const slug = extractPostSlugFromHash();
         renderPostDetailView(slug);
     } else if (route === "authCallback") {
