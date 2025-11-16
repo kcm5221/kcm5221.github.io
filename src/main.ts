@@ -890,6 +890,18 @@ function renderPostDetailView(slug: string | null) {
       `;
     };
 
+    const buildMobileMediaNavBtn = (direction: "prev" | "next", target: FeedItem | null) => {
+        if (!target) {
+            return `<span class="post-detail-media-mobile-btn is-disabled">${direction === "prev" ? "첫 글" : "마지막 글"}</span>`;
+        }
+        const label = direction === "prev" ? "‹ 이전 글" : "다음 글 ›";
+        return `
+        <button type="button" class="post-detail-media-mobile-btn" data-target-slug="${escapeHtml(target.slug)}">
+          ${label}
+        </button>
+      `;
+    };
+
     const mediaNavButtons = `
       ${prevItem
             ? `<button type="button" class="post-detail-media-nav is-prev" data-target-slug="${escapeHtml(
@@ -903,6 +915,13 @@ function renderPostDetailView(slug: string | null) {
             : ""}
     `;
 
+    const mobileMediaNav = `
+      <div class="post-detail-media-mobile-nav" role="group" aria-label="게시물 빠르게 넘기기">
+        ${buildMobileMediaNavBtn("prev", prevItem)}
+        ${buildMobileMediaNavBtn("next", nextItem)}
+      </div>
+    `;
+
     const sectionContent = `
       <section class="post-detail" ${prevItem ? `data-prev-slug="${escapeHtml(prevItem.slug)}"` : ""} ${nextItem
             ? `data-next-slug="${escapeHtml(nextItem.slug)}"`
@@ -911,6 +930,7 @@ function renderPostDetailView(slug: string | null) {
           <div class="post-detail-media">
             ${cover}
             ${mediaNavButtons}
+            ${mobileMediaNav}
           </div>
           <div class="post-detail-panel">
             <header class="post-detail-header">
@@ -1035,6 +1055,9 @@ function bindPostDetailInteractions() {
     const likeBtn = document.querySelector<HTMLButtonElement>("#post-like-btn");
     const saveBtn = document.querySelector<HTMLButtonElement>("#post-save-btn");
     const mediaNavBtns = document.querySelectorAll<HTMLButtonElement>(".post-detail-media-nav[data-target-slug]");
+    const mobileMediaNavBtns = document.querySelectorAll<HTMLButtonElement>(
+        ".post-detail-media-mobile-btn[data-target-slug]"
+    );
 
     if (commentInput && submitBtn) {
         const syncState = () => {
@@ -1061,14 +1084,22 @@ function bindPostDetailInteractions() {
         });
     }
 
-    if (mediaNavBtns.length) {
-        mediaNavBtns.forEach((btn) => {
+    const wireMediaNav = (btns: NodeListOf<HTMLButtonElement>) => {
+        btns.forEach((btn) => {
             const targetSlug = btn.dataset.targetSlug;
             if (!targetSlug) return;
             btn.addEventListener("click", () => {
                 window.location.hash = `#/post/${encodeURIComponent(targetSlug)}`;
             });
         });
+    };
+
+    if (mediaNavBtns.length) {
+        wireMediaNav(mediaNavBtns);
+    }
+
+    if (mobileMediaNavBtns.length) {
+        wireMediaNav(mobileMediaNavBtns);
     }
 }
 
