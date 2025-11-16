@@ -29,6 +29,15 @@ interface ProfileStat {
     value: string;
 }
 
+interface DetailComment {
+    id: string;
+    username: string;
+    avatar: string;
+    text: string;
+    likes: number;
+    timeAgo: string;
+}
+
 type IconName =
     | "home"
     | "search"
@@ -42,7 +51,9 @@ type IconName =
     | "grid"
     | "bookmark"
     | "tagged"
-    | "chevron";
+    | "chevron"
+    | "send"
+    | "smile";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -211,6 +222,41 @@ const INFO_CARDS: Record<"search" | "write", InfoCard[]> = {
     ],
 };
 
+const POST_DETAIL_COMMENTS: DetailComment[] = [
+    {
+        id: "1",
+        username: "dev_mode",
+        avatar: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=150",
+        text: "깊이 있는 글 감사합니다. 구조가 한눈에 들어오네요!",
+        likes: 18,
+        timeAgo: "2시간 전",
+    },
+    {
+        id: "2",
+        username: "infra_lab",
+        avatar: "https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?w=150",
+        text: "Cloudflare Worker 설정 참고해서 따라 해볼게요.",
+        likes: 11,
+        timeAgo: "1시간 전",
+    },
+    {
+        id: "3",
+        username: "frontend_flow",
+        avatar: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=150",
+        text: "UI 디테일 너무 좋아요. JSON feed 연결도 기대됩니다!",
+        likes: 7,
+        timeAgo: "45분 전",
+    },
+    {
+        id: "4",
+        username: "cloudworker",
+        avatar: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=150",
+        text: "Rate limit 처리 팁 공유 부탁드려요 🙌",
+        likes: 5,
+        timeAgo: "30분 전",
+    },
+];
+
 const TAB_LABELS: Record<Tab, { label: string; icon: IconName }> = {
     posts: { label: "Posts", icon: "grid" },
     saved: { label: "Saved", icon: "bookmark" },
@@ -301,6 +347,20 @@ const ICONS: Record<IconName, string> = {
     chevron: `
       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="m6 9 6 6 6-6" />
+      </svg>
+    `,
+    send: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 2 11 13" />
+        <path d="m22 2-7 20-4-9-9-4Z" />
+      </svg>
+    `,
+    smile: `
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M8 15s1.5 2 4 2 4-2 4-2" />
+        <path d="M9 9h.01" />
+        <path d="M15 9h.01" />
       </svg>
     `,
 };
@@ -616,6 +676,11 @@ function fallbackGradient(seed: string): string {
     return `linear-gradient(135deg, ${colors[index]}, #fff)`;
 }
 
+function truncateText(text: string, maxLength = 48): string {
+    if (text.length <= maxLength) return text;
+    return `${text.slice(0, maxLength - 1)}…`;
+}
+
 function renderInfoCards(cards: InfoCard[]): string {
     return `
       <section class="info-grid">
@@ -633,6 +698,34 @@ function renderInfoCards(cards: InfoCard[]): string {
             .join("")}
       </section>
     `;
+}
+
+function renderDetailComments(): string {
+    if (!POST_DETAIL_COMMENTS.length) {
+        return `<p class="post-detail-comment-empty">준비 중인 댓글 더미입니다.</p>`;
+    }
+
+    return POST_DETAIL_COMMENTS.map(
+        (comment) => `
+      <article class="post-detail-comment">
+        <img src="${escapeHtml(comment.avatar)}" alt="${escapeHtml(comment.username)}" loading="lazy" />
+        <div class="post-detail-comment-content">
+          <div class="post-detail-comment-body">
+            <span class="comment-author">${escapeHtml(comment.username)}</span>
+            ${escapeHtml(comment.text)}
+          </div>
+          <div class="post-detail-comment-meta">
+            <span>${escapeHtml(comment.timeAgo)}</span>
+            <button type="button">좋아요 ${comment.likes}</button>
+            <button type="button">답글</button>
+          </div>
+        </div>
+        <button type="button" class="post-detail-comment-like" aria-label="댓글 좋아요">
+          ${iconMarkup("heart")}
+        </button>
+      </article>
+    `
+    ).join("");
 }
 
 function buildCommonProfileStats(): ProfileStat[] {
@@ -687,10 +780,6 @@ function renderPostDetailView(slug: string | null) {
     }
 
     const stats = buildCommonProfileStats();
-    const tags = item.tags.length
-        ? item.tags.map((tag) => `#${escapeHtml(tag)}`).join(" ")
-        : "태그 없음";
-
     const createdDate = new Date(item.created);
     const createdLabel = isNaN(createdDate.getTime())
         ? "작성일 미정"
@@ -700,53 +789,126 @@ function renderPostDetailView(slug: string | null) {
             day: "2-digit",
         });
 
+    const summaryText = (item.summary ?? "요약이 아직 작성되지 않았습니다.").trim();
+    const summarySnippet = truncateText(summaryText, 140);
+    const readingMinutes = Math.max(2, Math.round((summaryText.length + item.title.length * 6) / 220));
+    const pseudoLikes = Math.max(320, 120 + item.title.length * 12 + item.tags.length * 8);
+
+    const tags = item.tags.length
+        ? item.tags.map((tag) => `<span class="post-detail-tag">#${escapeHtml(tag)}</span>`).join("")
+        : '<span class="post-detail-tag is-empty">태그 없음</span>';
+
+    const cover = item.cover
+        ? `<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(item.title)}" class="post-detail-cover" loading="lazy" />`
+        : `
+        <div class="post-detail-fallback" style="background:${fallbackGradient(item.slug)}">
+          <span class="post-detail-collection-chip">${escapeHtml(item.collection ?? "Gitstagram")}</span>
+          <h2>${escapeHtml(item.title)}</h2>
+          <p>${escapeHtml(summarySnippet)}</p>
+        </div>
+      `;
+
+    const index = currentItems.findIndex((it) => it.slug === item.slug);
+    const prevItem = index > 0 ? currentItems[index - 1] : null;
+    const nextItem = index >= 0 && index < currentItems.length - 1 ? currentItems[index + 1] : null;
+
+    const buildNavBtn = (direction: "prev" | "next", target: FeedItem | null) => {
+        if (!target) {
+            return `<span class="post-detail-nav-btn is-disabled">${direction === "prev" ? "첫 글입니다" : "마지막 글입니다"}</span>`;
+        }
+        const arrow = direction === "prev" ? "←" : "→";
+        return `
+        <a class="post-detail-nav-btn" href="#/post/${encodeURIComponent(target.slug)}">
+          ${arrow} ${escapeHtml(truncateText(target.title, 28))}
+        </a>
+      `;
+    };
+
     const mainContent = `
       ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
-      <section class="profile-section">
-        <article class="info-card">
-          <h3>${escapeHtml(item.title)}</h3>
-          <div class="profile-section-body">
-            <div class="profile-row">
-              <span class="profile-label">슬러그</span>
-              <span class="profile-value">${escapeHtml(item.slug)}</span>
-            </div>
-            <div class="profile-row">
-              <span class="profile-label">작성일</span>
-              <span class="profile-value">${createdLabel}</span>
-            </div>
-            <div class="profile-row">
-              <span class="profile-label">태그</span>
-              <span class="profile-value">${tags}</span>
-            </div>
-            <div class="profile-row">
-              <span class="profile-label">컬렉션</span>
-              <span class="profile-value">${escapeHtml(item.collection ?? "지정 없음")}</span>
-            </div>
-            ${item.cover
-            ? `
-            <div class="profile-row">
-              <span class="profile-label">커버</span>
-              <span class="profile-value">
-                <img src="${escapeHtml(item.cover)}" alt="${escapeHtml(item.title)}" loading="lazy" />
-              </span>
-            </div>
-            `
-            : ""
-        }
+      <section class="post-detail">
+        <div class="post-detail-container">
+          <div class="post-detail-media">
+            ${cover}
           </div>
-        </article>
-
-        <article class="info-card">
-          <h3>본문</h3>
-          <div id="post-body" class="post-body">
-            <p>본문을 불러오는 중입니다...</p>
+          <div class="post-detail-panel">
+            <header class="post-detail-header">
+              <div class="post-detail-author">
+                <img src="/profile/profile.jpg" alt="Cheolmin Kim" loading="lazy" />
+                <div>
+                  <p>Cheolmin Kim</p>
+                  <span>${createdLabel}</span>
+                </div>
+              </div>
+              <div class="post-detail-header-actions">
+                <button type="button" class="post-detail-action-btn" aria-label="모든 메뉴">${iconMarkup("menu")}</button>
+              </div>
+            </header>
+            <div class="post-detail-nav">
+              ${buildNavBtn("prev", prevItem)}
+              ${buildNavBtn("next", nextItem)}
+            </div>
+            <div class="post-detail-scroll">
+              <div class="post-detail-summary">
+                ${escapeHtml(summaryText)}
+              </div>
+              <div class="post-detail-meta">
+                <div class="post-detail-meta-row">
+                  <span class="post-detail-meta-label">작성일</span>
+                  <span class="post-detail-meta-value">${createdLabel}</span>
+                </div>
+                <div class="post-detail-meta-row">
+                  <span class="post-detail-meta-label">컬렉션</span>
+                  <span class="post-detail-meta-value">${escapeHtml(item.collection ?? "지정 없음")}</span>
+                </div>
+                <div class="post-detail-meta-row">
+                  <span class="post-detail-meta-label">슬러그</span>
+                  <span class="post-detail-meta-value">${escapeHtml(item.slug)}</span>
+                </div>
+                <div class="post-detail-meta-row">
+                  <span class="post-detail-meta-label">예상 읽기</span>
+                  <span class="post-detail-meta-value">${readingMinutes}분</span>
+                </div>
+              </div>
+              <div class="post-detail-tags">
+                ${tags}
+              </div>
+              <div class="post-detail-body">
+                <h4>본문</h4>
+                <div id="post-body" class="post-detail-body-content">
+                  <p>본문을 불러오는 중입니다...</p>
+                </div>
+              </div>
+              <div class="post-detail-comments">
+                <h4>최근 메모</h4>
+                ${renderDetailComments()}
+              </div>
+            </div>
+            <div class="post-detail-footer">
+              <div class="post-detail-actions">
+                <div class="post-detail-action-buttons">
+                  <button type="button" id="post-like-btn" class="post-detail-action-btn" aria-label="좋아요" aria-pressed="false">${iconMarkup("heart")}</button>
+                  <button type="button" class="post-detail-action-btn" aria-label="댓글">${iconMarkup("message")}</button>
+                  <button type="button" class="post-detail-action-btn" aria-label="공유">${iconMarkup("send")}</button>
+                </div>
+                <button type="button" id="post-save-btn" class="post-detail-action-btn" aria-label="저장" aria-pressed="false">${iconMarkup("bookmark")}</button>
+              </div>
+              <div class="post-detail-likes">${pseudoLikes.toLocaleString()}명이 이 글을 읽었어요</div>
+              <div class="post-detail-timestamp">${createdLabel} · ${escapeHtml(item.slug)}</div>
+              <div class="post-detail-comment-input">
+                <button type="button" class="post-detail-emoji-btn" aria-label="이모지">${iconMarkup("smile")}</button>
+                <input type="text" id="post-comment-input" placeholder="느낀점을 남겨주세요" />
+                <button type="button" id="post-comment-submit" class="post-detail-submit-btn" disabled>게시</button>
+              </div>
+            </div>
           </div>
-        </article>
+        </div>
       </section>
     `;
 
     // 상세 페이지에서도 프로필 탭이 활성화된 느낌을 주기 위해 route는 "profile"로 사용
     renderAppShell("profile", mainContent);
+    bindPostDetailInteractions();
     loadAndRenderPostBody(item);
 }
 
@@ -763,6 +925,38 @@ async function loadAndRenderPostBody(item: FeedItem) {
         console.error(e);
         container.innerHTML =
             "<p>본문을 불러오지 못했습니다. GitHub Pages 설정 또는 경로를 확인해 주세요.</p>";
+    }
+}
+
+function bindPostDetailInteractions() {
+    const commentInput = document.querySelector<HTMLInputElement>("#post-comment-input");
+    const submitBtn = document.querySelector<HTMLButtonElement>("#post-comment-submit");
+    const likeBtn = document.querySelector<HTMLButtonElement>("#post-like-btn");
+    const saveBtn = document.querySelector<HTMLButtonElement>("#post-save-btn");
+
+    if (commentInput && submitBtn) {
+        const syncState = () => {
+            const hasText = commentInput.value.trim().length > 0;
+            submitBtn.disabled = !hasText;
+            submitBtn.classList.toggle("is-active", hasText);
+        };
+        commentInput.addEventListener("input", syncState);
+    }
+
+    if (likeBtn) {
+        likeBtn.addEventListener("click", () => {
+            const nextState = !likeBtn.classList.contains("is-active");
+            likeBtn.classList.toggle("is-active", nextState);
+            likeBtn.setAttribute("aria-pressed", nextState ? "true" : "false");
+        });
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener("click", () => {
+            const nextState = !saveBtn.classList.contains("is-active");
+            saveBtn.classList.toggle("is-active", nextState);
+            saveBtn.setAttribute("aria-pressed", nextState ? "true" : "false");
+        });
     }
 }
 
