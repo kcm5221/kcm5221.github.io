@@ -890,11 +890,27 @@ function renderPostDetailView(slug: string | null) {
       `;
     };
 
+    const mediaNavButtons = `
+      ${prevItem
+            ? `<button type="button" class="post-detail-media-nav is-prev" data-target-slug="${escapeHtml(
+                  prevItem.slug
+              )}" aria-label="이전 게시물">‹</button>`
+            : ""}
+      ${nextItem
+            ? `<button type="button" class="post-detail-media-nav is-next" data-target-slug="${escapeHtml(
+                  nextItem.slug
+              )}" aria-label="다음 게시물">›</button>`
+            : ""}
+    `;
+
     const sectionContent = `
-      <section class="post-detail">
+      <section class="post-detail" ${prevItem ? `data-prev-slug="${escapeHtml(prevItem.slug)}"` : ""} ${nextItem
+            ? `data-next-slug="${escapeHtml(nextItem.slug)}"`
+            : ""}>
         <div class="post-detail-container">
           <div class="post-detail-media">
             ${cover}
+            ${mediaNavButtons}
           </div>
           <div class="post-detail-panel">
             <header class="post-detail-header">
@@ -1018,6 +1034,7 @@ function bindPostDetailInteractions() {
     const submitBtn = document.querySelector<HTMLButtonElement>("#post-comment-submit");
     const likeBtn = document.querySelector<HTMLButtonElement>("#post-like-btn");
     const saveBtn = document.querySelector<HTMLButtonElement>("#post-save-btn");
+    const mediaNavBtns = document.querySelectorAll<HTMLButtonElement>(".post-detail-media-nav[data-target-slug]");
 
     if (commentInput && submitBtn) {
         const syncState = () => {
@@ -1041,6 +1058,16 @@ function bindPostDetailInteractions() {
             const nextState = !saveBtn.classList.contains("is-active");
             saveBtn.classList.toggle("is-active", nextState);
             saveBtn.setAttribute("aria-pressed", nextState ? "true" : "false");
+        });
+    }
+
+    if (mediaNavBtns.length) {
+        mediaNavBtns.forEach((btn) => {
+            const targetSlug = btn.dataset.targetSlug;
+            if (!targetSlug) return;
+            btn.addEventListener("click", () => {
+                window.location.hash = `#/post/${encodeURIComponent(targetSlug)}`;
+            });
         });
     }
 }
