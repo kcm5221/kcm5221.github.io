@@ -841,13 +841,14 @@ function setupWriteViewInteractions() {
 
         errorBox.style.display = "none";
 
+        // ✅ Worker가 기대하는 필드 이름에 맞게 body → content 로 변경
         const payload: CommitPayload = {
             title,
             slug,
             summary,
             tags,
             collection: collection || null,
-            body,
+            content: body,
         };
 
         console.log("✏️ 새 글 작성 payload:", payload);
@@ -861,10 +862,18 @@ function setupWriteViewInteractions() {
             console.log("✅ Worker 응답:", result);
 
             submitBtn.textContent = "게시 완료";
+
+            // 폼 초기화
+            form.reset();
+            slugInput.dataset.userEdited = "0";
+
             window.alert(
-                "작성 요청이 성공적으로 전송되었습니다.\n잠시 후 피드에서 확인할 수 있습니다."
+                "작성 요청이 성공적으로 전송되었습니다.\n" +
+                "잠시 후 private 저장소에 커밋이 반영됩니다."
             );
-            window.location.hash = "#/"; // 홈으로 이동
+
+            // 홈으로 이동 (원래 로직 유지)
+            window.location.hash = "#/";
         } catch (err) {
             const msg =
                 err instanceof Error
@@ -932,7 +941,7 @@ interface CommitPayload {
     summary: string;
     tags: string[];
     collection: string | null;
-    body: string;
+    content: string;
 }
 
 // Worker /content/commit 호출 헬퍼
