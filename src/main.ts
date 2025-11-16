@@ -3,7 +3,7 @@ import "./style.css";
 import { loadInitialFeed } from "./api/feed";
 import type { FeedItem } from "./types/Feed";
 
-type Route = "home" | "search" | "profile" | "write" | "authCallback";
+type Route = "home" | "search" | "profile" | "write" | "authCallback" | "postDetail";
 type Tab = "posts" | "saved";
 
 type SidebarItem = {
@@ -73,16 +73,78 @@ const API_BASE =
     (import.meta as any).env?.VITE_API_BASE ??
     "https://blog-auth-worker.kimcm5221.workers.dev";
 
-// JWT 저장 키 & 로그인 여부 헬퍼
+// JWT 저장 키
 const JWT_STORAGE_KEY = "devlog_jwt";
 
+// JWT payload 타입 (exp만 써도 됨)
+interface JwtPayload {
+    exp?: number;
+    sub?: string;
+    iat?: number;
+    iss?: string;
+}
 
-function getJwtToken(): string | null {
+// base64url → JSON payload 파싱
+function parseJwt(token: string): JwtPayload | null {
     try {
-        return localStorage.getItem(JWT_STORAGE_KEY);
+        const parts = token.split(".");
+        if (parts.length !== 3) return null;
+        const payloadBase64 = parts[1]
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+        const json = atob(payloadBase64);
+        return JSON.parse(json);
     } catch {
         return null;
     }
+}
+
+// 만료 체크 포함한 토큰 읽기
+function getJwtToken(): string | null {
+    try {
+        const token = localStorage.getItem(JWT_STORAGE_KEY);
+        if (!token) return null;
+
+        const payload = parseJwt(token);
+        if (!payload || typeof payload.exp !== "number") {
+            // exp 없으면 그냥 쓴다
+            return token;
+        }
+
+        const now = Math.floor(Date.now() / 1000);
+        if (now > payload.exp) {
+            // 만료 → 토큰 제거
+            localStorage.removeItem(JWT_STORAGE_KEY);
+            return null;
+        }
+
+        return token;
+    } catch {
+        return null;
+    }
+}
+
+function isLoggedIn(): boolean {
+    return !!getJwtToken();
+}
+
+
+function bootstrapAuthFromHash() {
+    const hash = window.location.hash || "";
+    if (!hash.startsWith("#auth=")) return;
+
+    const token = decodeURIComponent(hash.slice("#auth=".length));
+    if (!token) return;
+
+    try {
+        localStorage.setItem(JWT_STORAGE_KEY, token);
+        console.log("✅ JWT 저장 완료");
+    } catch (e) {
+        console.error("JWT 저장 실패:", e);
+    }
+
+    // 해시를 깨끗하게 정리 (#/ 로 돌리기)
+    window.location.hash = "#/";
 }
 
 // 🔐 GitHub OAuth 콜백(#auth=...)에서 토큰 회수
@@ -109,9 +171,6 @@ function consumeAuthFromHash(): void {
 
 
 
-function isLoggedIn(): boolean {
-    return !!getJwtToken();
-}
 
 const INFO_CARDS: Record<"search" | "write", InfoCard[]> = {
     search: [
@@ -255,7 +314,19 @@ function getCurrentRouteFromHash(): Route {
     if (hash.startsWith("#/profile")) return "profile";
     if (hash.startsWith("#/write")) return "write";
     if (hash.startsWith("#/auth/callback")) return "authCallback";
+    if (hash.startsWith("#/post/")) return "postDetail";
     return "home";
+}
+
+function extractPostSlugFromHash(): string | null {
+    const hash = window.location.hash || "";
+    const match = hash.match(/^#\/post\/([^/?#]+)/);
+    if (!match) return null;
+    try {
+        return decodeURIComponent(match[1]);
+    } catch {
+        return match[1];
+    }
 }
 
 function extractTokenFromHash(): string | null {
@@ -507,9 +578,9 @@ function renderPostTile(item: FeedItem): string {
         : "";
 
     return `
-      <article class="post-card">
-        <div class="post-media ${cover ? "" : "is-fallback"}" ${cover ? "" : `style="background:${fallbackGradient(item.slug)}"`
-        }>
+      <article class="post-card" data-slug="${escapeHtml(item.slug)}">
+        <div class="post-media ${cover ? "" : "is-fallback"}" ${cover ? "" : `style="background:${fallbackGradient(item.slug)}"`}
+        >
           ${cover || `<span>${escapeHtml(item.title.charAt(0).toUpperCase())}</span>`}
         </div>
         <div class="post-overlay">
@@ -596,6 +667,103 @@ function renderSearchView() {
     `;
 
     renderAppShell("search", mainContent);
+}
+
+function renderPostDetailView(slug: string | null) {
+    if (!slug) {
+        renderError("잘못된 주소입니다. 슬러그를 찾을 수 없습니다.");
+        return;
+    }
+
+    if (!currentItems.length) {
+        renderError("아직 피드를 불러오지 못했습니다. 홈 화면을 한 번 연 뒤 다시 시도해 주세요.");
+        return;
+    }
+
+    const item = currentItems.find((it) => it.slug === slug);
+    if (!item) {
+        renderError(`슬러그가 '${slug}'인 글을 찾을 수 없습니다.`);
+        return;
+    }
+
+    const stats = buildCommonProfileStats();
+    const tags = item.tags.length
+        ? item.tags.map((tag) => `#${escapeHtml(tag)}`).join(" ")
+        : "태그 없음";
+
+    const createdDate = new Date(item.created);
+    const createdLabel = isNaN(createdDate.getTime())
+        ? "작성일 미정"
+        : createdDate.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        });
+
+    const mainContent = `
+      ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
+      <section class="profile-section">
+        <article class="info-card">
+          <h3>${escapeHtml(item.title)}</h3>
+          <div class="profile-section-body">
+            <div class="profile-row">
+              <span class="profile-label">슬러그</span>
+              <span class="profile-value">${escapeHtml(item.slug)}</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">작성일</span>
+              <span class="profile-value">${createdLabel}</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">태그</span>
+              <span class="profile-value">${tags}</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">컬렉션</span>
+              <span class="profile-value">${escapeHtml(item.collection ?? "지정 없음")}</span>
+            </div>
+            ${item.cover
+            ? `
+            <div class="profile-row">
+              <span class="profile-label">커버</span>
+              <span class="profile-value">
+                <img src="${escapeHtml(item.cover)}" alt="${escapeHtml(item.title)}" loading="lazy" />
+              </span>
+            </div>
+            `
+            : ""
+        }
+          </div>
+        </article>
+
+        <article class="info-card">
+          <h3>본문</h3>
+          <div id="post-body" class="post-body">
+            <p>본문을 불러오는 중입니다...</p>
+          </div>
+        </article>
+      </section>
+    `;
+
+    // 상세 페이지에서도 프로필 탭이 활성화된 느낌을 주기 위해 route는 "profile"로 사용
+    renderAppShell("profile", mainContent);
+    loadAndRenderPostBody(item);
+}
+
+async function loadAndRenderPostBody(item: FeedItem) {
+    const container = document.querySelector<HTMLDivElement>("#post-body");
+    if (!container) return;
+
+    try {
+        const markdown = await fetchPostMarkdown(item);
+        const { body } = splitFrontmatter(markdown);
+        const html = renderMarkdown(body.trim());
+        container.innerHTML = html || "<p>본문이 비어 있습니다.</p>";
+    } catch (e) {
+        console.error(e);
+        container.innerHTML =
+            "<p>본문을 불러오지 못했습니다. GitHub Pages 설정 또는 경로를 확인해 주세요.</p>";
+    }
 }
 
 function renderProfileView() {
@@ -764,7 +932,18 @@ function bindHomeInteractions() {
             renderHomeView();
         });
     });
+
+    // ✅ 게시물 카드 클릭 → 상세 페이지로 이동
+    const postCards = document.querySelectorAll<HTMLElement>(".post-card[data-slug]");
+    postCards.forEach((card) => {
+        card.addEventListener("click", () => {
+            const slug = card.dataset.slug;
+            if (!slug) return;
+            window.location.hash = `#/post/${encodeURIComponent(slug)}`;
+        });
+    });
 }
+
 
 function setupWriteViewInteractions() {
     const form = document.querySelector<HTMLFormElement>("#write-form");
@@ -934,6 +1113,120 @@ function escapeHtml(str: string): string {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+function buildPostMarkdownUrl(item: FeedItem): string {
+    const d = new Date(item.created);
+    if (!isNaN(d.getTime())) {
+        const yyyy = d.getUTCFullYear();
+        const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+        return `/posts/${yyyy}/${mm}/${encodeURIComponent(item.slug)}.md`;
+    }
+    // created 값을 신뢰할 수 없는 경우 fallback
+    return `/posts/${encodeURIComponent(item.slug)}.md`;
+}
+
+async function fetchPostMarkdown(item: FeedItem): Promise<string> {
+    const url = buildPostMarkdownUrl(item);
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) {
+        throw new Error(`Markdown 로드 실패: ${res.status} ${res.statusText} (${url})`);
+    }
+    return await res.text();
+}
+
+function splitFrontmatter(markdown: string): { frontmatter: string; body: string } {
+    if (!markdown.startsWith("---")) {
+        return { frontmatter: "", body: markdown };
+    }
+    const lines = markdown.split(/\r?\n/);
+    if (lines[0].trim() !== "---") {
+        return { frontmatter: "", body: markdown };
+    }
+    let endIndex = -1;
+    for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim() === "---") {
+            endIndex = i;
+            break;
+        }
+    }
+    if (endIndex === -1) {
+        return { frontmatter: "", body: markdown };
+    }
+    const front = lines.slice(1, endIndex).join("\n");
+    const body = lines.slice(endIndex + 1).join("\n");
+    return { frontmatter: front, body };
+}
+
+// 아주 단순한 Markdown → HTML 변환기 (헤더/단락/코드블럭/리스트 정도만 지원)
+function renderMarkdown(md: string): string {
+    const lines = md.split(/\r?\n/);
+    let html = "";
+    let inCode = false;
+    let inList = false;
+
+    function closeList() {
+        if (inList) {
+            html += "</ul>";
+            inList = false;
+        }
+    }
+
+    for (let raw of lines) {
+        const line = raw.replace(/\s+$/, "");
+
+        // ``` 코드블럭 토글
+        if (line.trim().startsWith("```")) {
+            if (!inCode) {
+                closeList();
+                html += "<pre><code>";
+                inCode = true;
+            } else {
+                html += "</code></pre>";
+                inCode = false;
+            }
+            continue;
+        }
+
+        if (inCode) {
+            html += escapeHtml(line) + "\n";
+            continue;
+        }
+
+        if (!line.trim()) {
+            closeList();
+            continue;
+        }
+
+        // #, ##, ### 헤더
+        const hMatch = line.match(/^(#{1,6})\s+(.*)$/);
+        if (hMatch) {
+            closeList();
+            const level = hMatch[1].length;
+            const content = escapeHtml(hMatch[2]);
+            html += `<h${level}>${content}</h${level}>`;
+            continue;
+        }
+
+        // 리스트(-, *)
+        if (/^[-*]\s+/.test(line)) {
+            const itemText = escapeHtml(line.replace(/^[-*]\s+/, ""));
+            if (!inList) {
+                html += "<ul>";
+                inList = true;
+            }
+            html += `<li>${itemText}</li>`;
+            continue;
+        } else {
+            closeList();
+        }
+
+        // 기본 단락
+        html += `<p>${escapeHtml(line)}</p>`;
+    }
+
+    closeList();
+    return html;
+}
+
 // 글 커밋 요청에 사용할 페이로드 타입
 interface CommitPayload {
     title: string;
@@ -960,6 +1253,21 @@ async function submitPostToWorker(payload: CommitPayload): Promise<unknown> {
         body: JSON.stringify(payload),
     });
 
+    // 🔹 토큰 만료 / 인증 실패 → 자동 로그아웃 처리
+    if (res.status === 401) {
+        try {
+            localStorage.removeItem(JWT_STORAGE_KEY);
+        } catch { }
+
+        // 필요하면 토스트/alert
+        alert("로그인 세션이 만료되었습니다. 다시 로그인해 주세요.");
+
+        // 글쓰기 화면으로 보내면, 자동으로 '로그인 필요' 카드가 뜸
+        window.location.hash = "#/write";
+
+        throw new Error("인증이 만료되었습니다.");
+    }
+
     if (!res.ok) {
         let detail = "";
         try {
@@ -982,6 +1290,7 @@ async function submitPostToWorker(payload: CommitPayload): Promise<unknown> {
     }
 }
 
+
 function renderRoute() {
     const route = getCurrentRouteFromHash();
 
@@ -997,10 +1306,14 @@ function renderRoute() {
         renderWriteView();
     } else if (route === "profile") {
         renderProfileView();
+    } else if (route === "postDetail") {
+        const slug = extractPostSlugFromHash();
+        renderPostDetailView(slug);
     } else if (route === "authCallback") {
         handleAuthCallbackRoute();
     }
 }
+
 function handleAuthCallbackRoute() {
     const token = extractTokenFromHash();
 
@@ -1067,4 +1380,5 @@ window.addEventListener("hashchange", () => {
     }
 });
 
+bootstrapAuthFromHash();
 bootstrap();
