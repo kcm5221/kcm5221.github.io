@@ -29,6 +29,12 @@ interface ProfileStat {
     value: string;
 }
 
+interface SavedCollectionSummary {
+    id: string;
+    name: string;
+    posts: FeedItem[];
+}
+
 
 type IconName =
     | "home"
@@ -47,6 +53,8 @@ type IconName =
     | "send"
     | "smile"
     | "close";
+
+const DEVLOG_COLLECTION_ID = "devlog";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -332,6 +340,7 @@ const ICONS: Record<IconName, string> = {
 let currentItems: FeedItem[] = [];
 let activeTab: Tab = "posts";
 let modalEscapeHandler: ((event: KeyboardEvent) => void) | null = null;
+let selectedCollectionId: string | null = null;
 
 function getCurrentRouteFromHash(): Route {
     const hash = window.location.hash || "#/";
@@ -629,6 +638,147 @@ function renderTabStrip(): string {
     `;
 }
 
+function renderSavedView(): string {
+    const collections = buildSavedCollections(currentItems);
+    const devlogCollections = collections.filter(
+        (collection) => collection.id.toLowerCase() === DEVLOG_COLLECTION_ID
+    );
+
+    if (devlogCollections.length === 0) {
+        return `<div class="empty-state">저장된 컬렉션이 아직 없습니다.</div>`;
+    }
+
+    let selected: SavedCollectionSummary | null = null;
+    if (selectedCollectionId) {
+        selected = devlogCollections.find((col) => col.id === selectedCollectionId) ?? null;
+        if (!selected) {
+            selectedCollectionId = null;
+        }
+    }
+
+    if (selected) {
+        return renderSavedCollectionDetail(selected);
+    }
+
+    return renderSavedCollectionsGrid(devlogCollections);
+}
+
+function buildSavedCollections(items: FeedItem[]): SavedCollectionSummary[] {
+    const groups = new Map<string, FeedItem[]>();
+
+    items.forEach((item) => {
+        const key = item.collection?.trim() || "uncategorized";
+        const list = groups.get(key) ?? [];
+        list.push(item);
+        groups.set(key, list);
+    });
+
+    return Array.from(groups.entries())
+        .map(([id, posts]) => ({
+            id,
+            name: formatCollectionName(id),
+            posts: [...posts].sort((a, b) => {
+                const aTime = new Date(a.created).getTime();
+                const bTime = new Date(b.created).getTime();
+                if (isNaN(aTime) || isNaN(bTime)) {
+                    return 0;
+                }
+                return bTime - aTime;
+            }),
+        }))
+        .sort((a, b) => {
+            if (b.posts.length !== a.posts.length) {
+                return b.posts.length - a.posts.length;
+            }
+            return a.name.localeCompare(b.name);
+        });
+}
+
+function formatCollectionName(id: string): string {
+    if (!id || id === "uncategorized") {
+        return "Unsorted";
+    }
+
+    const words = id
+        .split(/[-_]/)
+        .filter(Boolean)
+        .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1));
+    return words.length ? words.join(" ") : id;
+}
+
+function renderSavedCollectionsGrid(collections: SavedCollectionSummary[]): string {
+    const totalPosts = collections.reduce((sum, col) => sum + col.posts.length, 0);
+    return `
+      <section class="saved-view saved-collections-view">
+        <div class="saved-header">
+          <div>
+            <h3>Collections</h3>
+            <p>${collections.length} collections · ${totalPosts} posts</p>
+          </div>
+          <button type="button" id="saved-new-collection-btn" class="saved-new-btn">+ New Collection</button>
+        </div>
+        <div class="saved-collections-grid">
+          ${collections.map((collection) => renderSavedCollectionCard(collection)).join("")}
+        </div>
+      </section>
+    `;
+}
+
+function renderSavedCollectionCard(collection: SavedCollectionSummary): string {
+    const coverItem = collection.posts.find((post) => !!post.cover);
+    const hasCover = !!coverItem?.cover;
+    const coverClass = `saved-collection-cover ${hasCover ? "" : "is-fallback"}`.trim();
+    const fallbackStyle = hasCover ? "" : `style="background:${fallbackGradient(collection.id)}"`;
+    const coverContent = hasCover
+        ? `<img src="${escapeHtml(coverItem!.cover!)}" alt="${escapeHtml(collection.name)}" loading="lazy" />`
+        : `<span>${escapeHtml(collection.name.charAt(0).toUpperCase())}</span>`;
+
+    return `
+      <button type="button" class="saved-collection-card" data-collection-id="${escapeHtml(collection.id)}">
+        <span class="${coverClass}" ${fallbackStyle}>
+          ${coverContent}
+        </span>
+        <span class="saved-collection-name">${escapeHtml(collection.name)}</span>
+        <span class="saved-collection-count">${collection.posts.length} posts</span>
+      </button>
+    `;
+}
+
+function renderSavedCollectionDetail(collection: SavedCollectionSummary): string {
+    const lastUpdated = collection.posts[0];
+    let updatedLabel = "";
+    if (lastUpdated) {
+        const date = new Date(lastUpdated.created);
+        if (!isNaN(date.getTime())) {
+            updatedLabel = date.toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            });
+        }
+    }
+
+    const subtitle = updatedLabel
+        ? `${collection.posts.length} posts · 최근 업데이트 ${updatedLabel}`
+        : `${collection.posts.length} posts`;
+
+    return `
+      <section class="saved-view saved-collection-detail">
+        <div class="saved-detail-header">
+          <button type="button" id="saved-back-button" class="saved-back-btn">
+            ${iconMarkup("chevron")}
+            <span>Collections</span>
+          </button>
+          <div class="saved-detail-meta">
+            <h3>${escapeHtml(collection.name)}</h3>
+            <p>${escapeHtml(subtitle)}</p>
+          </div>
+        </div>
+        ${renderPostGrid(collection.posts)}
+      </section>
+    `;
+}
+
 function renderPostGrid(items: FeedItem[]): string {
     if (items.length === 0) {
         return `<div class="empty-state">조건에 맞는 글이 없습니다.</div>`;
@@ -733,7 +883,7 @@ function renderHomeView() {
       ${renderTabStrip()}
       ${activeTab === "posts"
             ? renderPostGrid(visibleItems)
-            : `<div class="empty-state">${TAB_LABELS[activeTab].label} 뷰는 준비 중입니다.</div>`
+            : renderSavedView()
         }
     `;
 
@@ -1113,6 +1263,9 @@ function bindHomeInteractions() {
             const tab = btn.dataset.tab as Tab | undefined;
             if (!tab) return;
             activeTab = tab;
+            if (tab !== "saved") {
+                selectedCollectionId = null;
+            }
             renderHomeView();
         });
     });
@@ -1125,6 +1278,27 @@ function bindHomeInteractions() {
             if (!slug) return;
             window.location.hash = `#/post/${encodeURIComponent(slug)}`;
         });
+    });
+
+    const savedCards = document.querySelectorAll<HTMLButtonElement>(".saved-collection-card");
+    savedCards.forEach((card) => {
+        card.addEventListener("click", () => {
+            const id = card.dataset.collectionId;
+            if (!id) return;
+            selectedCollectionId = id;
+            renderHomeView();
+        });
+    });
+
+    const savedBackBtn = document.querySelector<HTMLButtonElement>("#saved-back-button");
+    savedBackBtn?.addEventListener("click", () => {
+        selectedCollectionId = null;
+        renderHomeView();
+    });
+
+    const savedNewBtn = document.querySelector<HTMLButtonElement>("#saved-new-collection-btn");
+    savedNewBtn?.addEventListener("click", () => {
+        alert("컬렉션 생성 기능은 곧 준비될 예정입니다.");
     });
 }
 
