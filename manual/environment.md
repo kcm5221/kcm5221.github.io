@@ -1,10 +1,10 @@
-# Environment Variables
+ο»Ώ# Environment Variables
 
 ---
 
 ## Cloudflare Worker
 
-| Key | Ό³Έν |
+| Key | μ„¤λª… |
 |------|------|
 | CORS_ALLOW_ORIGIN | https://kcm5221.github.io |
 | FRONTEND_BASE_URL | https://kcm5221.github.io |
