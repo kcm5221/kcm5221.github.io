@@ -54,8 +54,6 @@ type IconName =
     | "smile"
     | "close";
 
-const DEVLOG_COLLECTION_ID = "devlog";
-
 const app = document.querySelector<HTMLDivElement>("#app");
 
 if (!app) {
@@ -640,17 +638,13 @@ function renderTabStrip(): string {
 
 function renderSavedView(): string {
     const collections = buildSavedCollections(currentItems);
-    const devlogCollections = collections.filter(
-        (collection) => collection.id.toLowerCase() === DEVLOG_COLLECTION_ID
-    );
-
-    if (devlogCollections.length === 0) {
+    if (collections.length === 0) {
         return `<div class="empty-state">저장된 컬렉션이 아직 없습니다.</div>`;
     }
 
     let selected: SavedCollectionSummary | null = null;
     if (selectedCollectionId) {
-        selected = devlogCollections.find((col) => col.id === selectedCollectionId) ?? null;
+        selected = collections.find((col) => col.id === selectedCollectionId) ?? null;
         if (!selected) {
             selectedCollectionId = null;
         }
@@ -660,7 +654,7 @@ function renderSavedView(): string {
         return renderSavedCollectionDetail(selected);
     }
 
-    return renderSavedCollectionsGrid(devlogCollections);
+    return renderSavedCollectionsGrid(collections);
 }
 
 function buildSavedCollections(items: FeedItem[]): SavedCollectionSummary[] {
