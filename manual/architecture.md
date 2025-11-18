@@ -1,88 +1,88 @@
-# Gitstagram Architecture
+ï»¿# Gitstagram Architecture
 
-ÀüÃ¼ ±¸Á¶´Â ´ÙÀ½ 3´Ü°è·Î ±¸¼ºµË´Ï´Ù.
+ì „ì²´ êµ¬ì¡°ëŠ” ë‹¤ìŒ 3ë‹¨ê³„ë¡œ êµ¬ì„±ë©ë‹ˆë‹¤.
 
 ---
 
 ## 1) Frontend (GitHub Pages + Vite)
 
 - Hash Router (`#/`, `#/search`, `#/profile`, `#/write`)
-- UI ±¸¼º
+- UI êµ¬ì„±
   - Sidebar
   - Bottom Navigation
   - Mobile Header
-- Feed ·Îµù ¹æ½Ä
-  - GitHub Actions°¡ »ı¼ºÇÑ JSONÀ» `/data/feed/page-*.json` ÇüÅÂ·Î ·Îµå
-- JWT ÀúÀå¼Ò
+- Feed ë¡œë”© ë°©ì‹
+  - GitHub Actionsê°€ ìƒì„±í•œ JSONì„ `/data/feed/page-*.json` í˜•íƒœë¡œ ë¡œë“œ
+- JWT ì €ì¥ì†Œ
   - `localStorage.devlog_jwt`
 
 ---
 
 ## 2) Cloudflare Worker (Auth + Commit API)
 
-### ÁÖ¿ä ¿ªÇÒ
-- GitHub OAuth ·Î±×ÀÎ (PKCE)
-- JWT ¹ß±Ş (HMAC-SHA256)
-- `/content/commit` ¿äÃ»À» ¹Ş¾Æ GitHub Private Repo¿¡ ÀÚµ¿ Ä¿¹Ô
-- CORS Ã³¸®
-- Token ¸¸·á Ã³¸®
-- Rate Limit(¸Ş¸ğ¸® ±â¹İ)
+### ì£¼ìš” ì—­í• 
+- GitHub OAuth ë¡œê·¸ì¸ (PKCE)
+- JWT ë°œê¸‰ (HMAC-SHA256)
+- `/content/commit` ìš”ì²­ì„ ë°›ì•„ GitHub Private Repoì— ìë™ ì»¤ë°‹
+- CORS ì²˜ë¦¬
+- Token ë§Œë£Œ ì²˜ë¦¬
+- Rate Limit(ë©”ëª¨ë¦¬ ê¸°ë°˜)
 
-### Worker ¡æ GitHub Èå¸§
+### Worker â†’ GitHub íë¦„
 
-Frontend ¡æ Worker (Bearer Token)
-Worker ¡æ GitHub App JWT ¡æ Installation Access Token
-Worker ¡æ GitHub /contents API ¡æ Markdown Ä¿¹Ô
-GitHub Actions ¡æ Feed Àç»ı¼º ¡æ GitHub Pages ¾÷µ¥ÀÌÆ®
+Frontend â†’ Worker (Bearer Token)
+Worker â†’ GitHub App JWT â†’ Installation Access Token
+Worker â†’ GitHub /contents API â†’ Markdown ì»¤ë°‹
+GitHub Actions â†’ Feed ì¬ìƒì„± â†’ GitHub Pages ì—…ë°ì´íŠ¸
 
 
 ---
 
 ## 3) GitHub Actions (CI / Feed)
 
-### ¿ªÇÒ
+### ì—­í• 
 
-- Posts repo º¯°æ °¨Áö
-- Markdown frontmatter ¡æ JSON feed º¯È¯
-- ÆäÀÌÁöº°(`page-1.json`, `page-2.json`)·Î ³ª´©¾î »ı¼º
-- `current.json`¿¡ ÃÖ½Å sha ±â·Ï
-- GitHub Pages ÀÚµ¿ ¹èÆ÷
+- Posts repo ë³€ê²½ ê°ì§€
+- Markdown frontmatter â†’ JSON feed ë³€í™˜
+- í˜ì´ì§€ë³„(`page-1.json`, `page-2.json`)ë¡œ ë‚˜ëˆ„ì–´ ìƒì„±
+- `current.json`ì— ìµœì‹  sha ê¸°ë¡
+- GitHub Pages ìë™ ë°°í¬
 
 ---
 
-## ÀüÃ¼ Èå¸§µµ
+## ì „ì²´ íë¦„ë„
 
 [User]
-¡é (PKCE Login)
+â†“ (PKCE Login)
 [Frontend]
-¡é Bearer JWT
+â†“ Bearer JWT
 [Worker]
-¡é Installation Token
+â†“ Installation Token
 [GitHub Private Repo]
-¡é push
+â†“ push
 [GitHub Actions]
-¡é Build feed
+â†“ Build feed
 [Public GitHub Pages]
 
 
 ---
 
-## µ¥ÀÌÅÍ Èå¸§: Feed ¡æ UI
+## ë°ì´í„° íë¦„: Feed â†’ UI
 
-1. `current.json`¿¡¼­ ÃÖ½Å sha ·Îµå
-2. `feed/page-1@{sha}.json` ºÒ·¯¿À±â
-3. °¢ FeedItem ·»´õ¸µ
-4. PostGrid ¡æ PostTile ¡æ PostDetail (ÃßÈÄ)
+1. `current.json`ì—ì„œ ìµœì‹  sha ë¡œë“œ
+2. `feed/page-1@{sha}.json` ë¶ˆëŸ¬ì˜¤ê¸°
+3. ê° FeedItem ë Œë”ë§
+4. PostGrid â†’ PostTile â†’ PostDetail (ì¶”í›„)
 
 ---
 
-## ¶ó¿ìÅÍ ¼³°è
+## ë¼ìš°í„° ì„¤ê³„
 
-| Route | ¼³¸í |
+| Route | ì„¤ëª… |
 |-------|------|
 | `#/` | Home |
-| `#/search` | °Ë»ö |
-| `#/profile` | ÇÁ·ÎÇÊ |
-| `#/write` | ±Û ÀÛ¼º |
-| `#/post/:slug` | »ó¼¼ ÆäÀÌÁö (Ãß°¡ ¿¹Á¤) |
+| `#/search` | ê²€ìƒ‰ |
+| `#/profile` | í”„ë¡œí•„ |
+| `#/write` | ê¸€ ì‘ì„± |
+| `#/post/:slug` | ìƒì„¸ í˜ì´ì§€ (ì¶”ê°€ ì˜ˆì •) |
 
