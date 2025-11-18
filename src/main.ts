@@ -732,8 +732,10 @@ function renderSavedCollectionCard(collection: SavedCollectionSummary): string {
         <span class="${coverClass}" ${fallbackStyle}>
           ${coverContent}
         </span>
-        <span class="saved-collection-name">${escapeHtml(collection.name)}</span>
-        <span class="saved-collection-count">${collection.posts.length} posts</span>
+        <span class="saved-collection-overlay">
+          <span class="saved-collection-name">${escapeHtml(collection.name)}</span>
+          <span class="saved-collection-count">${collection.posts.length} posts</span>
+        </span>
       </button>
     `;
 }

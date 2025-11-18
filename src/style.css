@@ -519,23 +519,31 @@ button {
 
 .saved-collections-grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+}
+
+@media (min-width: 768px) {
+  .saved-collections-grid {
+    gap: 24px;
+  }
 }
 
 .saved-collection-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: left;
-  padding: 4px;
-  border-radius: 18px;
-  transition: background 0.2s ease, transform 0.2s ease;
-  color: #09090b;
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  background: #f4f4f5;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
 .saved-collection-card:hover {
-  background: #f8fafc;
   transform: translateY(-2px);
 }
 
@@ -545,10 +553,10 @@ button {
 }
 
 .saved-collection-cover {
-  display: block;
-  border-radius: 16px;
-  overflow: hidden;
-  aspect-ratio: 1 / 1;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   background: #f4f4f5;
 }
 
@@ -556,6 +564,7 @@ button {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
   transition: transform 0.3s ease;
 }
 
@@ -567,17 +576,31 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
   color: #030213;
+}
+
+.saved-collection-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.75) 100%);
+  text-align: left;
+  color: #ffffff;
 }
 
 .saved-collection-name {
   font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0 0 4px;
 }
 
 .saved-collection-count {
-  color: #71717a;
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.9rem;
 }
 
