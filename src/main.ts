@@ -222,8 +222,8 @@ const INFO_CARDS: Record<"search" | "write", InfoCard[]> = {
 };
 
 const TAB_LABELS: Record<Tab, { label: string; icon: IconName }> = {
-    posts: { label: "Posts", icon: "grid" },
-    saved: { label: "Saved", icon: "bookmark" },
+    posts: { label: "게시물", icon: "grid" },
+    saved: { label: "컬렉션", icon: "bookmark" },
 };
 
 const ICONS: Record<IconName, string> = {
@@ -517,8 +517,8 @@ function renderProfileHeader(stats: ProfileStat[], description: string): string 
             .map(
                 (stat) => `
                       <div class="stat">
-                        <span class="stat-value">${escapeHtml(stat.value)}</span>
                         ${escapeHtml(stat.label)}
+                        <span class="stat-value">${escapeHtml(stat.value)}</span>
                       </div>
                     `
             )
@@ -690,7 +690,7 @@ function buildSavedCollections(items: FeedItem[]): SavedCollectionSummary[] {
 
 function formatCollectionName(id: string): string {
     if (!id || id === "uncategorized") {
-        return "Unsorted";
+        return "미분류";
     }
 
     const words = id
@@ -701,15 +701,13 @@ function formatCollectionName(id: string): string {
 }
 
 function renderSavedCollectionsGrid(collections: SavedCollectionSummary[]): string {
-    const totalPosts = collections.reduce((sum, col) => sum + col.posts.length, 0);
     return `
       <section class="saved-view saved-collections-view">
         <div class="saved-header">
           <div>
-            <h3>Collections</h3>
-            <p>${collections.length} collections · ${totalPosts} posts</p>
+            <p>컬렉션 ${collections.length}</p>
           </div>
-          <button type="button" id="saved-new-collection-btn" class="saved-new-btn">+ New Collection</button>
+          <button type="button" id="saved-new-collection-btn" class="saved-new-btn">+ 새 컬렉션</button>
         </div>
         <div class="saved-collections-grid">
           ${collections.map((collection) => renderSavedCollectionCard(collection)).join("")}
@@ -734,7 +732,7 @@ function renderSavedCollectionCard(collection: SavedCollectionSummary): string {
         </span>
         <span class="saved-collection-overlay">
           <span class="saved-collection-name">${escapeHtml(collection.name)}</span>
-          <span class="saved-collection-count">${collection.posts.length} posts</span>
+          <span class="saved-collection-count">게시물 ${collection.posts.length}</span>
         </span>
       </button>
     `;
@@ -755,15 +753,15 @@ function renderSavedCollectionDetail(collection: SavedCollectionSummary): string
     }
 
     const subtitle = updatedLabel
-        ? `${collection.posts.length} posts · 최근 업데이트 ${updatedLabel}`
-        : `${collection.posts.length} posts`;
+        ? `게시물 ${collection.posts.length} · 최근 업데이트 ${updatedLabel}`
+        : `게시물 ${collection.posts.length}`;
 
     return `
       <section class="saved-view saved-collection-detail">
         <div class="saved-detail-header">
           <button type="button" id="saved-back-button" class="saved-back-btn">
             ${iconMarkup("chevron")}
-            <span>Collections</span>
+            <span>컬렉션</span>
           </button>
           <div class="saved-detail-meta">
             <h3>${escapeHtml(collection.name)}</h3>
@@ -865,7 +863,7 @@ function renderInfoCards(cards: InfoCard[]): string {
 }
 
 function buildCommonProfileStats(): ProfileStat[] {
-    return [{ label: "posts", value: `${currentItems.length}` }];
+    return [{ label: "게시물", value: `${currentItems.length}` }];
 }
 
 function renderHomeView() {
@@ -1119,8 +1117,7 @@ function renderWriteView() {
               <h3>로그인이 필요합니다</h3>
               <div class="profile-section-body">
                 <p class="write-hint">
-                  GitHub OAuth로 본인 확인 후, 이 블로그에서 글을 작성할 수 있습니다.
-                  (현재는 소유자 계정만 작성 가능하도록 제한되어 있습니다.)
+                  GitHub OAuth로 소유자 계정 확인 후, 글을 작성할 수 있습니다.
                 </p>
                 <div class="write-actions">
                   <button type="button" id="write-login-btn" class="primary">
@@ -1179,19 +1176,6 @@ function renderWriteView() {
                 </div>
               </div>
 
-              <!-- 요약 -->
-              <div class="profile-row">
-                <div class="profile-label">요약</div>
-                <div class="profile-value">
-                  <textarea
-                    id="write-summary"
-                    rows="3"
-                    placeholder="이 글에서 다루는 내용을 한두 문장으로 정리해 주세요."
-                    class="write-textarea"
-                  ></textarea>
-                </div>
-              </div>
-
               <!-- 태그 -->
               <div class="profile-row">
                 <div class="profile-label">태그 *</div>
@@ -1227,10 +1211,9 @@ function renderWriteView() {
                   <textarea
                     id="write-body"
                     rows="10"
-                    placeholder="Markdown 형식으로 본문을 작성해 주세요."
+                    placeholder="본문을 작성해 주세요."
                     class="write-textarea"
                   ></textarea>
-                  <p class="write-hint">지금은 미리보기 없이 textarea만 사용합니다. (나중에 Preview 탭 추가 예정)</p>
                 </div>
               </div>
 
@@ -1305,7 +1288,6 @@ function setupWriteViewInteractions() {
 
     const titleInput = form.querySelector<HTMLInputElement>("#write-title");
     const slugInput = form.querySelector<HTMLInputElement>("#write-slug");
-    const summaryInput = form.querySelector<HTMLTextAreaElement>("#write-summary");
     const tagsInput = form.querySelector<HTMLInputElement>("#write-tags");
     const collectionInput = form.querySelector<HTMLInputElement>("#write-collection");
     const bodyInput = form.querySelector<HTMLTextAreaElement>("#write-body");
@@ -1341,7 +1323,6 @@ function setupWriteViewInteractions() {
 
         const title = titleInput.value.trim();
         const slug = slugInput.value.trim();
-        const summary = summaryInput?.value.trim() ?? "";
         const tagsRaw = tagsInput.value;
         const collection = collectionInput?.value.trim() ?? "";
         const body = bodyInput.value.trim();
@@ -1378,7 +1359,7 @@ function setupWriteViewInteractions() {
         const payload: CommitPayload = {
             title,
             slug,
-            summary,
+            summary: "",
             tags,
             collection: collection || null,
             content: body,
