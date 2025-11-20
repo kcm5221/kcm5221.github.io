@@ -922,9 +922,6 @@ function renderPostDetailView(slug: string | null) {
             day: "2-digit",
         });
 
-    const summaryText = (item.summary ?? "요약이 아직 작성되지 않았습니다.").trim();
-    const summarySnippet = truncateText(summaryText, 140);
-
     const tags = item.tags.length
         ? item.tags.map((tag) => `<span class="post-detail-tag">#${escapeHtml(tag)}</span>`).join("")
         : '<span class="post-detail-tag is-empty">태그 없음</span>';
@@ -933,11 +930,10 @@ function renderPostDetailView(slug: string | null) {
         ? `<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(item.title)}" class="post-detail-cover" loading="lazy" />`
         : `
         <div class="post-detail-fallback" style="background:${fallbackGradient(item.slug)}">
-          <span class="post-detail-collection-chip">${escapeHtml(item.collection ?? "Gitstagram")}</span>
           <h2>${escapeHtml(item.title)}</h2>
-          <p>${escapeHtml(summarySnippet)}</p>
         </div>
       `;
+
 
     const index = currentItems.findIndex((it) => it.slug === item.slug);
     const prevItem = index > 0 ? currentItems[index - 1] : null;
@@ -993,8 +989,8 @@ function renderPostDetailView(slug: string | null) {
               </div>
             </header>
             <div class="post-detail-scroll">
-              <div class="post-detail-summary">
-                ${escapeHtml(summaryText)}
+              <div class="post-detail-title-block">
+                <h2 class="post-detail-title">${escapeHtml(item.title)}</h2>
               </div>
               <div class="post-detail-meta">
                 <div class="post-detail-meta-row">
