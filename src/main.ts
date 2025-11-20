@@ -1041,21 +1041,23 @@ function renderPostDetailView(slug: string | null) {
     loadAndRenderPostBody(item);
 }
 
-async function loadAndRenderPostBody(item: FeedItem) {
+function loadAndRenderPostBody(item: FeedItem) {
     const container = document.querySelector<HTMLDivElement>("#post-body");
     if (!container) return;
 
-    try {
-        const markdown = await fetchPostMarkdown(item);
-        const { body } = splitFrontmatter(markdown);
-        const html = renderMarkdown(body.trim());
-        container.innerHTML = html || "<p>본문이 비어 있습니다.</p>";
-    } catch (e) {
-        console.error(e);
-        container.innerHTML =
-            "<p>본문을 불러오지 못했습니다. GitHub Pages 설정 또는 경로를 확인해 주세요.</p>";
+    // 지금은 summary 필드에 실제 본문이 들어 있다고 보고 사용합니다.
+    const raw = (item.summary ?? "").trim();
+
+    if (!raw) {
+        container.innerHTML = "<p>본문이 비어 있습니다.</p>";
+        return;
     }
+
+    // markdown 형식으로 작성하셨다면 그대로 렌더
+    const html = renderMarkdown(raw);
+    container.innerHTML = html || "<p>본문이 비어 있습니다.</p>";
 }
+
 
 function bindPostDetailInteractions() {
     const commentInput = document.querySelector<HTMLInputElement>("#post-comment-input");
@@ -1442,49 +1444,6 @@ function renderError(message: string) {
 
 function escapeHtml(str: string): string {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-function buildPostMarkdownUrl(item: FeedItem): string {
-    const d = new Date(item.created);
-    if (!isNaN(d.getTime())) {
-        const yyyy = d.getUTCFullYear();
-        const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
-        return `/posts/${yyyy}/${mm}/${encodeURIComponent(item.slug)}.md`;
-    }
-    // created 값을 신뢰할 수 없는 경우 fallback
-    return `/posts/${encodeURIComponent(item.slug)}.md`;
-}
-
-async function fetchPostMarkdown(item: FeedItem): Promise<string> {
-    const url = buildPostMarkdownUrl(item);
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) {
-        throw new Error(`Markdown 로드 실패: ${res.status} ${res.statusText} (${url})`);
-    }
-    return await res.text();
-}
-
-function splitFrontmatter(markdown: string): { frontmatter: string; body: string } {
-    if (!markdown.startsWith("---")) {
-        return { frontmatter: "", body: markdown };
-    }
-    const lines = markdown.split(/\r?\n/);
-    if (lines[0].trim() !== "---") {
-        return { frontmatter: "", body: markdown };
-    }
-    let endIndex = -1;
-    for (let i = 1; i < lines.length; i++) {
-        if (lines[i].trim() === "---") {
-            endIndex = i;
-            break;
-        }
-    }
-    if (endIndex === -1) {
-        return { frontmatter: "", body: markdown };
-    }
-    const front = lines.slice(1, endIndex).join("\n");
-    const body = lines.slice(endIndex + 1).join("\n");
-    return { frontmatter: front, body };
 }
 
 // 아주 단순한 Markdown → HTML 변환기 (헤더/단락/코드블럭/리스트 정도만 지원)
