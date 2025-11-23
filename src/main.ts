@@ -661,7 +661,12 @@ function buildSavedCollections(items: FeedItem[]): SavedCollectionSummary[] {
     const groups = new Map<string, FeedItem[]>();
 
     items.forEach((item) => {
-        const key = item.collection?.trim() || "uncategorized";
+        const key = item.collection?.trim();
+        // 컬렉션이 없으면 Saved 컬렉션 목록에서 제외
+        if (!key) {
+            return;
+        }
+
         const list = groups.get(key) ?? [];
         list.push(item);
         groups.set(key, list);
@@ -688,17 +693,17 @@ function buildSavedCollections(items: FeedItem[]): SavedCollectionSummary[] {
         });
 }
 
-function formatCollectionName(id: string): string {
-    if (!id || id === "uncategorized") {
-        return "미분류";
-    }
 
-    const words = id
+function formatCollectionName(id: string): string {
+    const trimmed = id.trim();
+    const words = trimmed
         .split(/[-_]/)
         .filter(Boolean)
         .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1));
-    return words.length ? words.join(" ") : id;
+    return words.length ? words.join(" ") : trimmed;
 }
+
+
 
 function renderSavedCollectionsGrid(collections: SavedCollectionSummary[]): string {
     return `
@@ -935,9 +940,24 @@ function renderPostDetailView(slug: string | null) {
       `;
 
 
-    const index = currentItems.findIndex((it) => it.slug === item.slug);
-    const prevItem = index > 0 ? currentItems[index - 1] : null;
-    const nextItem = index >= 0 && index < currentItems.length - 1 ? currentItems[index + 1] : null;
+    // 컬렉션 상세에서 들어온 경우에는 해당 컬렉션 내부에서만 이전/다음을 이동한다.
+    let navItems: FeedItem[] = currentItems;
+
+    if (selectedCollectionId) {
+        const colId = selectedCollectionId;
+        const withinCollection = currentItems.filter(
+            (it) => (it.collection ?? "").trim() === colId
+        );
+        // 현재 글이 이 컬렉션 안에 포함되어 있을 때만 이 목록을 사용
+        if (withinCollection.some((it) => it.slug === item.slug)) {
+            navItems = withinCollection;
+        }
+    }
+
+    const index = navItems.findIndex((it) => it.slug === item.slug);
+    const prevItem = index > 0 ? navItems[index - 1] : null;
+    const nextItem = index >= 0 && index < navItems.length - 1 ? navItems[index + 1] : null;
+
 
     const buildNavBtn = (direction: "prev" | "next", target: FeedItem | null) => {
         const dirClass = `post-detail-nav-btn-${direction}`;

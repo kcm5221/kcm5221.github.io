@@ -1,4 +1,4 @@
-(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const n of document.querySelectorAll('link[rel="modulepreload"]'))o(n);new MutationObserver(n=>{for(const a of n)if(a.type==="childList")for(const i of a.addedNodes)i.tagName==="LINK"&&i.rel==="modulepreload"&&o(i)}).observe(document,{childList:!0,subtree:!0});function s(n){const a={};return n.integrity&&(a.integrity=n.integrity),n.referrerPolicy&&(a.referrerPolicy=n.referrerPolicy),n.crossOrigin==="use-credentials"?a.credentials="include":n.crossOrigin==="anonymous"?a.credentials="omit":a.credentials="same-origin",a}function o(n){if(n.ep)return;n.ep=!0;const a=s(n);fetch(n.href,a)}})();const N="/data";async function R(e){const t=await fetch(e,{cache:"no-store"});if(!t.ok)throw new Error(`Request failed: ${t.status} ${t.statusText} (${e})`);return await t.json()}async function K(){const e=`${N}/current.json`;return await R(e)}async function V(e,t){const s=`${N}/feed/page-${t}@${e}.json`;return await R(s)}async function J(e=1){const t=await K(),s=await V(t.sha,e);return{current:t,page:s}}const Z={},M=document.querySelector("#app");if(!M)throw new Error("#app element not found");const Y=[{id:"home",label:"Home",icon:"home",route:"home"},{id:"search",label:"Search",icon:"search",route:"search"},{id:"profile",label:"Profile",icon:"user",route:"profile"},{id:"create",label:"Create",icon:"plus",route:"write"}],Q=[{id:"home",icon:"home",route:"home"},{id:"search",icon:"search",route:"search"},{id:"profile",icon:"user",route:"profile"},{id:"create",icon:"plus",route:"write"}],S={home:"Developer"},_=Z?.VITE_API_BASE??"https://blog-auth-worker.kimcm5221.workers.dev",f="devlog_jwt";function X(e){try{const t=e.split(".");if(t.length!==3)return null;const s=t[1].replace(/-/g,"+").replace(/_/g,"/"),o=atob(s);return JSON.parse(o)}catch{return null}}function O(){try{const e=localStorage.getItem(f);if(!e)return null;const t=X(e);return!t||typeof t.exp!="number"?e:Math.floor(Date.now()/1e3)>t.exp?(localStorage.removeItem(f),null):e}catch{return null}}function ee(){return!!O()}function te(){const e=window.location.hash||"";if(!e.startsWith("#auth="))return;const t=decodeURIComponent(e.slice(6));if(t){try{localStorage.setItem(f,t),console.log("✅ JWT 저장 완료")}catch(s){console.error("JWT 저장 실패:",s)}window.location.hash="#/"}}function se(){const t=(window.location.hash||"").match(/^#\/?auth=(.+)$/);if(!t)return;const s=t[1];if(s){try{localStorage.setItem(f,s)}catch{}window.location.replace("#/write")}}const oe={search:[{title:"검색 화면 준비 중",lines:["태그, 제목, 요약을 동시에 검색하는 통합 입력창","기간과 컬렉션 필터, 즐겨찾기 저장","PKCE 기반 GitHub OAuth 로 권한 제어"]},{title:"릴리스 계획",lines:["v0.2 - 전체 검색 API 연결","v0.3 - 저장된 검색 & 공유","v1.0 - Cloudflare Worker 확장"]}]},ne={posts:{label:"게시물",icon:"grid"},saved:{label:"컬렉션",icon:"bookmark"}},ae={home:`
+(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const n of document.querySelectorAll('link[rel="modulepreload"]'))o(n);new MutationObserver(n=>{for(const a of n)if(a.type==="childList")for(const i of a.addedNodes)i.tagName==="LINK"&&i.rel==="modulepreload"&&o(i)}).observe(document,{childList:!0,subtree:!0});function s(n){const a={};return n.integrity&&(a.integrity=n.integrity),n.referrerPolicy&&(a.referrerPolicy=n.referrerPolicy),n.crossOrigin==="use-credentials"?a.credentials="include":n.crossOrigin==="anonymous"?a.credentials="omit":a.credentials="same-origin",a}function o(n){if(n.ep)return;n.ep=!0;const a=s(n);fetch(n.href,a)}})();const N="/data";async function R(e){const t=await fetch(e,{cache:"no-store"});if(!t.ok)throw new Error(`Request failed: ${t.status} ${t.statusText} (${e})`);return await t.json()}async function V(){const e=`${N}/current.json`;return await R(e)}async function z(e,t){const s=`${N}/feed/page-${t}@${e}.json`;return await R(s)}async function J(e=1){const t=await V(),s=await z(t.sha,e);return{current:t,page:s}}const Z={},B=document.querySelector("#app");if(!B)throw new Error("#app element not found");const Y=[{id:"home",label:"Home",icon:"home",route:"home"},{id:"search",label:"Search",icon:"search",route:"search"},{id:"profile",label:"Profile",icon:"user",route:"profile"},{id:"create",label:"Create",icon:"plus",route:"write"}],Q=[{id:"home",icon:"home",route:"home"},{id:"search",icon:"search",route:"search"},{id:"profile",icon:"user",route:"profile"},{id:"create",icon:"plus",route:"write"}],C={home:"Developer"},_=Z?.VITE_API_BASE??"https://blog-auth-worker.kimcm5221.workers.dev",y="devlog_jwt";function X(e){try{const t=e.split(".");if(t.length!==3)return null;const s=t[1].replace(/-/g,"+").replace(/_/g,"/"),o=atob(s);return JSON.parse(o)}catch{return null}}function O(){try{const e=localStorage.getItem(y);if(!e)return null;const t=X(e);return!t||typeof t.exp!="number"?e:Math.floor(Date.now()/1e3)>t.exp?(localStorage.removeItem(y),null):e}catch{return null}}function ee(){return!!O()}function te(){const e=window.location.hash||"";if(!e.startsWith("#auth="))return;const t=decodeURIComponent(e.slice(6));if(t){try{localStorage.setItem(y,t),console.log("✅ JWT 저장 완료")}catch(s){console.error("JWT 저장 실패:",s)}window.location.hash="#/"}}function se(){const t=(window.location.hash||"").match(/^#\/?auth=(.+)$/);if(!t)return;const s=t[1];if(s){try{localStorage.setItem(y,s)}catch{}window.location.replace("#/write")}}const oe={search:[{title:"검색 화면 준비 중",lines:["태그, 제목, 요약을 동시에 검색하는 통합 입력창","기간과 컬렉션 필터, 즐겨찾기 저장","PKCE 기반 GitHub OAuth 로 권한 제어"]},{title:"릴리스 계획",lines:["v0.2 - 전체 검색 API 연결","v0.3 - 저장된 검색 & 공유","v1.0 - Cloudflare Worker 확장"]}]},ne={posts:{label:"게시물",icon:"grid"},saved:{label:"컬렉션",icon:"bookmark"}},ae={home:`
       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
         <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -88,7 +88,7 @@
         <path d="M18 6 6 18" />
         <path d="M6 6l12 12" />
       </svg>
-    `};let u=[],A="posts",h=null,y=null;function W(){const e=window.location.hash||"#/";return e.startsWith("#/search")?"search":e.startsWith("#/profile")?"profile":e.startsWith("#/write")?"write":e.startsWith("#/auth/callback")?"authCallback":e.startsWith("#/post/")?"postDetail":"home"}function ie(){const t=(window.location.hash||"").match(/^#\/post\/([^/?#]+)/);if(!t)return null;try{return decodeURIComponent(t[1])}catch{return t[1]}}function re(){const e=window.location.hash,t=e.indexOf("?");if(t===-1)return null;const s=e.slice(t+1);return new URLSearchParams(s).get("token")}function x(e,t){M.innerHTML=`
+    `};let u=[],M="posts",b=null,g=null;function W(){const e=window.location.hash||"#/";return e.startsWith("#/search")?"search":e.startsWith("#/profile")?"profile":e.startsWith("#/write")?"write":e.startsWith("#/auth/callback")?"authCallback":e.startsWith("#/post/")?"postDetail":"home"}function ie(){const t=(window.location.hash||"").match(/^#\/post\/([^/?#]+)/);if(!t)return null;try{return decodeURIComponent(t[1])}catch{return t[1]}}function re(){const e=window.location.hash,t=e.indexOf("?");if(t===-1)return null;const s=e.slice(t+1);return new URLSearchParams(s).get("token")}function S(e,t){B.innerHTML=`
       <div class="app-shell">
         ${le(e)}
         <div class="main-area">
@@ -111,12 +111,12 @@
         type="button"
         ${e.route?`data-route="${e.route}"`:""}
       >
-        ${m(e.icon)}
+        ${k(e.icon)}
         <span>${e.label}</span>
       </button>
     `}function de(){return`
       <header class="mobile-header">
-        <div class="mobile-username">Cheolmin Kim${m("chevron")}</div>
+        <div class="mobile-username">Cheolmin Kim${k("chevron")}</div>
       </header>
     `}function ue(e){return`
       <nav class="bottom-nav">
@@ -126,21 +126,21 @@
                 class="bottom-nav-btn ${!!t.route&&t.route===e?"is-active":""}"
                 ${t.route?`data-route="${t.route}"`:""}
             >
-                ${m(t.icon)}
+                ${k(t.icon)}
               </button>
             `).join("")}
       </nav>
-    `}function I(){return document.querySelector("#post-detail-modal-root")}function pe(){const e=I();e&&(e.innerHTML="",e.classList.remove("is-active"),h&&(document.removeEventListener("keydown",h),h=null))}function U(){const e=I();if(!e)return;e.querySelectorAll("[data-close-modal='true']").forEach(s=>{s.addEventListener("click",o=>{o.preventDefault(),window.location.hash="#/"})}),h&&document.removeEventListener("keydown",h),h=s=>{s.key==="Escape"&&(window.location.hash="#/")},document.addEventListener("keydown",h)}function D(e){const t=I();t&&(t.innerHTML=`
+    `}function A(){return document.querySelector("#post-detail-modal-root")}function pe(){const e=A();e&&(e.innerHTML="",e.classList.remove("is-active"),b&&(document.removeEventListener("keydown",b),b=null))}function U(){const e=A();if(!e)return;e.querySelectorAll("[data-close-modal='true']").forEach(s=>{s.addEventListener("click",o=>{o.preventDefault(),window.location.hash="#/"})}),b&&document.removeEventListener("keydown",b),b=s=>{s.key==="Escape"&&(window.location.hash="#/")},document.addEventListener("keydown",b)}function D(e){const t=A();t&&(t.innerHTML=`
       <div class="post-detail-modal is-visible" role="dialog" aria-modal="true">
         <div class="post-detail-modal-backdrop" data-close-modal="true"></div>
         <div class="post-detail-modal-surface">
           <button type="button" class="post-detail-close" aria-label="게시물 닫기" data-close-modal="true">
-            ${m("close")}
+            ${k("close")}
           </button>
           <div class="post-detail-empty">${r(e)}</div>
         </div>
       </div>
-    `,t.classList.add("is-active"),U())}function m(e){return`<span class="icon">${ae[e]}</span>`}function L(e,t){return`
+    `,t.classList.add("is-active"),U())}function k(e){return`<span class="icon">${ae[e]}</span>`}function x(e,t){return`
       <section class="profile-header">
         <div class="profile-avatar">
           <img src="/profile/profile.jpg" alt="Profile" loading="lazy" />
@@ -242,17 +242,17 @@
       <div class="tab-strip" role="tablist">
         ${Object.entries(ne).map(([e,t])=>{const s=e;return`
                   <button
-                    class="tab-btn ${A===s?"is-active":""}"
+                    class="tab-btn ${M===s?"is-active":""}"
                     role="tab"
                     data-tab="${s}"
                     type="button"
                   >
-                    ${m(t.icon)}
+                    ${k(t.icon)}
                     <span>${t.label}</span>
                   </button>
                 `}).join("")}
       </div>
-    `}function fe(){const e=me(u);if(e.length===0)return'<div class="empty-state">저장된 컬렉션이 아직 없습니다.</div>';let t=null;return y&&(t=e.find(s=>s.id===y)??null,t||(y=null)),t?ye(t):we(e)}function me(e){const t=new Map;return e.forEach(s=>{const o=s.collection?.trim()||"uncategorized",n=t.get(o)??[];n.push(s),t.set(o,n)}),Array.from(t.entries()).map(([s,o])=>({id:s,name:ge(s),posts:[...o].sort((n,a)=>{const i=new Date(n.created).getTime(),l=new Date(a.created).getTime();return isNaN(i)||isNaN(l)?0:l-i})})).sort((s,o)=>o.posts.length!==s.posts.length?o.posts.length-s.posts.length:s.name.localeCompare(o.name))}function ge(e){if(!e||e==="uncategorized")return"미분류";const t=e.split(/[-_]/).filter(Boolean).map(s=>s.charAt(0).toUpperCase()+s.slice(1));return t.length?t.join(" "):e}function we(e){return`
+    `}function fe(){const e=me(u);if(e.length===0)return'<div class="empty-state">저장된 컬렉션이 아직 없습니다.</div>';let t=null;return g&&(t=e.find(s=>s.id===g)??null,t||(g=null)),t?ye(t):we(e)}function me(e){const t=new Map;return e.forEach(s=>{const o=s.collection?.trim();if(!o)return;const n=t.get(o)??[];n.push(s),t.set(o,n)}),Array.from(t.entries()).map(([s,o])=>({id:s,name:ge(s),posts:[...o].sort((n,a)=>{const i=new Date(n.created).getTime(),c=new Date(a.created).getTime();return isNaN(i)||isNaN(c)?0:c-i})})).sort((s,o)=>o.posts.length!==s.posts.length?o.posts.length-s.posts.length:s.name.localeCompare(o.name))}function ge(e){const t=e.trim(),s=t.split(/[-_]/).filter(Boolean).map(o=>o.charAt(0).toUpperCase()+o.slice(1));return s.length?s.join(" "):t}function we(e){return`
       <section class="saved-view saved-collections-view">
         <div class="saved-header">
           <div>
@@ -278,7 +278,7 @@
       <section class="saved-view saved-collection-detail">
         <div class="saved-detail-header">
           <button type="button" id="saved-back-button" class="saved-back-btn">
-            ${m("chevron")}
+            ${k("chevron")}
             <span>컬렉션</span>
           </button>
           <div class="saved-detail-meta">
@@ -315,33 +315,33 @@
                   </article>
                 `).join("")}
       </section>
-    `}function T(){return[{label:"게시물",value:`${u.length}`}]}function C(){const e="home",t=u,s=T(),o=`
-      ${L(s,S.home)}
+    `}function I(){return[{label:"게시물",value:`${u.length}`}]}function $(){const e="home",t=u,s=I(),o=`
+      ${x(s,C.home)}
       ${he()}
-      ${A==="posts"?F(t):fe()}
-    `;x(e,o),Ie()}function xe(){const e=T(),t=`
-      ${L(e,S.home)}
+      ${M==="posts"?F(t):fe()}
+    `;S(e,o),Ie()}function xe(){const e=I(),t=`
+      ${x(e,C.home)}
       ${Se(oe.search)}
-    `;x("search",t)}function Le(e){if(!e){D("잘못된 주소입니다. 슬러그를 찾을 수 없습니다.");return}if(!u.length){D("아직 피드를 불러오지 못했습니다. 홈 화면을 연 뒤 다시 시도해 주세요.");return}const t=u.find(d=>d.slug===e);if(!t){D(`슬러그가 '${r(e)}'인 글을 찾을 수 없습니다.`);return}const s=new Date(t.created),o=isNaN(s.getTime())?"작성일 미정":s.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"}),n=t.tags.length?t.tags.map(d=>`<span class="post-detail-tag">#${r(d)}</span>`).join(""):'<span class="post-detail-tag is-empty">태그 없음</span>',a=t.cover?`<img src="${r(t.cover)}" alt="${r(t.title)}" class="post-detail-cover" loading="lazy" />`:`
+    `;S("search",t)}function Le(e){if(!e){D("잘못된 주소입니다. 슬러그를 찾을 수 없습니다.");return}if(!u.length){D("아직 피드를 불러오지 못했습니다. 홈 화면을 연 뒤 다시 시도해 주세요.");return}const t=u.find(l=>l.slug===e);if(!t){D(`슬러그가 '${r(e)}'인 글을 찾을 수 없습니다.`);return}const s=new Date(t.created),o=isNaN(s.getTime())?"작성일 미정":s.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"}),n=t.tags.length?t.tags.map(l=>`<span class="post-detail-tag">#${r(l)}</span>`).join(""):'<span class="post-detail-tag is-empty">태그 없음</span>',a=t.cover?`<img src="${r(t.cover)}" alt="${r(t.title)}" class="post-detail-cover" loading="lazy" />`:`
         <div class="post-detail-fallback" style="background:${P(t.slug)}">
           <h2>${r(t.title)}</h2>
         </div>
-      `,i=u.findIndex(d=>d.slug===t.slug),l=i>0?u[i-1]:null,c=i>=0&&i<u.length-1?u[i+1]:null,v=(d,p)=>{const k=`post-detail-nav-btn-${d}`,$=d==="prev"?"‹":"›",B=d==="prev"?"이전 게시물":"다음 게시물";return p?`
-        <a class="post-detail-nav-btn ${k}" href="#/post/${encodeURIComponent(p.slug)}" aria-label="${B}" title="${r(Ce(p.title,48))}">
-          <span aria-hidden="true">${$}</span>
+      `;let i=u;if(g){const l=g,v=u.filter(h=>(h.collection??"").trim()===l);v.some(h=>h.slug===t.slug)&&(i=v)}const c=i.findIndex(l=>l.slug===t.slug),d=c>0?i[c-1]:null,p=c>=0&&c<i.length-1?i[c+1]:null,w=(l,v)=>{const h=`post-detail-nav-btn-${l}`,E=l==="prev"?"‹":"›",f=l==="prev"?"이전 게시물":"다음 게시물";return v?`
+        <a class="post-detail-nav-btn ${h}" href="#/post/${encodeURIComponent(v.slug)}" aria-label="${f}" title="${r(Ce(v.title,48))}">
+          <span aria-hidden="true">${E}</span>
         </a>
-      `:`<span class="post-detail-nav-btn is-disabled ${k}" aria-disabled="true" aria-label="${B}"><span aria-hidden="true">${$}</span></span>`},g=`
+      `:`<span class="post-detail-nav-btn is-disabled ${h}" aria-disabled="true" aria-label="${f}"><span aria-hidden="true">${E}</span></span>`},L=`
       <nav class="post-detail-nav post-detail-nav-prev" aria-label="이전 게시물">
-        ${v("prev",l)}
+        ${w("prev",d)}
       </nav>
-    `,E=`
+    `,j=`
       <nav class="post-detail-nav post-detail-nav-next" aria-label="다음 게시물">
-        ${v("next",c)}
+        ${w("next",p)}
       </nav>
     `,q=`
-      <section class="post-detail" ${l?`data-prev-slug="${r(l.slug)}"`:""} ${c?`data-next-slug="${r(c.slug)}"`:""}>
+      <section class="post-detail" ${d?`data-prev-slug="${r(d.slug)}"`:""} ${p?`data-next-slug="${r(p.slug)}"`:""}>
         <div class="post-detail-frame">
-          ${g}
+          ${L}
           <div class="post-detail-container">
             <div class="post-detail-media">
               ${a}
@@ -356,7 +356,7 @@
                 </div>
               </div>
               <div class="post-detail-header-actions">
-                <button type="button" class="post-detail-action-btn" aria-label="닫기" data-close-modal="true">${m("chevron")}</button>
+                <button type="button" class="post-detail-action-btn" aria-label="닫기" data-close-modal="true">${k("chevron")}</button>
               </div>
             </header>
             <div class="post-detail-scroll">
@@ -384,21 +384,21 @@
               </div>
             </div>
           </div>
-          ${E}
+          ${j}
         </div>
       </section>
-    `,w=I();w&&(w.innerHTML=`
+    `,m=A();m&&(m.innerHTML=`
       <div class="post-detail-modal is-visible" role="dialog" aria-modal="true">
         <div class="post-detail-modal-backdrop" data-close-modal="true"></div>
         <div class="post-detail-modal-surface">
           ${q}
         </div>
       </div>
-    `,w.classList.add("is-active"),requestAnimationFrame(()=>{w.querySelector(".post-detail-modal")?.classList.add("is-open")}),Be(),U(),Ee(t))}function Ee(e){const t=document.querySelector("#post-body");if(!t)return;const s=(e.summary??"").trim();if(!s){t.innerHTML="<p>본문이 비어 있습니다.</p>";return}const o=De(s);t.innerHTML=o||"<p>본문이 비어 있습니다.</p>"}function Be(){const e=document.querySelector("#post-comment-input"),t=document.querySelector("#post-comment-submit"),s=document.querySelector("#post-like-btn"),o=document.querySelector("#post-save-btn");if(e&&t){const n=()=>{const a=e.value.trim().length>0;t.disabled=!a,t.classList.toggle("is-active",a)};e.addEventListener("input",n)}s&&s.addEventListener("click",()=>{const n=!s.classList.contains("is-active");s.classList.toggle("is-active",n),s.setAttribute("aria-pressed",n?"true":"false")}),o&&o.addEventListener("click",()=>{const n=!o.classList.contains("is-active");o.classList.toggle("is-active",n),o.setAttribute("aria-pressed",n?"true":"false")})}function Me(){const e=T(),t=`
-      ${L(e,S.home)}
+    `,m.classList.add("is-active"),requestAnimationFrame(()=>{m.querySelector(".post-detail-modal")?.classList.add("is-open")}),Be(),U(),Ee(t))}function Ee(e){const t=document.querySelector("#post-body");if(!t)return;const s=(e.summary??"").trim();if(!s){t.innerHTML="<p>본문이 비어 있습니다.</p>";return}const o=De(s);t.innerHTML=o||"<p>본문이 비어 있습니다.</p>"}function Be(){const e=document.querySelector("#post-comment-input"),t=document.querySelector("#post-comment-submit"),s=document.querySelector("#post-like-btn"),o=document.querySelector("#post-save-btn");if(e&&t){const n=()=>{const a=e.value.trim().length>0;t.disabled=!a,t.classList.toggle("is-active",a)};e.addEventListener("input",n)}s&&s.addEventListener("click",()=>{const n=!s.classList.contains("is-active");s.classList.toggle("is-active",n),s.setAttribute("aria-pressed",n?"true":"false")}),o&&o.addEventListener("click",()=>{const n=!o.classList.contains("is-active");o.classList.toggle("is-active",n),o.setAttribute("aria-pressed",n?"true":"false")})}function Me(){const e=I(),t=`
+      ${x(e,C.home)}
       ${ve()}
-    `;x("profile",t)}function Ae(){const e=T();if(!ee()){const s=`
-          ${L(e,S.home)}
+    `;S("profile",t)}function Ae(){const e=I();if(!ee()){const s=`
+          ${x(e,C.home)}
           <section class="profile-section">
             <article class="info-card">
               <h3>로그인이 필요합니다</h3>
@@ -414,8 +414,8 @@
               </div>
             </article>
           </section>
-        `;x("write",s),document.querySelector("#write-login-btn")?.addEventListener("click",()=>{window.location.href=`${_}/auth/login`});return}const t=`
-      ${L(e,S.home)}
+        `;S("write",s),document.querySelector("#write-login-btn")?.addEventListener("click",()=>{window.location.href=`${_}/auth/login`});return}const t=`
+      ${x(e,C.home)}
       <section class="profile-section">
         <article class="info-card">
           <h3>새 글 작성</h3>
@@ -502,16 +502,16 @@
           </form>
         </article>
       </section>
-    `;x("write",t),Te()}function Ie(){document.querySelectorAll("[data-tab]").forEach(a=>{a.addEventListener("click",()=>{const i=a.dataset.tab;i&&(A=i,i!=="saved"&&(y=null),C())})}),document.querySelectorAll(".post-card[data-slug]").forEach(a=>{a.addEventListener("click",()=>{const i=a.dataset.slug;i&&(window.location.hash=`#/post/${encodeURIComponent(i)}`)})}),document.querySelectorAll(".saved-collection-card").forEach(a=>{a.addEventListener("click",()=>{const i=a.dataset.collectionId;i&&(y=i,C())})}),document.querySelector("#saved-back-button")?.addEventListener("click",()=>{y=null,C()}),document.querySelector("#saved-new-collection-btn")?.addEventListener("click",()=>{alert("컬렉션 생성 기능은 곧 준비될 예정입니다.")})}function Te(){const e=document.querySelector("#write-form");if(!e)return;const t=e.querySelector("#write-title"),s=e.querySelector("#write-slug"),o=e.querySelector("#write-tags"),n=e.querySelector("#write-collection"),a=e.querySelector("#write-body"),i=e.querySelector("#write-submit"),l=e.querySelector("#write-reset"),c=e.querySelector("#write-error");!t||!s||!o||!a||!i||!c||(t.addEventListener("input",()=>{s.dataset.userEdited!=="1"&&(s.value=$e(t.value))}),s.addEventListener("input",()=>{s.dataset.userEdited="1"}),l?.addEventListener("click",()=>{e.reset(),s.dataset.userEdited="0",c.style.display="none",c.textContent=""}),e.addEventListener("submit",async v=>{v.preventDefault();const g=t.value.trim(),E=s.value.trim(),q=o.value,w=n?.value.trim()??"",d=a.value.trim(),p=[];g||p.push("제목을 입력해 주세요."),E||p.push("슬러그를 입력해 주세요.");const k=q.split(/[,\s]+/).map(b=>b.trim()).filter(Boolean);if(k.length===0&&p.push("태그를 한 개 이상 입력해 주세요."),d.length<10&&p.push("본문을 10자 이상 작성해 주세요. (현재 글자 수: "+d.length+")"),p.length>0){c.textContent=p.join(" / "),c.style.display="block";return}c.style.display="none";const $={title:g,slug:E,summary:"",tags:k,collection:w||null,content:d};console.log("✏️ 새 글 작성 payload:",$),i.disabled=!0;const B=i.textContent;i.textContent="게시 중...";try{const b=await He($);console.log("✅ Worker 응답:",b),i.textContent="게시 완료",e.reset(),s.dataset.userEdited="0",window.alert(`작성 요청이 성공적으로 전송되었습니다.
-잠시 후 private 저장소에 커밋이 반영됩니다.`),window.location.hash="#/"}catch(b){const G=b instanceof Error?b.message:"작성 중 알 수 없는 오류가 발생했습니다.";c.textContent=G,c.style.display="block",i.textContent=B,i.disabled=!1}}))}function je(){document.querySelectorAll("[data-route]").forEach(t=>{t.addEventListener("click",()=>{const s=t.dataset.route;s&&(s==="home"?window.location.hash="#/":s==="search"?window.location.hash="#/search":s==="profile"?window.location.hash="#/profile":s==="write"&&(window.location.hash="#/write"))})})}function H(){M.innerHTML=`
+    `;S("write",t),Te()}function Ie(){document.querySelectorAll("[data-tab]").forEach(a=>{a.addEventListener("click",()=>{const i=a.dataset.tab;i&&(M=i,i!=="saved"&&(g=null),$())})}),document.querySelectorAll(".post-card[data-slug]").forEach(a=>{a.addEventListener("click",()=>{const i=a.dataset.slug;i&&(window.location.hash=`#/post/${encodeURIComponent(i)}`)})}),document.querySelectorAll(".saved-collection-card").forEach(a=>{a.addEventListener("click",()=>{const i=a.dataset.collectionId;i&&(g=i,$())})}),document.querySelector("#saved-back-button")?.addEventListener("click",()=>{g=null,$()}),document.querySelector("#saved-new-collection-btn")?.addEventListener("click",()=>{alert("컬렉션 생성 기능은 곧 준비될 예정입니다.")})}function Te(){const e=document.querySelector("#write-form");if(!e)return;const t=e.querySelector("#write-title"),s=e.querySelector("#write-slug"),o=e.querySelector("#write-tags"),n=e.querySelector("#write-collection"),a=e.querySelector("#write-body"),i=e.querySelector("#write-submit"),c=e.querySelector("#write-reset"),d=e.querySelector("#write-error");!t||!s||!o||!a||!i||!d||(t.addEventListener("input",()=>{s.dataset.userEdited!=="1"&&(s.value=$e(t.value))}),s.addEventListener("input",()=>{s.dataset.userEdited="1"}),c?.addEventListener("click",()=>{e.reset(),s.dataset.userEdited="0",d.style.display="none",d.textContent=""}),e.addEventListener("submit",async p=>{p.preventDefault();const w=t.value.trim(),L=s.value.trim(),j=o.value,q=n?.value.trim()??"",m=a.value.trim(),l=[];w||l.push("제목을 입력해 주세요."),L||l.push("슬러그를 입력해 주세요.");const v=j.split(/[,\s]+/).map(f=>f.trim()).filter(Boolean);if(v.length===0&&l.push("태그를 한 개 이상 입력해 주세요."),m.length<10&&l.push("본문을 10자 이상 작성해 주세요. (현재 글자 수: "+m.length+")"),l.length>0){d.textContent=l.join(" / "),d.style.display="block";return}d.style.display="none";const h={title:w,slug:L,summary:"",tags:v,collection:q||null,content:m};console.log("✏️ 새 글 작성 payload:",h),i.disabled=!0;const E=i.textContent;i.textContent="게시 중...";try{const f=await He(h);console.log("✅ Worker 응답:",f),i.textContent="게시 완료",e.reset(),s.dataset.userEdited="0",window.alert(`작성 요청이 성공적으로 전송되었습니다.
+잠시 후 private 저장소에 커밋이 반영됩니다.`),window.location.hash="#/"}catch(f){const K=f instanceof Error?f.message:"작성 중 알 수 없는 오류가 발생했습니다.";d.textContent=K,d.style.display="block",i.textContent=E,i.disabled=!1}}))}function je(){document.querySelectorAll("[data-route]").forEach(t=>{t.addEventListener("click",()=>{const s=t.dataset.route;s&&(s==="home"?window.location.hash="#/":s==="search"?window.location.hash="#/search":s==="profile"?window.location.hash="#/profile":s==="write"&&(window.location.hash="#/write"))})})}function H(){B.innerHTML=`
       <div class="view-state">
         <div class="loader"></div>
         <p>피드를 불러오는 중입니다...</p>
       </div>
-    `}function qe(e){M.innerHTML=`
+    `}function qe(e){B.innerHTML=`
       <div class="view-state">
         <p>${r(e)}</p>
         <button class="primary" id="reload" type="button">다시 시도</button>
       </div>
-    `,document.querySelector("#reload")?.addEventListener("click",()=>{j()})}function r(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}function De(e){const t=e.split(/\r?\n/);let s="",o=!1,n=!1;function a(){n&&(s+="</ul>",n=!1)}for(let i of t){const l=i.replace(/\s+$/,"");if(l.trim().startsWith("```")){o?(s+="</code></pre>",o=!1):(a(),s+="<pre><code>",o=!0);continue}if(o){s+=r(l)+`
-`;continue}if(!l.trim()){a();continue}const c=l.match(/^(#{1,6})\s+(.*)$/);if(c){a();const v=c[1].length,g=r(c[2]);s+=`<h${v}>${g}</h${v}>`;continue}if(/^[-*]\s+/.test(l)){const v=r(l.replace(/^[-*]\s+/,""));n||(s+="<ul>",n=!0),s+=`<li>${v}</li>`;continue}else a();s+=`<p>${r(l)}</p>`}return a(),s}async function He(e){const t=O();if(!t)throw new Error("로그인 정보가 없습니다. 먼저 로그인 후 다시 시도해 주세요.");const s=await fetch(`${_}/content/commit`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${t}`},body:JSON.stringify(e)});if(s.status===401){try{localStorage.removeItem(f)}catch{}throw alert("로그인 세션이 만료되었습니다. 다시 로그인해 주세요."),window.location.hash="#/write",new Error("인증이 만료되었습니다.")}if(!s.ok){let o="";try{const a=await s.json();a&&typeof a.message=="string"&&(o=a.message)}catch{}const n=`작성 요청 실패: ${s.status} ${s.statusText}`;throw new Error(o?`${n} - ${o}`:n)}try{return await s.json()}catch{return{}}}function z(){const e=W();if(e!=="postDetail"&&pe(),e==="home"){if(u.length===0){H();return}C()}else if(e==="search")xe();else if(e==="write")Ae();else if(e==="profile")Me();else if(e==="postDetail"){if(u.length===0){H();return}C();const t=ie();Le(t)}else e==="authCallback"&&Pe()}function Pe(){const e=re();if(e)try{localStorage.setItem(f,e)}catch{console.error("Failed to save token to localStorage")}window.location.hash="#/write"}async function j(){se(),H(),A="posts";try{const{page:e}=await J(1);u=e.items,z()}catch(e){console.error(e);const t=e instanceof Error?e.message:"알 수 없는 오류가 발생했습니다.";qe(t)}}function Ne(){const t=(window.location.hash||"").match(/auth=([^&]+)/);if(!t)return;const s=decodeURIComponent(t[1]);try{localStorage.setItem(f,s)}catch{}const o=window.location.href.split("#")[0];window.history.replaceState(null,"",o+"#/write")}Ne();j();window.addEventListener("hashchange",()=>{W()==="home"&&u.length===0?j():z()});te();j();
+    `,document.querySelector("#reload")?.addEventListener("click",()=>{T()})}function r(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}function De(e){const t=e.split(/\r?\n/);let s="",o=!1,n=!1;function a(){n&&(s+="</ul>",n=!1)}for(let i of t){const c=i.replace(/\s+$/,"");if(c.trim().startsWith("```")){o?(s+="</code></pre>",o=!1):(a(),s+="<pre><code>",o=!0);continue}if(o){s+=r(c)+`
+`;continue}if(!c.trim()){a();continue}const d=c.match(/^(#{1,6})\s+(.*)$/);if(d){a();const p=d[1].length,w=r(d[2]);s+=`<h${p}>${w}</h${p}>`;continue}if(/^[-*]\s+/.test(c)){const p=r(c.replace(/^[-*]\s+/,""));n||(s+="<ul>",n=!0),s+=`<li>${p}</li>`;continue}else a();s+=`<p>${r(c)}</p>`}return a(),s}async function He(e){const t=O();if(!t)throw new Error("로그인 정보가 없습니다. 먼저 로그인 후 다시 시도해 주세요.");const s=await fetch(`${_}/content/commit`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${t}`},body:JSON.stringify(e)});if(s.status===401){try{localStorage.removeItem(y)}catch{}throw alert("로그인 세션이 만료되었습니다. 다시 로그인해 주세요."),window.location.hash="#/write",new Error("인증이 만료되었습니다.")}if(!s.ok){let o="";try{const a=await s.json();a&&typeof a.message=="string"&&(o=a.message)}catch{}const n=`작성 요청 실패: ${s.status} ${s.statusText}`;throw new Error(o?`${n} - ${o}`:n)}try{return await s.json()}catch{return{}}}function G(){const e=W();if(e!=="postDetail"&&pe(),e==="home"){if(u.length===0){H();return}$()}else if(e==="search")xe();else if(e==="write")Ae();else if(e==="profile")Me();else if(e==="postDetail"){if(u.length===0){H();return}$();const t=ie();Le(t)}else e==="authCallback"&&Pe()}function Pe(){const e=re();if(e)try{localStorage.setItem(y,e)}catch{console.error("Failed to save token to localStorage")}window.location.hash="#/write"}async function T(){se(),H(),M="posts";try{const{page:e}=await J(1);u=e.items,G()}catch(e){console.error(e);const t=e instanceof Error?e.message:"알 수 없는 오류가 발생했습니다.";qe(t)}}function Ne(){const t=(window.location.hash||"").match(/auth=([^&]+)/);if(!t)return;const s=decodeURIComponent(t[1]);try{localStorage.setItem(y,s)}catch{}const o=window.location.href.split("#")[0];window.history.replaceState(null,"",o+"#/write")}Ne();T();window.addEventListener("hashchange",()=>{W()==="home"&&u.length===0?T():G()});te();T();
