@@ -373,7 +373,7 @@ button {
 
 .post-card {
   position: relative;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   border-radius: 12px;
   overflow: hidden;
   background: #f4f4f5;
@@ -784,6 +784,8 @@ button {
   .post-detail-modal {
     align-items: flex-start;
     padding: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -832,6 +834,7 @@ button {
     border-radius: 0;
     padding: 0;
     background: #000000;
+    overflow-y: auto;
   }
 
   .post-detail-close {
@@ -949,22 +952,10 @@ button {
     flex: 0 0 auto;
     width: 100%;
     min-height: unset;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 5;
     position: sticky;
     top: 0;
     z-index: 2;
-  }
-}
-
-@media (max-width: 768px) and (max-aspect-ratio: 2 / 3) {
-  .post-detail-media {
-    aspect-ratio: 4 / 5;
-  }
-}
-
-@media (max-width: 768px) and (min-aspect-ratio: 3 / 2) {
-  .post-detail-media {
-    aspect-ratio: 16 / 9;
   }
 }
 
