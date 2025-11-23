@@ -392,12 +392,12 @@ button {
 
 .post-media.is-fallback {
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
   font-weight: 700;
   color: #030213;
-  text-align: left;
+  text-align: center;
 }
 
 .post-fallback-title {
@@ -1002,9 +1002,11 @@ button {
   padding: 32px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
   color: #111827;
   gap: 12px;
+  text-align: center;
 }
 
 .post-detail-fallback h2 {
