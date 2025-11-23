@@ -806,13 +806,13 @@ function renderPostTile(item: FeedItem): string {
         ? `<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(
             item.title
         )}" loading="lazy" />`
-        : "";
+        : `<div class="post-fallback-title">${escapeHtml(item.title)}</div>`;
 
     return `
       <article class="post-card" data-slug="${escapeHtml(item.slug)}">
         <div class="post-media ${cover ? "" : "is-fallback"}" ${cover ? "" : `style="background:${fallbackGradient(item.slug)}"`}
         >
-          ${cover || `<span>${escapeHtml(item.title.charAt(0).toUpperCase())}</span>`}
+          ${cover}
         </div>
         <div class="post-overlay">
           <p class="overlay-title">${escapeHtml(item.title)}</p>
