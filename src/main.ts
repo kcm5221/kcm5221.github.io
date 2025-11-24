@@ -19,11 +19,6 @@ type BottomNavItem = {
     route?: Route;
 };
 
-interface InfoCard {
-    title: string;
-    lines: string[];
-}
-
 interface ProfileStat {
     label: string;
     value: string;
@@ -181,46 +176,6 @@ function consumeAuthFromHash(): void {
 
 
 
-
-const INFO_CARDS: Record<"search" | "write", InfoCard[]> = {
-    search: [
-        {
-            title: "검색 화면 준비 중",
-            lines: [
-                "태그, 제목, 요약을 동시에 검색하는 통합 입력창",
-                "기간과 컬렉션 필터, 즐겨찾기 저장",
-                "PKCE 기반 GitHub OAuth 로 권한 제어",
-            ],
-        },
-        {
-            title: "릴리스 계획",
-            lines: [
-                "v0.2 - 전체 검색 API 연결",
-                "v0.3 - 저장된 검색 & 공유",
-                "v1.0 - Cloudflare Worker 확장",
-            ],
-        },
-    ],
-    write: [
-        {
-            title: "작성 도구",
-            lines: [
-                "제목 · 슬러그 · 요약 입력 UI",
-                "컬렉션/태그 선택 및 미리보기",
-                "Cloudflare Worker 로 커밋",
-            ],
-        },
-        {
-            title: "보안 메모",
-            lines: [
-                "PKCE + GitHub App 권한 확인",
-                "JWT 1시간 유효",
-                "Audit 로그 저장",
-            ],
-        },
-    ],
-};
-
 const TAB_LABELS: Record<Tab, { label: string; icon: IconName }> = {
     posts: { label: "게시물", icon: "grid" },
     saved: { label: "컬렉션", icon: "bookmark" },
@@ -339,6 +294,10 @@ let currentItems: FeedItem[] = [];
 let activeTab: Tab = "posts";
 let modalEscapeHandler: ((event: KeyboardEvent) => void) | null = null;
 let selectedCollectionId: string | null = null;
+let lastSearchQuery = "";
+let lastListHash: string = "#/posts";
+let lastSearchFilteredSlugs: string[] = [];
+
 
 function getCurrentRouteFromHash(): Route {
     const hash = window.location.hash || "#/";
@@ -460,10 +419,16 @@ function setupModalCloseInteractions() {
     if (!modalRoot) return;
 
     const closeTargets = modalRoot.querySelectorAll<HTMLElement>("[data-close-modal='true']");
+
+    const goBackFromModal = () => {
+        const target = lastListHash || "#/posts";
+        window.location.hash = target;
+    };
+
     closeTargets.forEach((target) => {
         target.addEventListener("click", (event) => {
             event.preventDefault();
-            window.location.hash = "#/";
+            goBackFromModal();
         });
     });
 
@@ -472,11 +437,12 @@ function setupModalCloseInteractions() {
     }
     modalEscapeHandler = (event) => {
         if (event.key === "Escape") {
-            window.location.hash = "#/";
+            goBackFromModal();
         }
     };
     document.addEventListener("keydown", modalEscapeHandler);
 }
+
 
 function renderPostDetailMessage(message: string) {
     const modalRoot = getPostDetailModalRoot();
@@ -806,13 +772,14 @@ function renderPostTile(item: FeedItem): string {
         ? `<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(
             item.title
         )}" loading="lazy" />`
-        : `<div class="post-fallback-title">${escapeHtml(item.title)}</div>`;
+        : "";
 
     return `
       <article class="post-card" data-slug="${escapeHtml(item.slug)}">
         <div class="post-media ${cover ? "" : "is-fallback"}" ${cover ? "" : `style="background:${fallbackGradient(item.slug)}"`}
         >
-          ${cover}
+                ${cover || `<span class="post-fallback-title">${escapeHtml(item.title)}</span>`}
+
         </div>
         <div class="post-overlay">
           <p class="overlay-title">${escapeHtml(item.title)}</p>
@@ -848,24 +815,6 @@ function truncateText(text: string, maxLength = 48): string {
     return `${text.slice(0, maxLength - 1)}…`;
 }
 
-function renderInfoCards(cards: InfoCard[]): string {
-    return `
-      <section class="info-grid">
-        ${cards
-            .map(
-                (card) => `
-                  <article class="info-card">
-                    <h3>${escapeHtml(card.title)}</h3>
-                    <ul>
-                      ${card.lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}
-                    </ul>
-                  </article>
-                `
-            )
-            .join("")}
-      </section>
-    `;
-}
 
 function buildCommonProfileStats(): ProfileStat[] {
     return [{ label: "게시물", value: `${currentItems.length}` }];
@@ -895,11 +844,26 @@ function renderSearchView() {
 
     const mainContent = `
       ${renderProfileHeader(stats, ROUTE_DESCRIPTIONS.home)}
-      ${renderInfoCards(INFO_CARDS.search)}
+      <section class="search-page">
+        <div class="search-bar-row">
+          <input
+            id="search-input"
+            type="search"
+            placeholder="제목, 태그, 본문 텍스트를 검색해 보세요"
+            class="search-input"
+          />
+        </div>
+        <div id="search-meta" class="search-meta"></div>
+        <div id="search-results">
+          ${renderPostGrid(currentItems)}
+        </div>
+      </section>
     `;
 
     renderAppShell("search", mainContent);
+    bindSearchInteractions();
 }
+
 
 function renderPostDetailView(slug: string | null) {
     if (!slug) {
@@ -943,20 +907,32 @@ function renderPostDetailView(slug: string | null) {
     // 컬렉션 상세에서 들어온 경우에는 해당 컬렉션 내부에서만 이전/다음을 이동한다.
     let navItems: FeedItem[] = currentItems;
 
+    // 1) 컬렉션에서 온 경우: 해당 컬렉션 내부만 사용
     if (selectedCollectionId) {
         const colId = selectedCollectionId;
         const withinCollection = currentItems.filter(
             (it) => (it.collection ?? "").trim() === colId
         );
-        // 현재 글이 이 컬렉션 안에 포함되어 있을 때만 이 목록을 사용
         if (withinCollection.some((it) => it.slug === item.slug)) {
             navItems = withinCollection;
+        }
+    }
+    // 2) 컬렉션이 아니라, 검색에서 온 경우: 검색 결과 목록만 사용
+    else if (lastListHash.startsWith("#/search") && lastSearchFilteredSlugs.length > 0) {
+        const fromSearch: FeedItem[] = lastSearchFilteredSlugs
+            .map((slug) => currentItems.find((it) => it.slug === slug) || null)
+            .filter((it): it is FeedItem => it !== null);
+
+        if (fromSearch.some((it) => it.slug === item.slug)) {
+            navItems = fromSearch;
         }
     }
 
     const index = navItems.findIndex((it) => it.slug === item.slug);
     const prevItem = index > 0 ? navItems[index - 1] : null;
-    const nextItem = index >= 0 && index < navItems.length - 1 ? navItems[index + 1] : null;
+    const nextItem =
+        index >= 0 && index < navItems.length - 1 ? navItems[index + 1] : null;
+
 
 
     const buildNavBtn = (direction: "prev" | "next", target: FeedItem | null) => {
@@ -1273,9 +1249,14 @@ function bindHomeInteractions() {
         card.addEventListener("click", () => {
             const slug = card.dataset.slug;
             if (!slug) return;
+
+            // ✅ 상세 들어가기 전에, 현재 목록 화면 hash 기억
+            lastListHash = window.location.hash || "#/posts";
+
             window.location.hash = `#/post/${encodeURIComponent(slug)}`;
         });
     });
+
 
     const savedCards = document.querySelectorAll<HTMLButtonElement>(".saved-collection-card");
     savedCards.forEach((card) => {
@@ -1298,6 +1279,86 @@ function bindHomeInteractions() {
         alert("컬렉션 생성 기능은 곧 준비될 예정입니다.");
     });
 }
+function bindSearchInteractions() {
+    const input = document.querySelector<HTMLInputElement>("#search-input");
+    const meta = document.querySelector<HTMLDivElement>("#search-meta");
+    const results = document.querySelector<HTMLDivElement>("#search-results");
+
+    // 여기서 한 번 걸러주고
+    if (!input || !results) return;
+
+    // ✅ 이후에는 절대 null 아님을 보장하는 새 변수로 재할당
+    const searchInput = input;
+    const searchResults = results;
+
+    // 화면 진입 시, 마지막 검색어를 인풋에 복원
+    searchInput.value = lastSearchQuery;
+
+    function filterItems(q: string): FeedItem[] {
+        const query = q.trim().toLowerCase();
+        if (!query) return currentItems;
+
+        return currentItems.filter((item) => {
+            const bucket = [
+                item.title,
+                item.summary ?? "",
+                item.collection ?? "",
+                item.tags.join(" "),
+            ]
+                .join(" ")
+                .toLowerCase();
+
+            return bucket.includes(query);
+        });
+    }
+
+    function update() {
+        const q = searchInput.value;
+
+        // 마지막 검색어 저장
+        lastSearchQuery = q;
+
+        const filtered = filterItems(q);
+
+        lastSearchFilteredSlugs = filtered.map((item) => item.slug);
+
+        // ✅ 여기서도 searchResults 사용
+        searchResults.innerHTML = renderPostGrid(filtered);
+
+        if (meta) {
+            const total = currentItems.length;
+            const count = filtered.length;
+            if (q.trim()) {
+                meta.textContent = `${total}개 중 ${count}개 검색됨`;
+            } else {
+                meta.textContent = `${total}개 글`;
+            }
+        }
+
+        const cards = searchResults.querySelectorAll<HTMLElement>(".post-card[data-slug]");
+        cards.forEach((card) => {
+            card.addEventListener("click", () => {
+                const slug = card.dataset.slug;
+                if (!slug) return;
+
+                // ✅ 검색 화면에서 상세로 갈 때도 현재 hash 기억
+                lastListHash = window.location.hash || "#/search";
+
+                window.location.hash = `#/post/${encodeURIComponent(slug)}`;
+            });
+        });
+
+    }
+
+    searchInput.addEventListener("input", () => {
+        update();
+    });
+
+    // 처음 진입 시에도 기존 검색어 기준으로 한 번 필터링
+    update();
+}
+
+
 
 
 function setupWriteViewInteractions() {

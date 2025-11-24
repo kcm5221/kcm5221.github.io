@@ -365,6 +365,42 @@ button {
   gap: 1px;
 }
 
+/* Search page */
+.search-page {
+    padding: 0 16px 24px;
+}
+
+@media (min-width: 768px) {
+    .search-page {
+        padding: 0 24px 32px;
+    }
+}
+
+.search-bar-row {
+    margin-bottom: 12px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+    .search-input:focus {
+        border-color: #0f172a;
+        background: #ffffff;
+    }
+
+.search-meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
 @media (min-width: 768px) {
   .post-grid {
     gap: 24px;
@@ -394,16 +430,10 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  font-weight: 700;
-  color: #030213;
-  text-align: center;
-}
-
-.post-fallback-title {
-  font-size: clamp(1rem, 0.6rem + 1vw, 1.4rem);
+  font-size: 1.4rem;
   line-height: 1.4;
-  word-break: break-word;
+  font-weight: 600;
+  color: #030213;
 }
 
 .post-overlay {
@@ -1002,11 +1032,9 @@ button {
   padding: 32px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-end;
   color: #111827;
   gap: 12px;
-  text-align: center;
 }
 
 .post-detail-fallback h2 {
