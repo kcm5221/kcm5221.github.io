@@ -969,6 +969,13 @@ function renderPostDetailView(slug: string | null) {
       </nav>
     `;
 
+    const mobileNav = `
+      <nav class="post-detail-mobile-nav" aria-label="게시물 이동">
+        ${buildNavBtn("prev", prevItem)}
+        ${buildNavBtn("next", nextItem)}
+      </nav>
+    `;
+
     const sectionContent = `
       <section class="post-detail" ${prevItem ? `data-prev-slug="${escapeHtml(prevItem.slug)}"` : ""} ${nextItem
             ? `data-next-slug="${escapeHtml(nextItem.slug)}"`
@@ -1019,6 +1026,7 @@ function renderPostDetailView(slug: string | null) {
           </div>
           ${nextNav}
         </div>
+        ${mobileNav}
       </section>
     `;
 
