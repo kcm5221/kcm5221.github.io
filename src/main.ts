@@ -297,6 +297,7 @@ let selectedCollectionId: string | null = null;
 let lastSearchQuery = "";
 let lastListHash: string = "#/posts";
 let lastSearchFilteredSlugs: string[] = [];
+let lastDetailNavSlugs: string[] = [];
 
 
 function getCurrentRouteFromHash(): Route {
@@ -907,8 +908,15 @@ function renderPostDetailView(slug: string | null) {
     // 컬렉션 상세에서 들어온 경우에는 해당 컬렉션 내부에서만 이전/다음을 이동한다.
     let navItems: FeedItem[] = currentItems;
 
+    const navFromLastDetail = lastDetailNavSlugs
+        .map((slug) => currentItems.find((it) => it.slug === slug) || null)
+        .filter((it): it is FeedItem => it !== null);
+    if (navFromLastDetail.length && navFromLastDetail.some((it) => it.slug === item.slug)) {
+        navItems = navFromLastDetail;
+    }
+
     // 1) 컬렉션에서 온 경우: 해당 컬렉션 내부만 사용
-    if (selectedCollectionId) {
+    else if (selectedCollectionId) {
         const colId = selectedCollectionId;
         const withinCollection = currentItems.filter(
             (it) => (it.collection ?? "").trim() === colId
@@ -1250,6 +1258,11 @@ function bindHomeInteractions() {
             const slug = card.dataset.slug;
             if (!slug) return;
 
+            const navSource = selectedCollectionId
+                ? currentItems.filter((it) => (it.collection ?? "").trim() === selectedCollectionId)
+                : currentItems;
+            lastDetailNavSlugs = navSource.map((item) => item.slug);
+
             // ✅ 상세 들어가기 전에, 현재 목록 화면 hash 기억
             lastListHash = window.location.hash || "#/posts";
 
@@ -1340,6 +1353,12 @@ function bindSearchInteractions() {
             card.addEventListener("click", () => {
                 const slug = card.dataset.slug;
                 if (!slug) return;
+
+                if (lastSearchFilteredSlugs.length > 0) {
+                    lastDetailNavSlugs = [...lastSearchFilteredSlugs];
+                } else {
+                    lastDetailNavSlugs = currentItems.map((item) => item.slug);
+                }
 
                 // ✅ 검색 화면에서 상세로 갈 때도 현재 hash 기억
                 lastListHash = window.location.hash || "#/search";
