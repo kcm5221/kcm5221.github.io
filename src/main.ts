@@ -133,45 +133,24 @@ function isLoggedIn(): boolean {
     return !!getJwtToken();
 }
 
-
-function bootstrapAuthFromHash() {
-    const hash = window.location.hash || "";
-    if (!hash.startsWith("#auth=")) return;
-
-    const token = decodeURIComponent(hash.slice("#auth=".length));
-    if (!token) return;
-
-    try {
-        localStorage.setItem(JWT_STORAGE_KEY, token);
-        console.log("✅ JWT 저장 완료");
-    } catch (e) {
-        console.error("JWT 저장 실패:", e);
-    }
-
-    // 해시를 깨끗하게 정리 (#/ 로 돌리기)
-    window.location.hash = "#/";
-}
-
-// 🔐 GitHub OAuth 콜백(#auth=...)에서 토큰 회수
-// URL 해시에서 #auth=토큰 형태를 소비해서 localStorage에 저장
-function consumeAuthFromHash(): void {
+// 🔐 GitHub OAuth 해시에서 토큰 회수 (#auth=... 혹은 해시 내 auth 파라미터)
+function captureAuthTokenFromHash(): void {
     const raw = window.location.hash || "";
+    const directMatch = raw.match(/^#\/?auth=([^&]+)/);
+    const queryMatch = raw.match(/auth=([^&]+)/);
+    const token = directMatch?.[1] ?? queryMatch?.[1];
 
-    // #auth=... 또는 #/auth=... 둘 다 허용
-    const match = raw.match(/^#\/?auth=(.+)$/);
-    if (!match) return;
-
-    const token = match[1];
     if (!token) return;
 
     try {
-        localStorage.setItem(JWT_STORAGE_KEY, token);
+        localStorage.setItem(JWT_STORAGE_KEY, decodeURIComponent(token));
     } catch {
         // localStorage 막힌 환경이면 무시
     }
 
     // 해시를 깔끔하게 정리하면서 작성 페이지로 이동
-    window.location.replace("#/write");
+    const base = window.location.href.split("#")[0];
+    window.history.replaceState(null, "", `${base}#/write`);
 }
 
 
@@ -1739,9 +1718,6 @@ function handleAuthCallbackRoute() {
 
 
 async function bootstrap() {
-    // 🔐 GitHub OAuth에서 되돌아온 #auth=토큰 처리
-    consumeAuthFromHash();
-
     renderLoading();
     activeTab = "posts";
 
@@ -1757,26 +1733,7 @@ async function bootstrap() {
     }
 }
 
-
-function consumeAuthTokenFromHash() {
-    const hash = window.location.hash || "";
-    const m = hash.match(/auth=([^&]+)/);
-    if (!m) return;
-
-    const token = decodeURIComponent(m[1]);
-
-    try {
-        localStorage.setItem(JWT_STORAGE_KEY, token);
-    } catch {
-        // 로컬스토리지 막힌 브라우저는 그냥 무시
-    }
-
-    // URL에서 auth=... 제거 (깔끔하게)
-    const base = window.location.href.split("#")[0];
-    window.history.replaceState(null, "", base + "#/write");
-}
-
-consumeAuthTokenFromHash();
+captureAuthTokenFromHash();
 bootstrap();
 
 window.addEventListener("hashchange", () => {
@@ -1786,6 +1743,3 @@ window.addEventListener("hashchange", () => {
         renderRoute();
     }
 });
-
-bootstrapAuthFromHash();
-bootstrap();
