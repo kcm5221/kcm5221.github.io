@@ -1,55 +1,38 @@
-﻿# Gitstagram Overview
+# Gitstagram Overview
 
-Gitstagram은 GitHub Pages + Cloudflare Workers + GitHub App을 이용한  
-**인스타그램 UI 기반 개발 블로그 플랫폼**입니다.
+Gitstagram은 GitHub Pages + Cloudflare Workers + GitHub App을 이용한 **인스타그램 UI 기반 개발 블로그 플랫폼**입니다. 정적 페이지를 유지하면서도 OAuth 인증과 자동 커밋 파이프라인을 갖추는 것이 목표입니다.
 
 ---
 
 ## 📌 현재까지 완료된 작업
-
-- UI 기본 구조: Home / Search / Profile / Write
-- Sidebar + Bottom Navigation (모바일/데스크탑)
-- Hash Router 기반 페이지 전환 (`#/`, `#/search`, `#/profile`, `#/write`)
-- GitHub OAuth (PKCE 방식)
-- Cloudflare Worker 인증 서버 구축
-- JWT 발급 및 검증
-- Markdown 포스트 GitHub Private Repo에 자동 작성(커밋)
-- GitHub Actions로 Feed(JSON) 생성
-- Home 화면에서 Posts 렌더링
-- 프로필 페이지 작성 완료
-- 글 작성 폼 완성 + Worker 연동
-- 토큰 저장 및 자동 Logout UX 설계 완료
+- Hash Router 기반 페이지 전환: `#/`, `#/search`, `#/profile`, `#/write`, `#/post/:slug`
+- Home/Saved 탭 UI와 컬렉션별 그룹 렌더링
+- 게시물 상세 페이지에서 컨텍스트(검색 결과·컬렉션) 기반 이전/다음 이동
+- 검색 페이지: 제목·요약·태그·컬렉션 텍스트 필터링 + 결과 개수 표기
+- GitHub OAuth(PKCE) + Worker JWT 발급, 해시(`auth=`) 토큰 수집 로직
+- 글쓰기 폼: 슬러그 자동 생성, 필수 입력 검증, Worker `/content/commit` 연동
+- Feed(JSON) 로딩: `current.json` → `feed/page-1@<sha>.json` 순으로 초기 로드
 
 ---
 
 ## 📌 앞으로 만들 구조
-
-1. Saved 탭 → **컬렉션 기반 정리 뷰**
-2. 게시물 상세 페이지 (`#/post/:slug`)
-3. 상세 페이지에서
-   - 컬렉션 편집 기능
-   - 태그 목록 + 이전/다음 포스트 이동
-4. Search 검색 → 통합 검색 UI + API
-5. 글 작성 페이지 확장
-   - Markdown Preview 탭
-   - 커버 이미지 업로드
-6. Admin 기능 (draft 관리, 글 수정)
-7. 퍼포먼스 개선 (JSON feed 캐싱)
+1. Saved 탭 컬렉션 생성/편집 및 상세 내 태그/컬렉션 수정
+2. 검색 고도화: 다중 키워드, 태그/컬렉션 필터 UI, 정렬 옵션
+3. 글쓰기 개선: Markdown 미리보기, 커버 이미지 업로드, 자동 요약 필드
+4. Admin 기능: 게시물 수정/드래프트 관리, 인증 만료 UX 향상
+5. 퍼포먼스 개선: JSON feed 캐싱/프리페치, 무한 스크롤
 
 ---
 
 ## 📌 주요 목표
-
-- **0원 인프라 유지**
-- GitHub에 자동 커밋하는 진짜 “개발자 친화적” 블로그
-- 인스타 UI처럼 직관적이고 시각적인 경험
-- 해시 라우터 기반으로 GitHub Pages에서 문제 없이 동작
-- Cloudflare Worker 인증 기반 보안 구조
+- **0원 인프라**를 유지하면서도 실제 블로그 운영에 필요한 기능 제공
+- GitHub에 자동 커밋되는 개발자 친화적 작성 플로우
+- 해시 라우터 기반으로 GitHub Pages에서 문제 없이 동작하는 SPA
+- Cloudflare Worker 인증 기반 최소 권한 보안 구조
 
 ---
 
-## 📌 GPT가 참고해야 할 사항
-
-- Worker Auth 구조는 꼭 api-spec.md와 security.md를 참고해서 개발해야 함
-- Hash router 구조는 architecture.md 참고
-- Feed JSON 구조는 frontend ↔ actions 연동 핵심
+## 📌 참고
+- Worker Auth 구조: `manual/worker.js`, `manual/environment.md`
+- 라우터 및 UI 흐름: `manual/architecture.md`
+- Feed JSON 구조: `data/` 폴더 예시 참고
