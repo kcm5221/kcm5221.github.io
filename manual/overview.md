@@ -1,6 +1,7 @@
 # Gitstagram Overview
 
-Gitstagram은 GitHub Pages + Cloudflare Workers + GitHub App을 이용한 **인스타그램 UI 기반 개발 블로그 플랫폼**입니다. 정적 페이지를 유지하면서도 OAuth 인증과 자동 커밋 파이프라인을 갖추는 것이 목표입니다.
+Gitstagram은 GitHub Pages + Cloudflare Workers + GitHub App을 이용한 **인스타그램 UI 기반 개발 블로그 플랫폼**입니다. 정적 페이지
+를 유지하면서도 OAuth 인증과 자동 커밋 파이프라인을 갖추는 것이 목표입니다.
 
 ---
 
@@ -16,8 +17,8 @@ Gitstagram은 GitHub Pages + Cloudflare Workers + GitHub App을 이용한 **인�
 ---
 
 ## 📌 앞으로 만들 구조
-1. Saved 탭 컬렉션 생성/편집 및 상세 내 태그/컬렉션 수정
-2. 검색 고도화: 다중 키워드, 태그/컬렉션 필터 UI, 정렬 옵션
+1. Saved 탭은 현행 뷰를 유지하고, 컬렉션 관리 흐름을 글쓰기 플로우에 통합
+2. 글쓰기에서 컬렉션을 직접 입력하는 대신 **기존 컬렉션 목록을 선택**하고, 동일 위치에서 새 컬렉션을 추가할 수 있는 UI 제공
 3. 글쓰기 개선: Markdown 미리보기, 커버 이미지 업로드, 자동 요약 필드
 4. Admin 기능: 게시물 수정/드래프트 관리, 인증 만료 UX 향상
 5. 퍼포먼스 개선: JSON feed 캐싱/프리페치, 무한 스크롤
