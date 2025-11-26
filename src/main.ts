@@ -1581,6 +1581,8 @@ function setupWriteViewInteractions() {
 
     // 🖱🖐 Pointer 이벤트 기반 커버 이미지 드래그 (PC + 모바일 공통)
     if (coverCanvas) {
+        coverCanvas.style.touchAction = "none";
+
         let activePointerId: number | null = null;
         const supportsPointerCapture =
             typeof coverCanvas.setPointerCapture === "function" &&
@@ -1621,28 +1623,38 @@ function setupWriteViewInteractions() {
         };
 
         if ("PointerEvent" in window) {
-            coverCanvas.addEventListener("pointerdown", (event: PointerEvent) => {
-                if (!coverImage) return;
+            coverCanvas.addEventListener(
+                "pointerdown",
+                (event: PointerEvent) => {
+                    if (!coverImage) return;
 
-                // 이 포인터(손가락/마우스) 캔버스에 캡처 (미지원 브라우저 대비)
-                if (supportsPointerCapture) {
-                    try {
-                        coverCanvas.setPointerCapture(event.pointerId);
-                    } catch {
-                        // 일부 모바일 브라우저에서 캡처를 지원하지 않아도 드래그는 계속 처리
+                    // 이 포인터(손가락/마우스) 캔버스에 캡처 (미지원 브라우저 대비)
+                    if (supportsPointerCapture) {
+                        try {
+                            coverCanvas.setPointerCapture(event.pointerId);
+                        } catch {
+                            // 일부 모바일 브라우저에서 캡처를 지원하지 않아도 드래그는 계속 처리
+                        }
                     }
-                }
 
-                if (!startDrag(event.clientX, event.clientY)) return;
-                activePointerId = event.pointerId;
-            });
+                    event.preventDefault();
+                    if (!startDrag(event.clientX, event.clientY)) return;
+                    activePointerId = event.pointerId;
+                },
+                { passive: false }
+            );
 
-            coverCanvas.addEventListener("pointermove", (event: PointerEvent) => {
-                if (!isDraggingCover) return;
-                if (activePointerId !== null && event.pointerId !== activePointerId) return;
+            coverCanvas.addEventListener(
+                "pointermove",
+                (event: PointerEvent) => {
+                    if (!isDraggingCover) return;
+                    if (activePointerId !== null && event.pointerId !== activePointerId) return;
 
-                moveDrag(event.clientX, event.clientY);
-            });
+                    event.preventDefault();
+                    moveDrag(event.clientX, event.clientY);
+                },
+                { passive: false }
+            );
 
             const endPointerDrag = (event: PointerEvent) => {
                 if (!isDraggingCover) return;
