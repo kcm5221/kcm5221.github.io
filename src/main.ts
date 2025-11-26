@@ -1582,6 +1582,9 @@ function setupWriteViewInteractions() {
     // 🖱🖐 Pointer 이벤트 기반 커버 이미지 드래그 (PC + 모바일 공통)
     if (coverCanvas) {
         let activePointerId: number | null = null;
+        const supportsPointerCapture =
+            typeof coverCanvas.setPointerCapture === "function" &&
+            typeof coverCanvas.releasePointerCapture === "function";
 
         const startDrag = (clientX: number, clientY: number) => {
             if (!coverImage || !coverCanvas) return false;
@@ -1621,8 +1624,14 @@ function setupWriteViewInteractions() {
             coverCanvas.addEventListener("pointerdown", (event: PointerEvent) => {
                 if (!coverImage) return;
 
-                // 이 포인터(손가락/마우스) 캔버스에 캡처
-                coverCanvas.setPointerCapture(event.pointerId);
+                // 이 포인터(손가락/마우스) 캔버스에 캡처 (미지원 브라우저 대비)
+                if (supportsPointerCapture) {
+                    try {
+                        coverCanvas.setPointerCapture(event.pointerId);
+                    } catch {
+                        // 일부 모바일 브라우저에서 캡처를 지원하지 않아도 드래그는 계속 처리
+                    }
+                }
 
                 if (!startDrag(event.clientX, event.clientY)) return;
                 activePointerId = event.pointerId;
@@ -1639,7 +1648,7 @@ function setupWriteViewInteractions() {
                 if (!isDraggingCover) return;
                 if (activePointerId !== null && event.pointerId !== activePointerId) return;
 
-                if (coverCanvas.hasPointerCapture(event.pointerId)) {
+                if (supportsPointerCapture && coverCanvas.hasPointerCapture(event.pointerId)) {
                     coverCanvas.releasePointerCapture(event.pointerId);
                 }
                 endDrag();
