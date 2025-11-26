@@ -50,3 +50,11 @@ Frontend(Bearer JWT) → Worker → GitHub App JWT → Installation Access Token
 | `#/write` | 글 작성 폼 + 로그인 안내 |
 | `#/post/:slug` | 게시물 상세 |
 | `#/auth=...` | OAuth 토큰 회수용 해시 |
+
+---
+
+## 유지보수 체크포인트
+- 해시 라우터 경로와 JSON 피드 스키마는 배포본과 동일하게 유지합니다. UI 수정 시에도 경로/키 이름을 바꾸지 않습니다.
+- Worker 엔드포인트(`/auth/login`, `/auth/callback`, `/content/commit`)는 인증 흐름에 영향이 없도록 시그니처와 응답 형식을 유지합니다.
+- `localStorage.devlog_jwt` 키와 JWT 파싱 로직은 후방 호환성을 위해 동일하게 유지하고, 만료 처리 로직만 필요한 경우에 한해 보강합니다.
+- Actions 산출물(`data/*`) 구조를 바꾸지 않는 대신, 캐시/서명 등 성능 개선이 필요하면 정적 파일 설정 수준에서 조정합니다.

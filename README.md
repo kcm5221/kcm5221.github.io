@@ -2,6 +2,8 @@
 
 Gitstagram은 GitHub Pages, Cloudflare Workers, GitHub Actions를 조합해 **인스타그램 스타일의 개발 블로그**를 제공하는 프로젝트입니다. 정적 페이지로 동작하면서도 GitHub OAuth 기반 인증, JWT, 자동 커밋 파이프라인을 갖추어 비용 없이 운영할 수 있습니다.
 
+현재 기능 구현을 완료했으며, 앞으로는 **새로운 기능/구조 변경 없이 필요한 경우에 한해 버그 수정과 안정화 작업**만 수행합니다. 최신 아키텍처와 운영 메모는 `manual/`의 문서를 참고하세요.
+
 ## 현재 기능
 - 해시 라우터 기반 네비게이션: `#/`, `#/search`, `#/profile`, `#/write`, `#/post/:slug`
 - GitHub Actions가 생성한 JSON 피드(`/data`)를 불러와 홈/검색/상세 화면에서 렌더링
@@ -16,6 +18,11 @@ Gitstagram은 GitHub Pages, Cloudflare Workers, GitHub Actions를 조합해 **�
 - **Data(정적)**: GitHub Actions가 private 저장소의 Markdown을 JSON으로 변환해 `/data/current.json`, `/data/feed/page-*.json`, `/data/tags@sha.json`, `/data/collections@sha.json` 형태로 배포합니다.
 - **Cloudflare Worker**: GitHub OAuth(PKCE) → JWT 발급 → `/content/commit`으로 Markdown 커밋 요청을 처리합니다. JWT는 `localStorage.devlog_jwt`에 저장합니다.
 - **GitHub Actions**: private 콘텐츠 저장소 변경을 감지해 JSON 피드를 빌드하고 `kcm5221.github.io` Pages에 배포합니다.
+
+## 유지보수 원칙
+- 신규 기능/구조 변경은 중단하고, 배포된 기능을 기준으로 한 **버그 수정·문서 보완·환경 변수 정리**만 수행합니다.
+- Worker와 프론트엔드 변경 시 테스트/배포 범위는 기존 아키텍처를 유지하는 선에서 최소화합니다.
+- 시크릿·설정값은 `manual/environment.md`에 정의된 키 목록을 기준으로 관리합니다.
 
 ## 실행 방법
 1. 의존성 설치: `npm install`
@@ -39,3 +46,10 @@ Gitstagram은 GitHub Pages, Cloudflare Workers, GitHub Actions를 조합해 **�
 - `data/`: Actions가 생성한 정적 JSON 피드
 - `manual/`: 아키텍처/환경/진행 상황 문서
 - `public/`, `assets/`: 정적 리소스
+
+## 문서 링크
+- `manual/overview.md`: 완료된 기능과 유지보수 방침 요약
+- `manual/architecture.md`: 프론트엔드/Worker/Actions 구조
+- `manual/environment.md`: 환경 변수·시크릿 목록
+- `manual/decisions.md`: 주요 의사결정 기록
+- `manual/todos.md`: 유지보수 체크리스트
