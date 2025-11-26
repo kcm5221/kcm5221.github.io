@@ -224,6 +224,32 @@ export default {
                     }
                 }
 
+                // 커버 이미지(data URL or 경로) 처리 준비
+                let coverPath = null;
+                let coverIsDataUrl = false;
+                let coverDataBase64 = null;
+                let coverExt = "jpg";
+
+                if (typeof cover === "string" && cover.trim()) {
+                    const trimmedCover = cover.trim();
+                    if (trimmedCover.startsWith("data:image/")) {
+                        const m = trimmedCover.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+                        if (!m) {
+                            return jsonErr("bad_cover_dataurl", 400, cors);
+                        }
+                        const mime = m[1];
+                        coverDataBase64 = m[2];
+                        coverIsDataUrl = true;
+
+                        if (mime === "image/png") coverExt = "png";
+                        else if (mime === "image/webp") coverExt = "webp";
+                        else coverExt = "jpg";
+                    } else {
+                        // 이미 경로/URL 형태로 넘어온 경우
+                        coverPath = trimmedCover;
+                    }
+                }
+
                 // 경로 구성
                 const iso = new Date().toISOString();
                 const { yyyy, mm } = yyyymm(iso);
@@ -232,13 +258,20 @@ export default {
                     return jsonErr("forbidden_path", 400, cors);
                 }
 
+                // data URL로 넘어온 커버라면 파일 경로 확정
+                let coverRelPath = null;
+                if (coverIsDataUrl) {
+                    coverRelPath = `images/covers/${yyyy}/${mm}/${slug}.${coverExt}`;
+                    coverPath = `/${coverRelPath}`;
+                }
+
                 // Frontmatter + Markdown 본문
                 const fm = {
                     title: title.trim(),
                     date: iso,
                     tags,
                     collection: collection || null,
-                    cover: cover || null,      // 이미지는 4단계에서 별도 처리(지금은 경로/URL만 허용)
+                    cover: coverPath || null,
                     summary: summary || null,  // 없으면 4단계에서 자동 생성
                 };
                 const md = buildMarkdownWithFrontmatter(fm, content);
@@ -256,6 +289,28 @@ export default {
                 const instToken = await getInstallationToken(instId, appJwt);
                 if (!instToken) return jsonErr("install_token_failed", 500, cors);
 
+                // 커버 이미지 파일 커밋 (data URL로 넘어온 경우만)
+                if (coverIsDataUrl && coverRelPath && coverDataBase64) {
+                    const coverUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(coverRelPath)}`;
+                    const coverCommitMsg = `cover: ${slug} by ${login} @${iso}`;
+                    const coverPutRes = await fetch(coverUrl, {
+                        method: "PUT",
+                        headers: {
+                            "accept": "application/vnd.github+json",
+                            "authorization": `Bearer ${instToken}`,
+                            "user-agent": "blog-auth-worker",
+                            "content-type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            message: coverCommitMsg,
+                            // data URL에서 이미 base64 부분만 추출했으므로 그대로 사용
+                            content: coverDataBase64,
+                        }),
+                    });
+                    if (!coverPutRes.ok) {
+                        return jsonErr("cover_commit_failed", 500, cors);
+                    }
+                }
                 // 파일 커밋 (PUT /repos/{owner}/{repo}/contents/{path})
                 const commitMsg = `post: ${slug} by ${login} @${iso}`;
                 const putUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(relPath)}`;
