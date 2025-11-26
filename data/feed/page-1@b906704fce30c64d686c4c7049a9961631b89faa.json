@@ -1,0 +1,42 @@
+{
+  "page": 1,
+  "pageSize": 20,
+  "total": 2,
+  "sha": "b906704fce30c64d686c4c7049a9961631b89faa",
+  "items": [
+    {
+      "id": "20251126093015-모바일작성-테스트",
+      "title": "모바일작성 테스트",
+      "created": "2025-11-26T09:30:15.000Z",
+      "updated": "2025-11-26T09:30:15.000Z",
+      "date": "2025-11-26T09:30:15.000Z",
+      "tags": [
+        "test"
+      ],
+      "collection": null,
+      "cover": "/images/covers/2025/11/모바일작성-테스트.jpg",
+      "summary": "모바일 환경에서 글,이미지 작성 테스트",
+      "slug": "모바일작성-테스트",
+      "path": "posts/2025/11/모바일작성-테스트.md",
+      "hidden": false,
+      "draft": false
+    },
+    {
+      "id": "20251126090740-first-post",
+      "title": "첫 글",
+      "created": "2025-11-26T09:07:40.000Z",
+      "updated": "2025-11-26T09:07:40.000Z",
+      "date": "2025-11-26T09:07:40.000Z",
+      "tags": [
+        "test"
+      ],
+      "collection": null,
+      "cover": null,
+      "summary": "테스트용 첫 게시물입니다.",
+      "slug": "first-post",
+      "path": "posts/2025/01/first-post.md",
+      "hidden": false,
+      "draft": false
+    }
+  ]
+}
