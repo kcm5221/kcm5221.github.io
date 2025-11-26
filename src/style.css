@@ -1552,3 +1552,8 @@ button {
     .write-cover-controls input[type="range"] {
         flex: 1;
     }
+
+
+#write-cover-canvas {
+    touch-action: none; /* 터치 드래그 시 스크롤 대신 pointer 이벤트로 처리 */
+}

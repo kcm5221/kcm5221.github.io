@@ -1579,11 +1579,19 @@ function setupWriteViewInteractions() {
         img.src = URL.createObjectURL(file);
     };
 
-    // 🖱 커버 이미지 드래그로 위치 이동
+    // 🖱🖐 Pointer 이벤트 기반 커버 이미지 드래그 (PC + 모바일 공통)
     if (coverCanvas) {
-        coverCanvas.addEventListener("mousedown", (event) => {
+        let activePointerId: number | null = null;
+
+        coverCanvas.addEventListener("pointerdown", (event: PointerEvent) => {
             if (!coverImage) return;
+
+            // 이 포인터(손가락/마우스) 캔버스에 캡처
+            coverCanvas.setPointerCapture(event.pointerId);
+
             isDraggingCover = true;
+            activePointerId = event.pointerId;
+
             const rect = coverCanvas.getBoundingClientRect();
             dragStartX = event.clientX - rect.left;
             dragStartY = event.clientY - rect.top;
@@ -1591,8 +1599,10 @@ function setupWriteViewInteractions() {
             dragStartOffsetY = coverOffsetY;
         });
 
-        window.addEventListener("mousemove", (event) => {
+        coverCanvas.addEventListener("pointermove", (event: PointerEvent) => {
             if (!isDraggingCover || !coverImage || !coverCanvas) return;
+            if (activePointerId !== null && event.pointerId !== activePointerId) return;
+
             const rect = coverCanvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
@@ -1604,14 +1614,22 @@ function setupWriteViewInteractions() {
             drawCover();
         });
 
-        window.addEventListener("mouseup", () => {
-            isDraggingCover = false;
-        });
+        const endDrag = (event: PointerEvent) => {
+            if (!isDraggingCover) return;
+            if (activePointerId !== null && event.pointerId !== activePointerId) return;
 
-        coverCanvas.addEventListener("mouseleave", () => {
             isDraggingCover = false;
-        });
+            if (coverCanvas.hasPointerCapture(event.pointerId)) {
+                coverCanvas.releasePointerCapture(event.pointerId);
+            }
+            activePointerId = null;
+        };
+
+        coverCanvas.addEventListener("pointerup", endDrag);
+        coverCanvas.addEventListener("pointercancel", endDrag);
+        coverCanvas.addEventListener("pointerleave", endDrag);
     }
+
 
 
     // 파일 선택 시 커버 로드
