@@ -1583,51 +1583,117 @@ function setupWriteViewInteractions() {
     if (coverCanvas) {
         let activePointerId: number | null = null;
 
-        coverCanvas.addEventListener("pointerdown", (event: PointerEvent) => {
-            if (!coverImage) return;
-
-            // 이 포인터(손가락/마우스) 캔버스에 캡처
-            coverCanvas.setPointerCapture(event.pointerId);
+        const startDrag = (clientX: number, clientY: number) => {
+            if (!coverImage || !coverCanvas) return false;
 
             isDraggingCover = true;
-            activePointerId = event.pointerId;
 
             const rect = coverCanvas.getBoundingClientRect();
-            dragStartX = event.clientX - rect.left;
-            dragStartY = event.clientY - rect.top;
+            dragStartX = clientX - rect.left;
+            dragStartY = clientY - rect.top;
             dragStartOffsetX = coverOffsetX;
             dragStartOffsetY = coverOffsetY;
-        });
 
-        coverCanvas.addEventListener("pointermove", (event: PointerEvent) => {
+            return true;
+        };
+
+        const moveDrag = (clientX: number, clientY: number) => {
             if (!isDraggingCover || !coverImage || !coverCanvas) return;
-            if (activePointerId !== null && event.pointerId !== activePointerId) return;
 
             const rect = coverCanvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
             const dx = x - dragStartX;
             const dy = y - dragStartY;
 
             coverOffsetX = dragStartOffsetX + dx;
             coverOffsetY = dragStartOffsetY + dy;
             drawCover();
-        });
+        };
 
-        const endDrag = (event: PointerEvent) => {
+        const endDrag = () => {
             if (!isDraggingCover) return;
-            if (activePointerId !== null && event.pointerId !== activePointerId) return;
-
             isDraggingCover = false;
-            if (coverCanvas.hasPointerCapture(event.pointerId)) {
-                coverCanvas.releasePointerCapture(event.pointerId);
-            }
             activePointerId = null;
         };
 
-        coverCanvas.addEventListener("pointerup", endDrag);
-        coverCanvas.addEventListener("pointercancel", endDrag);
-        coverCanvas.addEventListener("pointerleave", endDrag);
+        if ("PointerEvent" in window) {
+            coverCanvas.addEventListener("pointerdown", (event: PointerEvent) => {
+                if (!coverImage) return;
+
+                // 이 포인터(손가락/마우스) 캔버스에 캡처
+                coverCanvas.setPointerCapture(event.pointerId);
+
+                if (!startDrag(event.clientX, event.clientY)) return;
+                activePointerId = event.pointerId;
+            });
+
+            coverCanvas.addEventListener("pointermove", (event: PointerEvent) => {
+                if (!isDraggingCover) return;
+                if (activePointerId !== null && event.pointerId !== activePointerId) return;
+
+                moveDrag(event.clientX, event.clientY);
+            });
+
+            const endPointerDrag = (event: PointerEvent) => {
+                if (!isDraggingCover) return;
+                if (activePointerId !== null && event.pointerId !== activePointerId) return;
+
+                if (coverCanvas.hasPointerCapture(event.pointerId)) {
+                    coverCanvas.releasePointerCapture(event.pointerId);
+                }
+                endDrag();
+            };
+
+            coverCanvas.addEventListener("pointerup", endPointerDrag);
+            coverCanvas.addEventListener("pointercancel", endPointerDrag);
+            coverCanvas.addEventListener("pointerleave", endPointerDrag);
+        } else {
+            // PointerEvent 미지원 환경(iOS 구형 브라우저 등)을 위한 터치 전용 핸들러
+            coverCanvas.addEventListener(
+                "touchstart",
+                (event: TouchEvent) => {
+                    if (!coverImage) return;
+                    const touch = event.touches[0];
+                    if (!touch) return;
+                    event.preventDefault();
+                    startDrag(touch.clientX, touch.clientY);
+                },
+                { passive: false }
+            );
+
+            coverCanvas.addEventListener(
+                "touchmove",
+                (event: TouchEvent) => {
+                    if (!isDraggingCover) return;
+                    const touch = event.touches[0];
+                    if (!touch) return;
+                    event.preventDefault();
+                    moveDrag(touch.clientX, touch.clientY);
+                },
+                { passive: false }
+            );
+
+            coverCanvas.addEventListener(
+                "touchend",
+                (event: TouchEvent) => {
+                    if (!isDraggingCover) return;
+                    event.preventDefault();
+                    endDrag();
+                },
+                { passive: false }
+            );
+
+            coverCanvas.addEventListener(
+                "touchcancel",
+                (event: TouchEvent) => {
+                    if (!isDraggingCover) return;
+                    event.preventDefault();
+                    endDrag();
+                },
+                { passive: false }
+            );
+        }
     }
 
 
