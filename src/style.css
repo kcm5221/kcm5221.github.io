@@ -858,7 +858,7 @@ button {
 
 .post-detail-frame {
   position: relative;
-  width: min(1180px, 96vw);
+  width: min(960px, 96vw);
   display: flex;
   justify-content: center;
 }
@@ -894,6 +894,7 @@ button {
     flex-direction: row;
     min-height: 560px;
     max-height: min(88vh, 780px);
+
   }
 }
 
@@ -901,7 +902,7 @@ button {
   .post-detail-container {
     width: 100%;
     max-width: 100%;
-    height: 100%;
+    height: auto;
     max-height: none;
     border: none;
     border-radius: 0;
@@ -913,15 +914,18 @@ button {
 }
 
 .post-detail-media {
-  position: relative;
-  flex: 1 1 60%;
-  min-height: 320px;
-  background: #000000;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: relative;
+    flex: 0 0 auto; /* 60% → 고정 크기 */
+    aspect-ratio: 4 / 5; /* 💡 비율 고정 */
+    width: 100%;
+    max-width: 480px; /* 데스크톱에서 적당한 폭 */
+    background: #000000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 
 @media (max-width: 768px) {
   .post-detail-media {
@@ -1007,11 +1011,11 @@ button {
 }
 
 @media (min-width: 900px) {
-  .post-detail-panel {
-    max-width: 420px;
-    flex: 0 0 380px;
-    border-left: 1px solid #f4f4f5;
-  }
+    .post-detail-panel {
+        max-width: none; /* 420px 제한 제거 */
+        flex: 1 1 auto; /* 남은 공간을 자연스럽게 채움 */
+        border-left: 1px solid #f4f4f5;
+    }
 }
 
 @media (max-width: 899px) {
@@ -1021,15 +1025,17 @@ button {
 }
 
 @media (max-width: 768px) {
-  .post-detail-panel {
-    flex: 1;
-    border-top: none;
-    border-radius: 24px 24px 0 0;
-    margin-top: -24px;
-    padding-top: 12px;
-    background: #ffffff;
-    box-shadow: 0 -18px 48px rgba(15, 23, 42, 0.15);
-  }
+    .post-detail-media {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 100%;
+        min-height: unset;
+        aspect-ratio: 4 / 5; /* 4:5 비율 유지 */
+        position: relative; /* sticky → 일반 박스로 */
+        top: auto;
+        z-index: 1;
+    }
+
 
   .post-detail-panel::before {
     content: "";
