@@ -1878,6 +1878,14 @@ function setupWriteViewInteractions() {
             form.reset();
             slugInput.dataset.userEdited = "0";
 
+            // 최신 데이터를 다시 받아 홈 화면에 반영
+            try {
+                await refreshFeed();
+                renderRoute();
+            } catch (err) {
+                console.error("새 피드 동기화 실패:", err);
+            }
+
             window.alert(
                 "작성 요청이 성공적으로 전송되었습니다.\n" +
                 "잠시 후 private 저장소에 커밋이 반영됩니다."
@@ -2078,6 +2086,12 @@ async function submitPostToWorker(payload: CommitPayload): Promise<unknown> {
     } catch {
         return {};
     }
+}
+
+// 최신 피드를 다시 불러와 상태를 갱신
+async function refreshFeed(): Promise<void> {
+    const { page } = await loadInitialFeed(1);
+    currentItems = page.items;
 }
 
 
