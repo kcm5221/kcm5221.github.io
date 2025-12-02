@@ -887,11 +887,13 @@ function renderPostDetailView(slug: string | null) {
         ? item.tags.map((tag) => `<span class="post-detail-tag">#${escapeHtml(tag)}</span>`).join("")
         : '<span class="post-detail-tag is-empty">태그 없음</span>';
 
-    const cover = item.cover
-        ? `<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(item.title)}" class="post-detail-cover" loading="lazy" />`
+    const hasCover = !!item.cover?.trim();
+    const cover = hasCover
+        ? `<img src="${escapeHtml(item.cover!)}" alt="${escapeHtml(item.title)}" class="post-detail-cover" loading="lazy" />`
         : `
         <div class="post-detail-fallback" style="background:${fallbackGradient(item.slug)}">
           <h2>${escapeHtml(item.title)}</h2>
+          <p>커버 이미지가 아직 없어요.</p>
         </div>
       `;
 

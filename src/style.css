@@ -917,14 +917,13 @@ button {
   flex: 1 1 60%;
   width: 100%;
   max-width: 780px;
-  min-height: 320px;
   aspect-ratio: 4 / 5;
   max-height: min(88vh, 860px);
   background: #000000;
   overflow: visible;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  align-items: stretch;
+  justify-items: stretch;
 }
 
 @media (max-width: 768px) {
@@ -932,7 +931,6 @@ button {
     flex: 0 0 auto;
     width: 100%;
     max-width: 100%;
-    min-height: auto;
     aspect-ratio: 4 / 5;
     max-height: none;
     position: relative;
@@ -960,6 +958,8 @@ button {
 .post-detail-media > * {
   position: relative;
   z-index: 1;
+  width: 100%;
+  height: 100%;
 }
 
 .post-detail-cover {
@@ -977,14 +977,15 @@ button {
 }
 
 .post-detail-fallback {
-  width: 100%;
-  height: 100%;
-  padding: 32px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  color: #111827;
+  align-items: center;
+  justify-content: center;
   gap: 12px;
+  padding: 32px;
+  color: #111827;
+  text-align: center;
+  background: #f4f4f5;
 }
 
 .post-detail-fallback h2 {
