@@ -915,9 +915,13 @@ button {
 .post-detail-media {
   position: relative;
   flex: 1 1 60%;
+  width: 100%;
+  max-width: 780px;
   min-height: 320px;
+  aspect-ratio: 4 / 5;
+  max-height: min(88vh, 860px);
   background: #000000;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -928,11 +932,14 @@ button {
     flex: 0 0 auto;
     width: 100%;
     max-width: 100%;
-    min-height: unset;
+    min-height: auto;
     aspect-ratio: 4 / 5;
-    position: sticky;
-    top: 0;
-    z-index: 2;
+    max-height: none;
+    position: relative;
+    top: auto;
+    z-index: auto;
+    padding: 0;
+    background: #000;
   }
 }
 
@@ -958,8 +965,15 @@ button {
 .post-detail-cover {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  max-height: 100%;
+  object-fit: contain;
   background: #000000;
+}
+
+@media (max-width: 768px) {
+  .post-detail-cover {
+    max-height: none;
+  }
 }
 
 .post-detail-fallback {
