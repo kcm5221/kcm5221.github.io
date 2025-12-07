@@ -53,3 +53,6 @@ Gitstagram은 GitHub Pages, Cloudflare Workers, GitHub Actions를 조합해 **�
 - `manual/environment.md`: 환경 변수·시크릿 목록
 - `manual/decisions.md`: 주요 의사결정 기록
 - `manual/todos.md`: 유지보수 체크리스트
+
+## 블로그 링크
+- [https://kcm5221.github.io](https://kcm5221.github.io)
