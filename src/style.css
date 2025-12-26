@@ -1479,14 +1479,14 @@ button {
         display: block;
         width: 100%;
         max-width: 100%;
-        height: 30dvh;
+        height: 40dvh;
         aspect-ratio: auto;
         position: relative;
         top: auto;
         z-index: 1;
         overflow: hidden;
         background: #000000;
-        flex: 0 0 30%;
+        flex: 0 0 40%;
     }
 
         .post-detail-media::after {
@@ -1496,7 +1496,7 @@ button {
     .post-detail-cover {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
         display: block;
         background: #000000;
     }
@@ -1507,7 +1507,7 @@ button {
         min-height: 0;
         display: flex;
         flex-direction: column;
-        flex: 1 1 70%;
+        flex: 1 1 60%;
     }
 
     .post-detail-header {
