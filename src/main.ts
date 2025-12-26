@@ -752,6 +752,7 @@ function renderPostTile(item: FeedItem): string {
     const tags = item.tags.length
         ? item.tags.map((tag) => `#${escapeHtml(tag)}`).join(" ")
         : "태그 없음";
+
     const createdDate = new Date(item.created);
     const createdLabel = isNaN(createdDate.getTime())
         ? "작성일 미정"
@@ -760,6 +761,7 @@ function renderPostTile(item: FeedItem): string {
             month: "2-digit",
             day: "2-digit",
         });
+
     const cover = item.cover
         ? `<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(
             item.title
@@ -768,19 +770,24 @@ function renderPostTile(item: FeedItem): string {
 
     return `
       <article class="post-card" data-slug="${escapeHtml(item.slug)}">
-        <div class="post-media ${cover ? "" : "is-fallback"}" ${cover ? "" : `style="background:${fallbackGradient(item.slug)}"`}
+        <div
+          class="post-media ${cover ? "" : "is-fallback"}"
+          ${cover ? "" : `style="background:${fallbackGradient(item.slug)}"`}
         >
-                ${cover || `<span class="post-fallback-title">${escapeHtml(item.title)}</span>`}
-
+          ${cover || `<span class="post-fallback-title">${escapeHtml(item.title)}</span>`}
         </div>
+
         <div class="post-overlay">
-          <p class="overlay-title">${escapeHtml(item.title)}</p>
-          <p class="overlay-tags">${tags}</p>
-          <p class="overlay-date">${createdLabel}</p>
+          <div class="post-overlay-content">
+            <p class="overlay-title">${escapeHtml(item.title)}</p>
+            <p class="overlay-tags">${tags}</p>
+            <p class="overlay-date">${createdLabel}</p>
+          </div>
         </div>
       </article>
     `;
 }
+
 
 function slugifyTitle(title: string): string {
     return title
