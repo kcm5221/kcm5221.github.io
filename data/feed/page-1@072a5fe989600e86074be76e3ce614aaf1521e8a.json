@@ -1,9 +1,28 @@
 {
   "page": 1,
   "pageSize": 20,
-  "total": 3,
-  "sha": "f660ea0dafb05641a6e2f0cc8c39680f16dfa22c",
+  "total": 4,
+  "sha": "072a5fe989600e86074be76e3ce614aaf1521e8a",
   "items": [
+    {
+      "id": "20251226103233-cpp-set-unorderedset",
+      "title": "cpp: set, unordered_set",
+      "created": "2025-12-26T10:32:33.000Z",
+      "updated": "2025-12-26T10:32:33.000Z",
+      "date": "2025-12-26T10:32:33.000Z",
+      "tags": [
+        "cs",
+        "c++",
+        "stl"
+      ],
+      "collection": "CS Study",
+      "cover": "/images/covers/2025/12/cpp-set-unorderedset.jpg",
+      "summary": "set과 unordered_set은 중복을 허용하지 않고 유일한 값(Value)만 저장하는 연관 컨테이너다. set은 데이터가 자동으로 정렬되어 저장되므로 정렬된 상태의 순회가 필요할 때 적합하다. unordered_set은 순서는 보장하지 않지만, 해시 테이블을 사용하여 빠른 검색 …",
+      "slug": "cpp-set-unorderedset",
+      "path": "posts/2025/12/cpp-set-unorderedset.md",
+      "hidden": false,
+      "draft": false
+    },
     {
       "id": "20251202054744-cpp-map-unorderedmap",
       "title": "cpp: map, unordered_map",
