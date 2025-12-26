@@ -796,6 +796,7 @@ button {
     position: relative;
     width: 100%;
     max-width: 1200px;
+    height: min(94vh, 900px);
     max-height: 94vh;
     display: flex;
     flex-direction: column;
@@ -860,6 +861,7 @@ button {
 .post-detail-frame {
     position: relative;
     width: min(960px, 96vw);
+    height: 100%;
     display: flex;
     justify-content: center;
 }
@@ -867,6 +869,7 @@ button {
 @media (max-width: 900px) {
     .post-detail-frame {
         width: 100%;
+        height: auto;
         flex-direction: column;
         gap: 12px;
     }
@@ -1418,23 +1421,23 @@ button {
 @media (max-width: 768px) {
     /* 모달 전체를 그냥 세로 스크롤 한 덩어리로 */
     .post-detail-modal {
-        align-items: flex-start;
+        align-items: center;
         padding: 0;
         height: 100%;
-        overflow-y: auto;
+        overflow: hidden;
         -webkit-overflow-scrolling: touch;
     }
 
     .post-detail-modal-surface {
         width: 100%;
-        height: auto;
+        height: 100dvh;
         max-width: none;
-        max-height: none;
+        max-height: 100dvh;
         border-radius: 0;
         padding: 0;
         align-items: stretch;
         background: #000000;
-        overflow: visible;
+        overflow: hidden;
     }
 
     .post-detail {
@@ -1449,13 +1452,14 @@ button {
     .post-detail-container {
         width: 100%;
         max-width: 100%;
-        height: auto;
-        max-height: none;
+        height: 100%;
+        max-height: 100%;
         border: none;
         border-radius: 0;
         box-shadow: none;
-        display: block; /* flex 해제 */
-        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
 
     /* ✅ 커버 영역: 그냥 위에 큰 이미지 한 장 */
@@ -1487,6 +1491,9 @@ button {
     .post-detail-panel {
         max-width: none;
         border-top: 1px solid #111827;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
     }
 
     .post-detail-header {
@@ -1498,6 +1505,7 @@ button {
         flex: 1 1 auto;
         padding: 16px;
         gap: 20px;
+        overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         scroll-behavior: smooth;
         padding-bottom: calc(140px + env(safe-area-inset-bottom));
