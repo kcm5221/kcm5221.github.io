@@ -374,6 +374,33 @@ button {
     transition: opacity 0.2s ease;
 }
 
+/* =========================
+   Post overlay scroll fix
+   ========================= */
+
+.post-overlay {
+    justify-content: flex-start; /* center → 위 기준 */
+}
+
+.post-overlay-content {
+    flex: 1;
+    width: 100%;
+    overflow-y: auto;
+    text-align: left;
+    padding-right: 4px; /* 스크롤바 여백 */
+}
+
+/* 긴 텍스트 안전장치 */
+.post-overlay-content {
+    word-break: break-word;
+}
+
+.post-overlay-content pre {
+    overflow-x: auto;
+    white-space: pre;
+}
+
+
 .post-card:hover .post-overlay {
     opacity: 1;
 }
