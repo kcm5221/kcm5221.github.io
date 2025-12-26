@@ -874,7 +874,7 @@ button {
 
 .post-detail-container {
     width: 100%;
-    max-height: min(88vh, 860px);
+    height: min(88vh, 860px);
     border: 1px solid #e4e4e7;
     border-radius: 32px;
     overflow: hidden;
@@ -888,7 +888,7 @@ button {
     .post-detail-container {
         flex-direction: row;
         min-height: 560px;
-        max-height: min(88vh, 780px);
+        height: min(88vh, 780px);
     }
 }
 
