@@ -102,7 +102,7 @@ button {
     background: #ffffff;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
     .left-sidebar {
         display: none;
     }
@@ -132,7 +132,7 @@ button {
     font-weight: 600;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
     .mobile-header {
         display: none;
     }
@@ -652,7 +652,7 @@ button {
         color: #09090b;
     }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
     .bottom-nav {
         display: none;
     }
@@ -809,7 +809,7 @@ button {
     z-index: 1;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
     .post-detail-modal-surface {
         max-height: 70vh;
     }
