@@ -1430,7 +1430,7 @@ button {
    Mobile overrides (cover 전체 보이게)
    ========================= */
 
-@media (max-width: 768px) {
+@media (max-width: 1199px) {
     /* 모달 전체를 그냥 세로 스크롤 한 덩어리로 */
     .post-detail-modal {
         align-items: center;
