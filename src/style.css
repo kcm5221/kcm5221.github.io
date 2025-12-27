@@ -102,7 +102,7 @@ button {
     background: #ffffff;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
     .left-sidebar {
         display: none;
     }
@@ -132,7 +132,7 @@ button {
     font-weight: 600;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
     .mobile-header {
         display: none;
     }
@@ -652,7 +652,7 @@ button {
         color: #09090b;
     }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
     .bottom-nav {
         display: none;
     }
@@ -809,7 +809,7 @@ button {
     z-index: 1;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
     .post-detail-modal-surface {
         max-height: 70vh;
     }
@@ -868,7 +868,7 @@ button {
     justify-content: center;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1199px) {
     .post-detail-frame {
         width: 100%;
         height: auto;
@@ -890,7 +890,7 @@ button {
     box-shadow: 0 40px 80px rgba(15, 23, 42, 0.15);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1200px) {
     .post-detail-container {
         flex-direction: row;
         min-height: 560px;
@@ -912,7 +912,7 @@ button {
     justify-content: center;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1200px) {
     .post-detail-media {
         height: 100%;
         max-height: 100%;
@@ -985,7 +985,7 @@ button {
     min-height: 0;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1200px) {
     .post-detail-panel {
         max-width: none;
         flex: 1 1 auto;
@@ -993,7 +993,7 @@ button {
     }
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1199px) {
     .post-detail-panel {
         border-top: 1px solid #f4f4f5;
     }
@@ -1095,7 +1095,7 @@ button {
     display: none;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1199px) {
     .post-detail-frame {
         padding: 0 12px;
     }
