@@ -1960,6 +1960,28 @@ function escapeHtml(str: string): string {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+function linkifyEscapedHttpUrls(escapedText: string): string {
+    return escapedText.replace(/https?:\/\/[^\s<]+/g, (rawUrl) => {
+        let url = rawUrl;
+        let trailing = "";
+
+        while (/[),.!?;:]$/.test(url)) {
+            trailing = url.slice(-1) + trailing;
+            url = url.slice(0, -1);
+        }
+
+        if (!/^https?:\/\//i.test(url)) {
+            return rawUrl;
+        }
+
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>${trailing}`;
+    });
+}
+
+function renderSafeTextWithLinks(text: string): string {
+    return linkifyEscapedHttpUrls(escapeHtml(text));
+}
+
 // 아주 단순한 Markdown → HTML 변환기 (헤더/단락/코드블럭/리스트 정도만 지원)
 function renderMarkdown(md: string): string {
     const lines = md.split(/\r?\n/);
@@ -2005,14 +2027,14 @@ function renderMarkdown(md: string): string {
         if (hMatch) {
             closeList();
             const level = hMatch[1].length;
-            const content = escapeHtml(hMatch[2]);
+            const content = renderSafeTextWithLinks(hMatch[2]);
             html += `<h${level}>${content}</h${level}>`;
             continue;
         }
 
         // 리스트(-, *)
         if (/^[-*]\s+/.test(line)) {
-            const itemText = escapeHtml(line.replace(/^[-*]\s+/, ""));
+            const itemText = renderSafeTextWithLinks(line.replace(/^[-*]\s+/, ""));
             if (!inList) {
                 html += "<ul>";
                 inList = true;
@@ -2024,7 +2046,7 @@ function renderMarkdown(md: string): string {
         }
 
         // 기본 단락
-        html += `<p>${escapeHtml(line)}</p>`;
+        html += `<p>${renderSafeTextWithLinks(line)}</p>`;
     }
 
     closeList();
