@@ -1,6 +1,9 @@
 {
-  "sha": "6565cbfa9ebb9ce3fbc02dd66252015d647d23d1",
+  "sha": "166714c4535599001cb21ccc286c1f31be838516",
   "collections": {
+    "Game": [
+      "20260228080646-swing-bird-출시"
+    ],
     "CS Study": [
       "20251226103233-cpp-set-unorderedset",
       "20251202054744-cpp-map-unorderedmap"

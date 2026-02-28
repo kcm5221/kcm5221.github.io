@@ -1,9 +1,27 @@
 {
   "page": 1,
   "pageSize": 20,
-  "total": 4,
-  "sha": "6565cbfa9ebb9ce3fbc02dd66252015d647d23d1",
+  "total": 5,
+  "sha": "166714c4535599001cb21ccc286c1f31be838516",
   "items": [
+    {
+      "id": "20260228080646-swing-bird-출시",
+      "title": "Swing Bird 출시",
+      "created": "2026-02-28T08:06:46.000Z",
+      "updated": "2026-02-28T08:06:46.000Z",
+      "date": "2026-02-28T08:06:46.000Z",
+      "tags": [
+        "game",
+        "release"
+      ],
+      "collection": "Game",
+      "cover": "/images/covers/2026/02/swing-bird-출시.jpg",
+      "summary": "\n첫 출시!! Swing Bird\n\nhttps://play.google.com/store/apps/details?id=com.TinkerShed.swingbird\n",
+      "slug": "swing-bird-출시",
+      "path": "posts/2026/02/swing-bird-출시.md",
+      "hidden": false,
+      "draft": false
+    },
     {
       "id": "20251226103233-cpp-set-unorderedset",
       "title": "cpp: set, unordered_set",
